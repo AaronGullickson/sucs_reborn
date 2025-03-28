@@ -5,6 +5,47 @@ library(here)
 
 # Helper functions ---------------------------------------------------
 
+# define a bounding box by planet entries
+create_box <- function(planet_left, planet_right, planet_high, planet_low) {
+  x_left <- system_coords |> 
+    filter(id_mhq == planet_left) |>
+    pull(x)
+  x_right <- system_coords |> 
+    filter(id_mhq == planet_right) |>
+    pull(x)
+  y_high <- system_coords |> 
+    filter(id_mhq == planet_high) |>
+    pull(y)
+  y_low <- system_coords |> 
+    filter(id_mhq == planet_low) |>
+    pull(y)
+  
+  list(x_left = x_left, x_right = x_right, y_high = y_high, y_low = y_low)
+}
+
+is_in_box <- function(x, y, box) {
+  (x >= box$x_left & x <= box$x_right & y <= box$y_high & y >= box$y_low)
+}
+
+
+update_sources <- function(target, title, loc, date, box, factions) {
+  sucs_data |> 
+    # First, drop any values from sucs_data from the target_time that are not in 
+    # the bounding box and do not come from acceptable factions
+    filter(
+      (time_point != target) | 
+        (is_in_box(x, y, box) & faction %in% factions)) |>
+    # add source information
+    mutate(
+      source_title = case_when(time_point == target ~ title),
+      source_loc = case_when(time_point == target ~ loc),
+      source_date = case_when(time_point == target ~ date)
+    )
+  
+}
+
+#create_box("Loongana", "Palos", "Chaffee (LC)", "Rohinjan")
+
 # Read in data -------------------------------------------------------
 
 gs4_deauth()
@@ -45,26 +86,37 @@ sucs_data <- sucs_data |>
 # add in MekHQ ids
 sucs_data <- sucs_data |>
   left_join(id_crosswalk) |>
-  select(id_sucs, id_mekhq, time_point, faction)
+  select(id_sucs, x, y, id_mhq, time_point, faction)
 
-# Add map source information ----------------------------------------------
+# get the coordinates by mekhq id for bounding boxes
+system_coords <- sucs_data |>
+  select(id_mhq, x, y) |>
+  distinct()
 
-# Lets start with the founding cases.
-test <- sucs_data |>
-  mutate(
-    source_type = "map",
-    source_title = case_when(
-      time_point == "2271" ~ "Handbook: House Marik",
-      time_point == "2317" ~ "Handbook: House Davion"
-    ),
-    source_loc = case_when(
-      time_point == "2271" ~ "p. 16",
-      time_point == "2317" ~ "p. 18"
-    ),
-    source_date = case_when(
-      time_point == "2271" ~ date("2271-06-01"), # day before FWL founding
-      time_point == "2317" ~ date("2317-06-26")  # founding day for FS
-    )
-    
-  )
-  
+# add in empty columns for what we need and re-organize a bit
+sucs_data <- sucs_data |>
+  mutate(source_type = "map", 
+         source_title = as.character(NA),
+         source_loc = as.character(NA), 
+         source_date = as_date(NA)) |>
+  select(starts_with("id_"), x, y, time_point, starts_with("source_"), faction)
+
+# Founding state maps from handbooks ----------------------------------------
+
+# Lets start with the founding cases. These are complicated by the fact that 
+# changes are sometimes clearly made outside the range of these maps. I can 
+# fix some of that by specifying a bounding box for changes. I can also restrict
+# to certain kinds of changes
+
+
+# Handbook: House Marik
+bounding_box <- create_box("Loongana", "Palos", "Chaffee (LC)", "Rohinjan")
+sucs_data <- update_sources(
+  target = "2271", 
+  title = "Handbook: House Marik", 
+  loc = "p. 16",
+  date = date("2271-06-02"), 
+  box = bounding_box, 
+  factions = c("I", "U", "MCM", "SC", "FO", "PR", "TA")
+)
+
