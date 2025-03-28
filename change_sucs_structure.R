@@ -3,6 +3,7 @@ library(tidyverse)
 library(here)
 
 
+# Helper functions ---------------------------------------------------
 
 # Read in data -------------------------------------------------------
 
@@ -17,12 +18,14 @@ id_crosswalk <- read_sheet("17GFFFp1sGvSYcs8DBryleQGvqgppX8EZ8MuF6Oq3or8")
 # Reshape and clean SUCS data ---------------------------------------------
 
 sucs_data <- sucs_data |>
-  select(-systemName, -alternateName, -x, -y, -size, -sarnaLink, -`distance (LY)`) |>
+  select(-systemName, -alternateName, -size, -sarnaLink, -`distance (LY)`) |>
   rename(id_sucs = systemId)
 
 # pivoting longer will get it in the format we want
 sucs_data <- sucs_data |>
-  pivot_longer(cols = !id_sucs, names_to = "time_point", values_to = "faction") |>
+  pivot_longer(cols = !c(id_sucs, x, y), 
+               names_to = "time_point", 
+               values_to = "faction") |>
   # remove missing values in faction at this point
   filter(!is.na(faction))
 
