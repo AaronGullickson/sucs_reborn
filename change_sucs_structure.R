@@ -157,6 +157,32 @@ sucs_data <- update_sources(
   factions = c("I", "U", "FS")
 )
 
+# Handbook: House Kurita
+bounding_box <- create_box("Nathan", "Ottumwa", "Thule", "Edwards")
+sucs_data <- update_sources(
+  target = "2319", 
+  title = "Handbook: House Kurita", 
+  loc = "p. 18",
+  # HBHK says Shiro Kurita had achieved his objectives by November (pg. 18), 
+  # so lets set it at the midpoint of the month.
+  date = date("2319-09-15"), 
+  box = bounding_box, 
+  factions = c("I", "U", "AG", "DC", "TH", "PoR", "TamP", "FoS")
+)
+
+# like the FWL, the current data has this as AG for the Alliance of Galedon
+# We know Shiro shortly afterwards changed it to DC. Lets date it to end of 
+# the month.
+dc_founders <- sucs_data |>
+  filter(time_point == "2319" & faction == "AG") |>
+  mutate(source_date = date("2319-09-30"),
+         faction = "DC")
+
+sucs_data <- sucs_data |>
+  bind_rows(dc_founders)
+
+# Handbook: House Steiner
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -164,5 +190,5 @@ sucs_data <- sucs_data |>
   select(id_sucs, id_mhq, starts_with("source_"), faction, starts_with("region")) |>
   arrange(id_sucs, source_date)
 
-gs4_auth()
-gs4_create("SUCS reborn", sheets = sucs_data)
+#gs4_auth()
+#gs4_create("SUCS reborn", sheets = sucs_data)
