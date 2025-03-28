@@ -63,6 +63,12 @@ gs4_deauth()
 sucs_data <- read_sheet("1uO6aZ20rfEcAZJ-nDRhCnaNUiCPemuoOOd67Zqi1MVM", 
                         sheet = "Systems", skip = 1)
 
+sucs_factions <- read_sheet("1uO6aZ20rfEcAZJ-nDRhCnaNUiCPemuoOOd67Zqi1MVM", 
+                        sheet = "Factions") |>
+  select(factionId, factionName, color) |>
+  rename(id_sucs = factionId, name = factionName) |>
+  filter(!is.na(id_sucs))
+
 id_crosswalk <- read_sheet("17GFFFp1sGvSYcs8DBryleQGvqgppX8EZ8MuF6Oq3or8")
 
 
@@ -84,19 +90,6 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |>
   separate_wider_delim(faction, ",", too_few = "align_start",
                        names = c("faction", paste("region", 1:4, sep="")))
-
-# get faction how we like it 
-# TODO: ultimately this should also allow expanding out the region data so we 
-# don't lose itm and probably keeping the disputed code for now
-#sucs_data <- sucs_data |>
-#  mutate(
-#    faction = case_when(
-#      str_detect(faction, "^D\\(") ~ str_extract(faction, "(?<=\\()[^()]+(?=\\))"),
-#      TRUE ~ str_split_i(faction, ",", 1)
-#    ),
-#    faction = str_trim(faction), # remove any leading/trailing whitespace
-#    faction = str_remove(faction, "\\s*\\([^\\)]+\\)")
-#  )
 
 # add in MekHQ ids
 sucs_data <- sucs_data |>
@@ -213,17 +206,17 @@ sucs_data <- update_sources(
   # the pre-states as beginning of the year.
   date = date("2366-01-01"), 
   box = bounding_box, 
-  factions = c("I", "U", "DL", "SIML", "CCom", "SiS", "TGU", "TH", "TC",
-               "FWL", "FS", "LC")
+  factions = c("I", "U", "DL", "SS", "SIML", "CCom", "SiS", "TGU", "TH", "TC",
+               "FWL", "FS", "LC", "CC")
 )
 
 # Now change them to CC.
 # p. 15 of HBHL tells us that this happened during a convention on St. Andre
 # in July of 2366, but not specific date 
 cc_founders <- sucs_data |>
-  filter(time_point == "2366" & faction %in% c( "DL", "SIML", "CCom", "SiS", "TGU")) |>
+  filter(time_point == "2366" & faction %in% c( "DL", "SS", "SIML", "CCom", "SiS", "TGU")) |>
   mutate(source_date = date("2366-07-15"),
-         faction = "LC")
+         faction = "CC")
 
 sucs_data <- sucs_data |>
   bind_rows(cc_founders)
@@ -232,8 +225,43 @@ sucs_data <- sucs_data |>
 
 sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
-  select(id_sucs, id_mhq, starts_with("source_"), faction, starts_with("region")) |>
+  select(id_sucs, id_mhq, x, y, starts_with("source_"), faction, starts_with("region")) |>
   arrange(id_sucs, source_date)
 
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)
+
+# Create plots to test ----------------------------------------------------
+
+plot_planets <- function(date) {
+  # get the date for each planet closest to the date but not over
+  temp <- sucs_data |>
+    filter(source_date <= date) |>
+    # arrange with most recent date at the top
+    arrange(id_sucs, desc(source_date)) |>
+    # remove duplicate planet entries
+    filter(!duplicated(id_sucs)) |>
+    select(x, y, faction) |>
+    mutate(faction = factor(faction, 
+                            levels = sucs_factions$id_sucs,
+                            labels = sucs_factions$name))
+  
+  # determine color palette
+  faction_colors <- sucs_factions |>
+    filter(name %in% unique(temp$faction)) |>
+    pull("color")
+  
+  temp |>
+    filter(faction != "Undiscovered") |>
+    ggplot(aes(x = x, y = y, color = faction))+
+    geom_point()+
+    scale_x_continuous(limits = c(-460, 460))+
+    scale_y_continuous(limits = c(-460, 460))+
+    scale_color_manual(values = faction_colors)+
+    labs(title = as.character(date))+
+    theme_void()+
+    theme(panel.background = element_rect(fill = "grey20"),
+          panel.grid = element_blank())
+}
+
+plot_planets(date("2367-01-01"))
