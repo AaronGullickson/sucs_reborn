@@ -119,8 +119,14 @@ sucs_data <- update_sources(
   target = "2271", 
   title = "Handbook: House Marik", 
   loc = "p. 16",
-  date = date("2271-06-02"), 
+  date = date("2271-06-01"), 
   box = bounding_box, 
   factions = c("I", "U", "MCM", "SC", "FO", "PR", "TA")
 )
 
+# Create final data --------------------------------------------------------
+
+sucs_data |>
+  filter(!is.na(source_title)) |>
+  select(id_sucs, id_mhq, starts_with("source_"), faction) |>
+  arrange(id_sucs, source_date)
