@@ -24,17 +24,21 @@ create_box <- function(planet_left, planet_right, planet_high, planet_low) {
 }
 
 is_in_box <- function(x, y, box) {
+  if(is.null(box)) {
+    return(TRUE)
+  }
   (x >= box$x_left & x <= box$x_right & y <= box$y_high & y >= box$y_low)
 }
 
 
-update_sources <- function(target, title, loc, date, box, factions) {
+update_sources <- function(target, title, loc, date, 
+                           box = NULL, factions = NULL) {
   sucs_data |> 
     # First, drop any values from sucs_data from the target_time that are not in 
     # the bounding box and do not come from acceptable factions
     filter(
       (time_point != target) | 
-        (is_in_box(x, y, box) & faction %in% factions)) |>
+        (is_in_box(x, y, box) & (is.null(faction) | faction %in% factions))) |>
     # add source information
     mutate(
       source_title = case_when(time_point == target ~ title),
