@@ -182,6 +182,26 @@ sucs_data <- sucs_data |>
   bind_rows(dc_founders)
 
 # Handbook: House Steiner
+bounding_box <- create_box("Cavanaugh II", "Errai", "Zhongshan", "Savannah")
+sucs_data <- update_sources(
+  target = "2341", 
+  title = "Handbook: House Steiner", 
+  loc = "p. 13",
+  # HBHS p. 12 says the foundation date was Jan 1, so set the original 
+  # member states to 12-31
+  date = date("2340-12-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "PD", "TamP", "FoS", "TH")
+)
+
+# Convert to LC on Jan 1 2341
+lc_founders <- sucs_data |>
+  filter(time_point == "2319" & faction %in% c("TamP", "FoS", "PD")) |>
+  mutate(source_date = date("2341-01-01"),
+         faction = "LC")
+
+sucs_data <- sucs_data |>
+  bind_rows(lc_founders)
 
 # Create final data --------------------------------------------------------
 
