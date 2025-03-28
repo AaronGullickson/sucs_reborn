@@ -136,6 +136,16 @@ sucs_data <- update_sources(
   factions = c("I", "U", "MCM", "SC", "FO", "PR", "TA")
 )
 
+# for the House Marik data, we also know that the planets with FO, MCM, SC, and
+# PR formed the FWL on 2271-06-02. So add that data
+fwl_founders <- sucs_data |>
+  filter(time_point == "2271" & faction %in% c("FO", "MCM", "PR", "SC")) |>
+  mutate(source_date = date("2271-06-02"),
+         faction = "FWL")
+
+sucs_data <- sucs_data |>
+  bind_rows(fwl_founders)
+
 # Handbook: House Davion
 bounding_box <- create_box("Perkasie", "Niquinohomo", "Rowe", "Islamabad")
 sucs_data <- update_sources(
