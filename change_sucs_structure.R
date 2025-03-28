@@ -124,6 +124,17 @@ sucs_data <- update_sources(
   factions = c("I", "U", "MCM", "SC", "FO", "PR", "TA")
 )
 
+# Handbook: House Davion
+bounding_box <- create_box("Perkasie", "Niquinohomo", "Rowe", "Islamabad")
+sucs_data <- update_sources(
+  target = "2317", 
+  title = "Handbook: House Davion", 
+  loc = "p. 18",
+  date = date("2317-06-26"), 
+  box = bounding_box, 
+  factions = c("I", "U", "FS")
+)
+
 # Create final data --------------------------------------------------------
 
 sucs_data |>
