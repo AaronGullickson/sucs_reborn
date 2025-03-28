@@ -50,7 +50,7 @@ test <- sucs_data |>
       time_point == "2271" ~ "p. 16"
     ),
     source_date = case_when(
-      time_point == "2271" ~ date("2271-06-01")
+      time_point == "2271" ~ date("2271-06-01") # day before FWL
     )
     
   )
