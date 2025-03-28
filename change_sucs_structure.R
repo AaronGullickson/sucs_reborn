@@ -1,6 +1,7 @@
 library(googlesheets4)
 library(tidyverse)
 library(here)
+library(ggpubr)
 
 
 # Helper functions ---------------------------------------------------
@@ -134,6 +135,12 @@ sucs_data <- update_sources(
 fwl_founders <- sucs_data |>
   filter(time_point == "2271" & faction %in% c("FO", "MCM", "PR", "SC")) |>
   mutate(source_date = date("2271-06-02"),
+         region1 = case_when(
+           faction == "MCM" ~ "Marik Commonwealth",
+           faction == "PR" ~ "Prinicipality of Regulus",
+           faction == "SC" ~ "Steward Confederation",
+           faction == "FO" ~ "Federation of Oriente"
+         ),
          faction = "FWL")
 
 sucs_data <- sucs_data |>
@@ -244,7 +251,7 @@ sucs_data <- sucs_data |>
 
 # Create plots to test ----------------------------------------------------
 
-plot_planets <- function(date) {
+plot_planets <- function(date, title = NULL) {
   # get the date for each planet closest to the date but not over
   temp <- sucs_data |>
     filter(source_date <= date) |>
@@ -262,6 +269,8 @@ plot_planets <- function(date) {
     filter(name %in% unique(temp$faction)) |>
     pull("color")
   
+  plot_title <- if_else(is.null(title), as.character(date), title)
+  
   temp |>
     filter(faction != "Undiscovered") |>
     ggplot(aes(x = x, y = y, color = faction))+
@@ -269,10 +278,22 @@ plot_planets <- function(date) {
     scale_x_continuous(limits = c(-460, 460))+
     scale_y_continuous(limits = c(-460, 460))+
     scale_color_manual(values = faction_colors)+
-    labs(title = as.character(date))+
+    labs(title = plot_title)+
     theme_void()+
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank())
 }
 
-plot_planets(date("2367-01-01"))
+g1 <- plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
+g2 <- plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
+g3 <- plot_planets(date("2317-06-26"), "2317-06-26, FedSuns Founding")
+g4 <- plot_planets(date("2319-09-15"), "2319-09-15, Eve of DC Founding (approximate")
+g5 <- plot_planets(date("2319-09-30"), "2319-09-30, DC Founding (approximate)")
+g6 <- plot_planets(date("2340-12-31"), "2340-12-31, Eve of LC Founding")
+g7 <- plot_planets(date("2341-01-01"), "2341-01-01, LC Founding")
+g8 <- plot_planets(date("2366-01-01"), "2366-01-01, Eve of CC Founding (approximate)")
+g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate")
+
+combined <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9,
+                      ncol = 3, nrow = 3)
+
