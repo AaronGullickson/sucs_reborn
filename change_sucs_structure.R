@@ -41,9 +41,15 @@ update_sources <- function(target, title, loc, date,
         (is_in_box(x, y, box) & (is.null(faction) | faction %in% factions))) |>
     # add source information
     mutate(
-      source_title = case_when(time_point == target ~ title),
-      source_loc = case_when(time_point == target ~ loc),
-      source_date = case_when(time_point == target ~ date)
+      source_title = case_when(
+        time_point == target ~ title,
+        TRUE ~ source_title),
+      source_loc = case_when(
+        time_point == target ~ loc,
+        TRUE ~ source_loc),
+      source_date = case_when(
+        time_point == target ~ date,
+        TRUE ~ source_date)
     )
   
 }
@@ -74,23 +80,28 @@ sucs_data <- sucs_data |>
   # remove missing values in faction at this point
   filter(!is.na(faction))
 
+# break up faction data into faction and regions. The max depth here is 5
+sucs_data <- sucs_data |>
+  separate_wider_delim(faction, ",", too_few = "align_start",
+                       names = c("faction", paste("region", 1:4, sep="")))
+
 # get faction how we like it 
 # TODO: ultimately this should also allow expanding out the region data so we 
 # don't lose itm and probably keeping the disputed code for now
-sucs_data <- sucs_data |>
-  mutate(
-    faction = case_when(
-      str_detect(faction, "^D\\(") ~ str_extract(faction, "(?<=\\()[^()]+(?=\\))"),
-      TRUE ~ str_split_i(faction, ",", 1)
-    ),
-    faction = str_trim(faction), # remove any leading/trailing whitespace
-    faction = str_remove(faction, "\\s*\\([^\\)]+\\)")
-  )
+#sucs_data <- sucs_data |>
+#  mutate(
+#    faction = case_when(
+#      str_detect(faction, "^D\\(") ~ str_extract(faction, "(?<=\\()[^()]+(?=\\))"),
+#      TRUE ~ str_split_i(faction, ",", 1)
+#    ),
+#    faction = str_trim(faction), # remove any leading/trailing whitespace
+#    faction = str_remove(faction, "\\s*\\([^\\)]+\\)")
+#  )
 
 # add in MekHQ ids
 sucs_data <- sucs_data |>
   left_join(id_crosswalk) |>
-  select(id_sucs, x, y, id_mhq, time_point, faction)
+  select(id_sucs, x, y, id_mhq, time_point, faction, starts_with("region"))
 
 # get the coordinates by mekhq id for bounding boxes
 system_coords <- sucs_data |>
@@ -103,7 +114,8 @@ sucs_data <- sucs_data |>
          source_title = as.character(NA),
          source_loc = as.character(NA), 
          source_date = as_date(NA)) |>
-  select(starts_with("id_"), x, y, time_point, starts_with("source_"), faction)
+  select(starts_with("id_"), x, y, time_point, starts_with("source_"), 
+         faction, starts_with("region"))
 
 # Founding state maps from handbooks ----------------------------------------
 
@@ -137,7 +149,10 @@ sucs_data <- update_sources(
 
 # Create final data --------------------------------------------------------
 
-sucs_data |>
+sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
-  select(id_sucs, id_mhq, starts_with("source_"), faction) |>
+  select(id_sucs, id_mhq, starts_with("source_"), faction, starts_with("region")) |>
   arrange(id_sucs, source_date)
+
+gs4_auth()
+gs4_create("SUCS reborn", sheets = sucs_data)
