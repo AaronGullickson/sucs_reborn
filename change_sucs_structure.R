@@ -196,12 +196,37 @@ sucs_data <- update_sources(
 
 # Convert to LC on Jan 1 2341
 lc_founders <- sucs_data |>
-  filter(time_point == "2319" & faction %in% c("TamP", "FoS", "PD")) |>
+  filter(time_point == "2341" & faction %in% c("TamP", "FoS", "PD")) |>
   mutate(source_date = date("2341-01-01"),
          faction = "LC")
 
 sucs_data <- sucs_data |>
   bind_rows(lc_founders)
+
+# Handbook: House Liao
+bounding_box <- create_box("Gannett", "Ridgebrook", "Ronel", "Ghorepani")
+sucs_data <- update_sources(
+  target = "2366", 
+  title = "Handbook: House Liao", 
+  loc = "p. 17",
+  # we know the Capellan Confederation was declared in July 2366, lets mark
+  # the pre-states as beginning of the year.
+  date = date("2366-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "DL", "SIML", "CCom", "SiS", "TGU", "TH", "TC",
+               "FWL", "FS", "LC")
+)
+
+# Now change them to CC.
+# p. 15 of HBHL tells us that this happened during a convention on St. Andre
+# in July of 2366, but not specific date 
+cc_founders <- sucs_data |>
+  filter(time_point == "2366" & faction %in% c( "DL", "SIML", "CCom", "SiS", "TGU")) |>
+  mutate(source_date = date("2366-07-15"),
+         faction = "LC")
+
+sucs_data <- sucs_data |>
+  bind_rows(cc_founders)
 
 # Create final data --------------------------------------------------------
 
