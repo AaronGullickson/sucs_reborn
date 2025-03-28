@@ -213,8 +213,19 @@ sucs_data <- update_sources(
 # Now change them to CC.
 # p. 15 of HBHL tells us that this happened during a convention on St. Andre
 # in July of 2366, but not specific date 
+# There are also several cases of independent planets that become part of the 
+# CC at this time according to map, so add them manually here
+independent_cc <- sucs_data |> 
+  # most of the independents on this map should be CC
+  filter(time_point == "2366" & faction == "I") |>
+  # remove the few cases that are not
+  filter((!id_mhq %in% c("Aspropirgos", "Gouderak", "Calseraigne", "Ghorepani",
+                         "Sunnywood", "Scheuerheck")))
+
 cc_founders <- sucs_data |>
-  filter(time_point == "2366" & faction %in% c( "DL", "SS", "SIML", "CCom", "SiS", "TGU")) |>
+  filter(time_point == "2366" & 
+           faction %in% c( "DL", "SS", "SIML", "CCom", "SiS", "TGU")) |>
+  bind_rows(independent_cc) |>
   mutate(source_date = date("2366-07-15"),
          faction = "CC")
 
