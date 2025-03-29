@@ -609,6 +609,21 @@ sucs_data <- update_sources(
 
 # TODO: we could add the wave data here
 
+
+# Add 2783 Lib Terra II Data ----------------------------------------------
+
+# This comes from Lib of Terra, p. 119, before houses gobble up Hegemony worlds
+
+bounding_box <- create_box("Gacrux", "Junction", "Altais", "Lacadon")
+sucs_data <- update_sources(
+  target = "2783", 
+  title = "Liberation of Terra, Vol. 2", 
+  loc = "p. 119",
+  date = date("2783-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "CC", "FWL", "FS", "DC", "LC", "AE", "TH")
+)
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -679,7 +694,7 @@ plot_planets <- function(date,
   
   if(show_id) {
     map <- map+
-      geom_text_repel(aes(label = id_mhq), color = "grey95")
+      geom_text_repel(aes(label = id_mhq), color = "grey95", size = 3)
   }
   
   return(map)
@@ -710,6 +725,7 @@ plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup",
              source_filter = "Handbook: House Arano")
 plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup")
 plot_planets(date("2772-07-01"), "2772-07-01, Amaris Empire")
+plot_planets(date("2783-01-01"), "2783-01-01, Great House Encroachment")
 
 
 sucs_data |> 
@@ -717,7 +733,7 @@ sucs_data |>
   filter(faction == "I")
 
 # get close in view
-#plot_planets(date("2772-07-01"), "2772-07-01, Amaris Empire",
+#plot_planets(date("2783-01-01"), "2783-01-01, Great House Encroachment",
 #             xlimits = c(-100, 150), ylimits = c(-125, 135),
 #             show_id = TRUE)
 
