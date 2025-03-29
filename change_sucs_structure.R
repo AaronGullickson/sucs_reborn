@@ -148,13 +148,137 @@ sucs_data <- sucs_data |>
   select(starts_with("id_"), x, y, time_point, starts_with("source_"), 
          faction, starts_with("region"))
 
+
+# Fix some cases ----------------------------------------------------------
+
+# There are some cases that if we fix them at the top, it will be easier
+# some of these I might want to check on for clarification and errata but
+# they definitely should not be in the maps
+
+## Randis IV ##
+# Randis IV is listed as I as early as 2750, but its described in Sarna as 
+# being settled by refugees from the succession wars, so not clear what is 
+# going on here. The earliest map I have it on is 3025, so change all 
+# years before that to U
+sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", 
+                             c("2750", "2765", "2767", "2783", "2786",
+                               "2821", "2822", "2830", "2864"),
+                             "U")
+
+## McEvans' Sacrifice ## 
+# Does not show up on this map. Listed as I based on OTP: Fronc Reaches 
+# which I don't have. The first map entry is from the House Arano book
+# (for 3025 map but not before), although the first "real" entry I can find is 
+# from the 3063 map in the Era Report 3062 book. I think the Arano entry 
+# should be handled with those other cases. So, I am going to list as U
+# for all entries before 3025, and then remove entries betweent 3025 and 3063
+# to handle them wit Arano case
+sucs_data <- correct_faction("McEvans' Sacrifice", 
+                             c("2750", "2765", "2767", "2783", "2786",
+                               "2821", "2822", "2830", "2864"),
+                             "U")
+sucs_data <- sucs_data |>
+  filter(!(time_point %in% c("3025", "3030", "3040", "3049", "3050a", "3050b",
+                             "3050c", "3051", "3052", "3057", "3058", "3059a",
+                             "3059b", "3059c", "3059d") &
+             id_mhq == "McEvans' Sacrifice"))
+
+## Brasha ##
+# This is showing up as independent based on p. 151 of Major Periphery
+# States which says it was found in the "early 26th century" - but it does not
+# show up on the map in Major Periphery States in 2571 or the 2596 maps from
+# the Reunification War. My guess is this is a typo meant to be 27th century. 
+# In any case, since we are going by maps only here, it needs to be U.
+sucs_data <- correct_faction("Brasha", "2596", "U")
+
+## Gibraltar ##
+# this is showing up as independent because of a planet write up
+# in Empire Alone that says it was independent until 2610, despite maps to the
+# contrary
+sucs_data <- correct_faction("Gibraltar", "2596", "FWL")
+
+## Sherwood ##
+# Seems to be "corrected" to independent from write up in Touring the 
+# Stars. However, Sherwood does not show up at all in map, so it should be
+# changed to U
+sucs_data <- correct_faction("Sherwood", "2596", "U")
+
+## Stotzing ##
+# This one is listed as independent but doesn't show up on the map.
+# I am guessing this is based on Touring the Stars: Stotzing, but this document
+# says quite clearly "The world was considered officially settled in 2598, 
+# "when its new capital of Alt-Eisenstadt—now known as Sophia—was founded."
+# That would be more than a year after the Reunification War map, so this 
+# should be listed as U
+sucs_data <- correct_faction("Stotzing", "2596", "U")
+
+## Alfirk ##
+# this is listed as an independent world, apparently from very early
+# on based on an entry from the Periphery handbook (2nd edition) and being
+# put on maps in Era Report 3145. But on this map, it is not present. I think 
+# it should be listed as U until 3145 where it makes its first map appearance
+# we can correct with errata if necessary
+sucs_data <- correct_faction("Alfirk", 
+                             c("2596", "2750", "2765", "2767", "2783", "2786",
+                               "2821", "2822", "2830", "2864", "3025", "3030", 
+                               "3040", "3049", "3050a", "3050b", "3050c", 
+                               "3051", "3052", "3057", "3058", "3059a", "3059b",
+                               "3059c", "3059d", "3063", "3067", "3068", "3075",
+                               "3079", "3081", "3085", "3095", "3130", "3135",
+                               "3145", "3151", "3152"),
+                             "U")
+
+## Ward ## 
+# The text on pg. 88 of HBHL says it was founded during "the Exodus
+# from Terra" but it doesn't show up on maps in the same document until the 
+# First Succession War map. It also shows up in the Era Report 2750 map. 
+# Technically, the only named date in the entry on pg. 88 is for 2644, so 
+# its not totally inconsistent that it wasn't founded until after Reunification
+# War. For map it should be U
+sucs_data <- correct_faction("Ward", "2596", "U")
+
+
+## McEvedy's Folly ##
+# This is shown as SL in 2765 based on Touring the Stars - McEvedy's Folly, but it 
+# does not show up on maps until 3067, so make it until thens
+# record as "U" here.
+sucs_data <- correct_faction("McEvedy's Folly", 
+                             c("2765", "2767", "2783", "2786",
+                               "2821", "2822", "2830", "2864", "3025", "3030", 
+                               "3040", "3049", "3050a", "3050b", "3050c", 
+                               "3051", "3052", "3057", "3058", "3059a", "3059b",
+                               "3059c", "3059d", "3063"), 
+                             "U")
+
+## Antallos (Port Krin) ##
+# It is listed as SL. This is from Merc Supplemental II where
+# is is listed as a joint venture of DC, FS, OA, and TH founded in 2674. Lets
+# change the map reference to "I" and add a text entry
+sucs_data <- correct_faction("Antallos (Port Krin)", "2750", "I")
+sucs_data <- sucs_data |>
+  bind_rows(
+    tibble(
+      id_sucs = 145,
+      id_mhq = "Antallos (Port Krin)",
+      x = 463.228,
+      y = 281.417,
+      source_type = "text",
+      source_title = "Mercenary FM Supplemental 2",
+      source_loc = "p. 12",
+      source_date = date("2674-01-01"),
+      faction = "SL"
+    )
+  )
+
+
+# Handle House Arano data -------------------------------------------------
+
+# TODO: fix this cluster fuck first so it doesn't affect other data
+
+
 # Founding state maps from handbooks ----------------------------------------
 
-# Lets start with the founding cases. These are complicated by the fact that 
-# changes are sometimes clearly made outside the range of these maps. I can 
-# fix some of that by specifying a bounding box for changes. I can also restrict
-# to certain kinds of changes
-
+# Lets start with the founding cases. 
 
 # Handbook: House Marik
 bounding_box <- create_box("Loongana", "Palos", "Chaffee (LC)", "Prix")
@@ -444,66 +568,7 @@ sucs_data <- update_sources(
                "OA", "TC", "MOC", "RW", "IP")
 )
 
-# a few errors need to be corrected
-# Brasha - this is showing up as independent based on p. 151 of Major Periphery
-# States which says it was found in the "early 26th century" - but it does not
-# show up on the map in Major Periphery States in 2571 or the 2596 maps from
-# the Reunification War. My guess is this is a typo meant to be 27th century. 
-# In any case, since we are going by maps only here, it needs to be U.
-sucs_data <- correct_faction("Brasha", "2596", "U")
-#sucs_data <- sucs_data |>
-#  mutate(faction = if_else(id_mhq == "Brasha" & time_point == "2596", "U", faction))
-# Gibraltar - this is showing up as independent because of a planet write up
-# in Empire Alone that says it was independent until 2610, despite maps to the
-# contrary
-sucs_data <- correct_faction("Gibraltar", "2596", "FWL")
-#sucs_data <- sucs_data |>
-#  mutate(faction = if_else(id_mhq == "Gibraltar" & time_point == "2596", "FWL", faction))
-# Sherwood - seems to be "corrected" to independent from write up in Touring the 
-# Stars. However, Sherwood does not show up at all in map, so it should be
-# changed to U
-sucs_data <- correct_faction("Sherwood", "2596", "U")
-# Stotzing - This one is listed as independent but doesn't show up on the map.
-# I am guessing this is based on Touring the Stars: Stotzing, but this document
-# says quite clearly "The world was considered officially settled in 2598, 
-# "when its new capital of Alt-Eisenstadt—now known as Sophia—was founded."
-# That would be more than a year after the Reunification War map, so this 
-# should be listed as U
-sucs_data <- correct_faction("Stotzing", "2596", "U")
-# Alfirk - this is listed as an independent world, apparently from very early
-# on based on an entry from the Periphery handbook (2nd edition) and being
-# put on maps in Era Report 3145. But on this map, it is not present, so it
-# should be listed as U. This is the first map where it could be present
-sucs_data <- correct_faction("Alfirk", "2596", "U")
-# Ward - The text on pg. 88 of HBHL says it was founded during "the Exodus
-# from Terra" but it doesn't show up on maps in the same document until the 
-# First Succession War map. It also shows up in the Era Report 2750 map. 
-# Technically, the only named date in the entry on pg. 88 is for 2644, so 
-# its not totally inconsistent that it wasn't founded until after Reunification
-# War. For map it should be U
-sucs_data <- correct_faction("Ward", "2596", "U")
-
-
 # Add 2750 data -----------------------------------------------------------
-
-# Antallos (Port Krin) is listed as SL. This is from Merc Supplemental II where
-# is is listed as a joint venture of DC, FS, OA, and TH founded in 2674. Lets
-# change the map reference to "I" and add a text entry
-sucs_data <- correct_faction("Antallos (Port Krin)", "2750", "I")
-sucs_data <- sucs_data |>
-  bind_rows(
-    tibble(
-      id_sucs = 145,
-      id_mhq = "Antallos (Port Krin)",
-      x = 463.228,
-      y = 281.417,
-      source_type = "text",
-      source_title = "Mercenary FM Supplemental 2",
-      source_loc = "p. 12",
-      source_date = date("2674-01-01"),
-      faction = "SL"
-    )
-  )
 
 bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
 sucs_data <- update_sources(
@@ -521,10 +586,6 @@ sucs_data <- update_sources(
 # Issues
 # Alfrik - same as problem above
 sucs_data <- correct_faction("Alfirk", "2750", "U")
-# Randis IV is listed as I, but its described in Sarna as being settled by
-# refugees from the succession wars, so not clear what is going on here
-sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", "2750", "U")
-
 
 # Add 2765 Lib of Terra Data -------------------------------------------------
 
@@ -543,21 +604,11 @@ sucs_data <- update_sources(
                "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
 )
 
-# Issues
-# Alfrik - same as problem above
-sucs_data <- correct_faction("Alfirk", "2765", "U")
-# Randis IV - same problem as above
-sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", "2765", "U")
-# McEvan's Sacrifice - Does not show up on this map. Listed as I based on
-# OTP: Fronc Reaches which I don't have. Mark as "U"
-sucs_data <- correct_faction("McEvans' Sacrifice", "2765", "U")
-# McEvedy's Folly - shown as SL based on Touring the Stars - McEvedy's Folly
-# record as "U" here.
-sucs_data <- correct_faction("McEvedy's Folly", "2765", "U")
 # we are getting quite a bit of Aurigan Coalition stuff mixed in here - lets
 # filter all of that out and put it in a separate Aurigan map
 aurigan_cases <- c("Alloway", "Bellerophon", "Bonavista", "Chaadan",
-                   "Don't", "Sacromonte", "Tiburon", "Wheeler")
+                   "Don't", "Sacromonte", "Tiburon", 
+                   "Wheeler (Perian 2822+/Mystras 3022+)")
 aurigan_planets_2765 <- sucs_data |>
   filter(id_mhq %in% aurigan_cases & time_point == "2765") |>
   mutate(source_title = "Handbook: House Arano",
@@ -649,6 +700,89 @@ sucs_data <- update_sources(
 
 # Add 2822 End of 1SW data -------------------------------------------------
 
+# Peratallada - part of Aurigan, should be U in 2822
+sucs_data <- correct_faction("Peratallada", "2822", "U")
+# Wheeler (Perian 2822+/Mystras 3022+) is not on the maps, here but it still 
+# exists and was already founded by 2765. I think we should remove it here
+sucs_data <- sucs_data |>
+  filter(!(time_point == "2822" & id_mhq == "Wheeler (Perian 2822+/Mystras 3022+)"))
+
+# The map in 1SW is missing some periphery planets that are shown in the 
+# later handbooks and have already been integrated into SUCS, so I will go
+# and and use the Handbooks and skip the 1SW
+# The map says 2822, but end of 1SW was 2821-09-24
+
+# Handbook: House Davion
+bounding_box <- create_box("Otho", "Shiri", "Tiflis", "Portland")
+sucs_data <- update_sources(
+  target = "2822", 
+  title = "Handbook: House Davion", 
+  loc = "p. 54",
+  date = date("2821-09-24"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "TH", "OA", "TD", "CS")
+)
+
+# Handbook: House Kurita
+bounding_box <- create_box("Dustball", "Quiberas", "Ichmandu", "New Praha")
+sucs_data <- update_sources(
+  target = "2822", 
+  title = "Handbook: House Kurita", 
+  loc = "p. 43",
+  date = date("2821-09-24"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "LC", "FWL", "OA", "CS")
+)
+
+# Handbook: House Steiner
+bounding_box <- create_box("Lothario", "Brighton", "Paulus Prime", "Brighton")
+sucs_data <- update_sources(
+  target = "2822", 
+  title = "Handbook: House Steiner", 
+  loc = "p. 40",
+  date = date("2821-09-24"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "LC", "FWL", "CF", "CS")
+)
+
+# Handbook: House Marik
+bounding_box <- create_box("Trondheimal", "Primus", "Glengarry", "Brighton")
+sucs_data <- update_sources(
+  target = "2822", 
+  title = "Handbook: House Marik", 
+  loc = "p. 34",
+  date = date("2821-09-24"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "LC", "FWL", "MOC", "IP", "CF", "CS")
+)
+
+# Handbook: House Liao
+bounding_box <- create_box("Bethonolog", "Firgrove", "Rochester", "Herotitus")
+sucs_data <- update_sources(
+  target = "2822", 
+  title = "Handbook: House Liao", 
+  loc = "p. 31",
+  date = date("2821-09-24"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "LC", "FWL", "FS", "MOC", "TC", "CS")
+)
+
+
+
+# Issues
+# No abandoned worlds in FWL?
+# getting Aurigan stuff once again and some independents south of TC
+
+
+# Naikongzu needs to be added as Independent from 1SW map and need to
+# do Tortuga Dominions from 1SW map
+# in general, I think the maps for the Handbooks are cropped enough that
+# we should also take the full 1SW map
 
 # Add 2830 Start of 2SW data -----------------------------------------------
 
@@ -658,11 +792,15 @@ sucs_data <- update_sources(
 
 # Add 3025 End of 3SW data ------------------------------------------------
 
+# this comes from a poster map?
+
 # need to deal with House Arano again
 
 
 # Add 3030 End of 4SW data ------------------------------------------------
 
+# I think the only source for this is the House Handbooks so will need to do
+# it in steps
 
 # Add 3039 end of War of 3039 data ----------------------------------------
 
@@ -746,7 +884,8 @@ plot_planets <- function(date,
 
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
-  mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color))
+  mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color),
+         color = ifelse(id_sucs == "A", "grey70", color))
 
 g1 <- plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
 g2 <- plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
@@ -770,15 +909,26 @@ plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup",
 plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup")
 plot_planets(date("2772-07-01"), "2772-07-01, Amaris Empire")
 plot_planets(date("2783-01-01"), "2783-01-01, Pre-Great House Encroachment")
-plot_planets(date("2786-12-31"), "2786-12-01, Great House Encroachment")
+plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment")
+plot_planets(date("2822-01-01"), "2822-01-01, End of 1st SW",
+             source_filter = "Handbook: House Arano")
 
 
-sucs_data |> 
-  faction_snapshot(date("2765-01-01")) |>
+x <- sucs_data |> 
+  faction_snapshot(date("2822-01-01")) |>
   filter(faction == "I")
 
 # get close in view
 #plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment",
 #             xlimits = c(-100, 150), ylimits = c(-125, 135),
 #             show_id = TRUE)
+
+#plot_planets(date("2822-01-01"), "Test",
+#             xlimits = c(500, 700), ylimits = c(-450, 200),
+#             show_id = TRUE)
+
+plot_planets(date("2822-01-01"), "Test",
+             source_filter = "Handbook: House Arano",
+             xlimits = c(-100, 350), ylimits = c(-550,-400),
+             show_id = TRUE)
 
