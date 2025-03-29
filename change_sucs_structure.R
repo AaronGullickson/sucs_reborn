@@ -607,6 +607,8 @@ sucs_data <- update_sources(
 
 # looking at the map, this seems to overlap perfectly
 
+# TODO: we could add the wave data here
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
