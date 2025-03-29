@@ -35,27 +35,25 @@ is_in_box <- function(x, y, box) {
 update_sources <- function(target, title, loc, date, 
                            box = NULL, factions = NULL) {
   sucs_data |> 
-    # First, drop any values from sucs_data from the target_time that are not in 
-    # the bounding box and do not come from acceptable factions
-    filter(
-      (time_point != target) | 
-        (is_in_box(x, y, box) & (is.null(faction) | faction %in% factions))) |>
-    # add source information
+    # First, drop any values from sucs_data from the target_time 
     mutate(
+      # only change values that are from the target time and in
+      # the bounding box and come from acceptable factions
+      change_source = (time_point == target) & is_in_box(x, y, box) & 
+        (is.null(faction) | faction %in% factions),
+      # add source information
       source_title = case_when(
-        time_point == target ~ title,
-        TRUE ~ source_title),
+        !change_source ~ source_title,
+        time_point == target ~ title),
       source_loc = case_when(
-        time_point == target ~ loc,
-        TRUE ~ source_loc),
+        !change_source ~ source_loc,
+        time_point == target ~ loc),
       source_date = case_when(
-        time_point == target ~ date,
-        TRUE ~ source_date)
+        !change_source ~ source_date,
+        time_point == target ~ date)
     )
   
 }
-
-#create_box("Loongana", "Palos", "Chaffee (LC)", "Rohinjan")
 
 # Read in data -------------------------------------------------------
 
@@ -239,6 +237,42 @@ cc_founders <- sucs_data |>
 sucs_data <- sucs_data |>
   bind_rows(cc_founders)
 
+# remove any cases left from this group that are not sourced
+#sucs_data <- sucs_data |>
+#  filter(!(is.na(source_title) & 
+#             time_point %in% c("2271", "2317", "2319", "2341", "2366")))
+
+# Add UHC -----------------------------------------------------------------
+
+# add UHC in properly from the Era Digest: Age of war map
+
+# Add 2571 data -----------------------------------------------------------
+
+# All the House Handbooks, plus Periphery book
+# will use the creation of the Star League on 2571-07-09 as "end" of Age of War
+
+# Handbook: House Marik
+# bounding_box <- create_box("Trondheimal", "Kashilla", "Premana", "Tarol IV")
+# sucs_data <- update_sources(
+#   target = "2571", 
+#   title = "Handbook: House Marik", 
+#   loc = "p. 24",
+#   date = date("2571-07-09"), 
+#   box = bounding_box, 
+#   factions = c("I", "U", "TH", "FWL", "LC", "MOC", "RW")
+# )
+
+# Handbook: House Davion
+# bounding_box <- create_box("Otho", "Delos IV", "Tiflis", "New Vandenburg")
+# test <- update_sources(
+#   target = "2571", 
+#   title = "Handbook: House Davion", 
+#   loc = "p. 48",
+#   date = date("2571-07-09"), 
+#   box = bounding_box, 
+#   factions = c("I", "U", "TH", "TC", "DC", "CC", "FS", "OA")
+# )
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -287,13 +321,14 @@ plot_planets <- function(date, title = NULL) {
 g1 <- plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
 g2 <- plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
 g3 <- plot_planets(date("2317-06-26"), "2317-06-26, FedSuns Founding")
-g4 <- plot_planets(date("2319-09-15"), "2319-09-15, Eve of DC Founding (approximate")
+g4 <- plot_planets(date("2319-09-15"), "2319-09-15, Eve of DC Founding (approximate)")
 g5 <- plot_planets(date("2319-09-30"), "2319-09-30, DC Founding (approximate)")
 g6 <- plot_planets(date("2340-12-31"), "2340-12-31, Eve of LC Founding")
 g7 <- plot_planets(date("2341-01-01"), "2341-01-01, LC Founding")
 g8 <- plot_planets(date("2366-01-01"), "2366-01-01, Eve of CC Founding (approximate)")
-g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate")
+g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
 
 combined <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9,
                       ncol = 3, nrow = 3)
 
+#plot_planets(date("2571-07-31"), "2571-07-31, Star League Founding")
