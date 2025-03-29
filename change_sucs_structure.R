@@ -125,7 +125,7 @@ sucs_data <- update_sources(
   loc = "p. 16",
   date = date("2271-06-01"), 
   box = bounding_box, 
-  factions = c("I", "U", "MCM", "SC", "FO", "PR", "TA")
+  factions = c("I", "U", "A", "MCM", "SC", "FO", "PR", "TA")
 )
 
 # for the House Marik data, we also know that the planets with FO, MCM, SC, and
@@ -152,7 +152,7 @@ sucs_data <- update_sources(
   loc = "p. 18",
   date = date("2317-06-26"), 
   box = bounding_box, 
-  factions = c("I", "U", "FS")
+  factions = c("I", "U", "A", "FS")
 )
 
 # Handbook: House Kurita
@@ -165,7 +165,7 @@ sucs_data <- update_sources(
   # so lets set it at the midpoint of the month.
   date = date("2319-09-15"), 
   box = bounding_box, 
-  factions = c("I", "U", "AG", "DC", "TH", "PoR", "TamP", "FoS")
+  factions = c("I", "U", "A", "AG", "DC", "TH", "PoR", "TamP", "FoS")
 )
 
 # like the FWL, the current data has this as AG for the Alliance of Galedon
@@ -189,7 +189,7 @@ sucs_data <- update_sources(
   # member states to 12-31
   date = date("2340-12-31"), 
   box = bounding_box, 
-  factions = c("I", "U", "PD", "TamP", "FoS", "TH")
+  factions = c("I", "U", "A", "PD", "TamP", "FoS", "TH")
 )
 
 # Convert to LC on Jan 1 2341
@@ -211,8 +211,8 @@ sucs_data <- update_sources(
   # the pre-states as beginning of the year.
   date = date("2366-01-01"), 
   box = bounding_box, 
-  factions = c("I", "U", "DL", "SS", "SIML", "CCom", "SiS", "TGU", "TH", "TC",
-               "FWL", "FS", "LC", "CC")
+  factions = c("I", "U", "A", "DL", "SS", "SIML", "CCom", "SiS", "TGU", "TH", "TC",
+               "FWL", "FS", "LC", "CC", "A")
 )
 
 # Now change them to CC.
@@ -237,11 +237,6 @@ cc_founders <- sucs_data |>
 sucs_data <- sucs_data |>
   bind_rows(cc_founders)
 
-# remove any cases left from this group that are not sourced
-#sucs_data <- sucs_data |>
-#  filter(!(is.na(source_title) & 
-#             time_point %in% c("2271", "2317", "2319", "2341", "2366")))
-
 # Add UHC -----------------------------------------------------------------
 
 # add UHC in properly from the Era Digest: Age of war map
@@ -251,27 +246,71 @@ sucs_data <- sucs_data |>
 # All the House Handbooks, plus Periphery book
 # will use the creation of the Star League on 2571-07-09 as "end" of Age of War
 
-# Handbook: House Marik
-# bounding_box <- create_box("Trondheimal", "Kashilla", "Premana", "Tarol IV")
-# sucs_data <- update_sources(
-#   target = "2571", 
-#   title = "Handbook: House Marik", 
-#   loc = "p. 24",
-#   date = date("2571-07-09"), 
-#   box = bounding_box, 
-#   factions = c("I", "U", "TH", "FWL", "LC", "MOC", "RW")
-# )
+#Handbook: House Marik
+bounding_box <- create_box("Trondheimal", "Kashilla", "Premana", "Tarol IV")
+sucs_data <- update_sources(
+   target = "2571",
+   title = "Handbook: House Marik", 
+   loc = "p. 24",
+   date = date("2571-07-09"), 
+   box = bounding_box, 
+   factions = c("I", "U", "A", "TH", "FWL", "LC", "MOC", "RW", "A")
+)
 
 # Handbook: House Davion
-# bounding_box <- create_box("Otho", "Delos IV", "Tiflis", "New Vandenburg")
-# test <- update_sources(
-#   target = "2571", 
-#   title = "Handbook: House Davion", 
-#   loc = "p. 48",
-#   date = date("2571-07-09"), 
-#   box = bounding_box, 
-#   factions = c("I", "U", "TH", "TC", "DC", "CC", "FS", "OA")
-# )
+bounding_box <- create_box("Otho", "Delos IV", "Tiflis", "New Vandenburg")
+sucs_data <- update_sources(
+   target = "2571", 
+   title = "Handbook: House Davion", 
+   loc = "p. 48",
+   date = date("2571-07-09"), 
+   box = bounding_box, 
+   factions = c("I", "U", "A", "TH", "TC", "DC", "CC", "FS", "OA")
+)
+
+# Handbook: House Kurita
+bounding_box <- create_box("Elektrougli", "Xenia", "Taran's World", "Loeches")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: House Kurita", 
+  loc = "p. 31",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "TH", "DC", "CC", "FS", "OA", "LC", "FWL", "RW")
+)
+
+# Handbook: House Steiner
+bounding_box <- create_box("Slewis", "Achernar", "Crellacor", "Gei-Fu")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: House Steiner", 
+  loc = "p. 25",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "TH", "DC", "CC", "OA", "LC", "FWL", "RW")
+)
+
+# Handbook: House Steiner
+bounding_box <- create_box("Slewis", "Achernar", "Crellacor", "Gei-Fu")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: House Steiner", 
+  loc = "p. 25",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "TH", "DC", "CC", "OA", "LC", "FWL", "RW")
+)
+
+# Handbook: House Liao
+bounding_box <- create_box("Sheridan (FWL)", "Ridgebrook", "Caph", "Harminous")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: House Liao", 
+  loc = "p. 25",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "TH", "TC", "CC", "MC", "FWL", "LC", "FS")
+)
 
 # Create final data --------------------------------------------------------
 
@@ -309,8 +348,8 @@ plot_planets <- function(date, title = NULL) {
     filter(faction != "Undiscovered") |>
     ggplot(aes(x = x, y = y, color = faction))+
     geom_point()+
-    scale_x_continuous(limits = c(-460, 460))+
-    scale_y_continuous(limits = c(-460, 460))+
+    scale_x_continuous(limits = c(-480, 620))+
+    scale_y_continuous(limits = c(-460, 510))+
     scale_color_manual(values = faction_colors)+
     labs(title = plot_title)+
     theme_void()+
@@ -331,4 +370,4 @@ g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
 combined <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9,
                       ncol = 3, nrow = 3)
 
-#plot_planets(date("2571-07-31"), "2571-07-31, Star League Founding")
+plot_planets(date("2571-07-31"), "2571-07-31, Star League Founding")
