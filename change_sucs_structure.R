@@ -55,6 +55,39 @@ update_sources <- function(target, title, loc, date,
   
 }
 
+plot_planets <- function(date, title = NULL) {
+  # get the date for each planet closest to the date but not over
+  temp <- sucs_data |>
+    filter(source_date <= date) |>
+    # arrange with most recent date at the top
+    arrange(id_sucs, desc(source_date)) |>
+    # remove duplicate planet entries
+    filter(!duplicated(id_sucs)) |>
+    select(x, y, faction) |>
+    mutate(faction = factor(faction, 
+                            levels = sucs_factions$id_sucs,
+                            labels = sucs_factions$name))
+  
+  # determine color palette
+  faction_colors <- sucs_factions |>
+    filter(name %in% unique(temp$faction)) |>
+    pull("color")
+  
+  plot_title <- if_else(is.null(title), as.character(date), title)
+  
+  temp |>
+    filter(faction != "Undiscovered") |>
+    ggplot(aes(x = x, y = y, color = faction))+
+    geom_point()+
+    scale_x_continuous(limits = c(-480, 620))+
+    scale_y_continuous(limits = c(-480, 510))+
+    scale_color_manual(values = faction_colors)+
+    labs(title = plot_title)+
+    theme_void()+
+    theme(panel.background = element_rect(fill = "grey20"),
+          panel.grid = element_blank())
+}
+
 # Read in data -------------------------------------------------------
 
 gs4_deauth()
@@ -406,39 +439,6 @@ sucs_data <- sucs_data |>
 sucs_factions <- sucs_factions |>
   mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color))
 
-plot_planets <- function(date, title = NULL) {
-  # get the date for each planet closest to the date but not over
-  temp <- sucs_data |>
-    filter(source_date <= date) |>
-    # arrange with most recent date at the top
-    arrange(id_sucs, desc(source_date)) |>
-    # remove duplicate planet entries
-    filter(!duplicated(id_sucs)) |>
-    select(x, y, faction) |>
-    mutate(faction = factor(faction, 
-                            levels = sucs_factions$id_sucs,
-                            labels = sucs_factions$name))
-  
-  # determine color palette
-  faction_colors <- sucs_factions |>
-    filter(name %in% unique(temp$faction)) |>
-    pull("color")
-  
-  plot_title <- if_else(is.null(title), as.character(date), title)
-  
-  temp |>
-    filter(faction != "Undiscovered") |>
-    ggplot(aes(x = x, y = y, color = faction))+
-    geom_point()+
-    scale_x_continuous(limits = c(-480, 620))+
-    scale_y_continuous(limits = c(-480, 510))+
-    scale_color_manual(values = faction_colors)+
-    labs(title = plot_title)+
-    theme_void()+
-    theme(panel.background = element_rect(fill = "grey20"),
-          panel.grid = element_blank())
-}
-
 g1 <- plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
 g2 <- plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
 g3 <- plot_planets(date("2317-06-26"), "2317-06-26, FedSuns Founding")
@@ -453,4 +453,4 @@ combined <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9,
                       ncol = 3, nrow = 3)
 
 plot_planets(date("2540-01-01"), "2540-01-01, UHC Pre-Merge")
-plot_planets(date("2540-01-01"), "2540-12-31, after UHC merge")
+plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
