@@ -587,6 +587,26 @@ sucs_data <- sucs_data |>
 # leave it in here and add errata, but I am wondering if there are other planets
 # as well and SUCS teams might have a record
 
+# Amaris Empire data -------------------------------------------------------
+
+# This is the data labeled as 2767 in the SUCS and described as "2765 map with 
+# the core TH worlds shifted to AE because of the Coup". Its unclear if it comes
+# from an actual map or not, but we do get the extent of the Amaris Empire on
+# a map on p. 138 of the Liberation of Terra Volume 1. I wonder if that is what
+# was used? If so, the date should not be 2767 but rather July 1 2772. 
+
+bounding_box <- create_box("Gacrux", "Tawas", "Kannon", "Lacadon")
+sucs_data <- update_sources(
+  target = "2767", 
+  title = "Liberation of Terra, Vol. 1", 
+  loc = "p. 138",
+  date = date("2772-07-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "CC", "FWL", "FS", "DC", "LC", "AE")
+)
+
+# looking at the map, this seems to overlap perfectly
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -687,13 +707,15 @@ plot_planets(date("2750-01-01"), "2750-01-01, Height of Star League")
 plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup",
              source_filter = "Handbook: House Arano")
 plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup")
+plot_planets(date("2772-07-01"), "2772-07-01, Amaris Empire")
+
 
 sucs_data |> 
   faction_snapshot(date("2765-01-01")) |>
   filter(faction == "I")
 
 # get close in view
-#plot_planets(date("2765-01-01"), "2765-01-01, Aurigan Area",
-#             xlimits = c(-100, 350), ylimits = c(-530, -425),
+#plot_planets(date("2772-07-01"), "2772-07-01, Amaris Empire",
+#             xlimits = c(-100, 150), ylimits = c(-125, 135),
 #             show_id = TRUE)
 
