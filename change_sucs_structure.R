@@ -529,13 +529,13 @@ sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", "2750", "U")
 # Add 2765 Lib of Terra Data -------------------------------------------------
 
 # need to fix Antallos before updating sources or it won't catch
-sucs_data <- correct_faction("Antallos (Port Krin)", "2750", "I")
+sucs_data <- correct_faction("Antallos (Port Krin)", "2765", "I")
 
 bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
 sucs_data <- update_sources(
   target = "2765", 
   title = "Liberation of Terra, Vol. I", 
-  loc = "pp. 36-37",
+  loc = "pp. 10-11",
   date = date("2765-01-01"), 
   box = bounding_box, 
   factions = c("I", "U", "A", 
