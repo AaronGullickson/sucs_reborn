@@ -120,7 +120,7 @@ sucs_data <- sucs_data |>
 
 
 # Handbook: House Marik
-bounding_box <- create_box("Loongana", "Palos", "Chaffee (LC)", "Rohinjan")
+bounding_box <- create_box("Loongana", "Palos", "Chaffee (LC)", "Prix")
 sucs_data <- update_sources(
   target = "2271", 
   title = "Handbook: House Marik", 
@@ -147,7 +147,7 @@ sucs_data <- sucs_data |>
   bind_rows(fwl_founders)
 
 # Handbook: House Davion
-bounding_box <- create_box("Perkasie", "Niquinohomo", "Rowe", "Islamabad")
+bounding_box <- create_box("Perkasie", "Niquinohomo", "Rowe", "Safe Port")
 sucs_data <- update_sources(
   target = "2317", 
   title = "Handbook: House Davion", 
@@ -158,7 +158,7 @@ sucs_data <- update_sources(
 )
 
 # Handbook: House Kurita
-bounding_box <- create_box("Nathan", "Ottumwa", "Thule", "Edwards")
+bounding_box <- create_box("Nathan", "Ottumwa", "Thule", "Avellaneda")
 sucs_data <- update_sources(
   target = "2319", 
   title = "Handbook: House Kurita", 
@@ -182,7 +182,7 @@ sucs_data <- sucs_data |>
   bind_rows(dc_founders)
 
 # Handbook: House Steiner
-bounding_box <- create_box("Cavanaugh II", "Errai", "Zhongshan", "Savannah")
+bounding_box <- create_box("Cavanaugh II", "Errai", "Zhongshan", "Gei-Fu")
 sucs_data <- update_sources(
   target = "2341", 
   title = "Handbook: House Steiner", 
