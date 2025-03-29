@@ -2,6 +2,9 @@ library(googlesheets4)
 library(tidyverse)
 library(here)
 library(ggpubr)
+library(ggrepel)
+
+# TODO: we could do an "errata" type to handle corrections
 
 
 # Helper functions ---------------------------------------------------
@@ -72,6 +75,17 @@ correct_sources <- function(id, time_target,
       source_date = if_else(id_mhq %in% id & time_point %in% time_target, 
                             new_source_date, source_date)
     )
+}
+
+faction_snapshot <- function(date) {
+  # get the date for each planet closest to the date but not over
+  sucs_data |>
+    filter(source_date <= date) |>
+    # arrange with most recent date at the top
+    arrange(id_sucs, desc(source_date)) |>
+    # remove duplicate planet entries
+    filter(!duplicated(id_sucs)) |>
+    select(starts_with("id_"), x, y, faction)
 }
 
 # Read in data -------------------------------------------------------
@@ -467,20 +481,6 @@ sucs_data <- correct_faction("Ward", "2596", "U")
 
 # Add 2750 data -----------------------------------------------------------
 
-bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
-sucs_data <- update_sources(
-  target = "2750", 
-  title = "Era Report 2750", 
-  loc = "pp. 36-37",
-  # we don't really know the date so assume Jan 1
-  date = date("2750-01-01"), 
-  box = bounding_box, 
-  factions = c("I", "U", "A", 
-               "TH", "DC", "FS", "FWL", "LC", "CC",
-               "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
-)
-
-# Issues
 # Antallos (Port Krin) is listed as SL. This is from Merc Supplemental II where
 # is is listed as a joint venture of DC, FS, OA, and TH founded in 2674. Lets
 # change the map reference to "I" and add a text entry
@@ -499,11 +499,68 @@ sucs_data <- sucs_data |>
       faction = "SL"
     )
   )
+
+bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2750", 
+  title = "Era Report 2750", 
+  loc = "pp. 36-37",
+  # we don't really know the date so assume Jan 1
+  date = date("2750-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "TH", "DC", "FS", "FWL", "LC", "CC",
+               "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
+)
+
+# Issues
 # Alfrik - same as problem above
 sucs_data <- correct_faction("Alfirk", "2750", "U")
 # Randis IV is listed as I, but its described in Sarna as being settled by
 # refugees from the succession wars, so not clear what is going on here
 sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", "2750", "U")
+
+
+# Add 2765 Lib of Terra Data -------------------------------------------------
+
+# need to fix Antallos before updating sources or it won't catch
+sucs_data <- correct_faction("Antallos (Port Krin)", "2750", "I")
+
+bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2765", 
+  title = "Liberation of Terra, Vol. I", 
+  loc = "pp. 36-37",
+  date = date("2765-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "TH", "DC", "FS", "FWL", "LC", "CC",
+               "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
+)
+
+# Issues
+# Alfrik - same as problem above
+sucs_data <- correct_faction("Alfirk", "2765", "U")
+# Randis IV - same problem as above
+sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", "2765", "U")
+# McEvan's Sacrifice - Does not show up on this map. Listed as I based on
+# OTP: Fronc Reaches which I don't have. Mark as "U"
+sucs_data <- correct_faction("McEvans' Sacrifice", "2765", "U")
+# McEvedy's Folly - shown as SL based on Touring the Stars - McEvedy's Folly
+# record as "U" here.
+sucs_data <- correct_faction("McEvedy's Folly", "2765", "U")
+# we are getting quite a bit of Aurigan Coalition stuff mixed in here - lets
+# filter all of that out and put it in a separate Aurigan map
+aurigan_cases <- c("Alloway", "Bellerophon", "Bonavista", "Chaadan",
+                   "Don't", "Sacromonte", "Tiburon", "Wheeler")
+aurigan_planets_2765 <- sucs_data |>
+  filter(id_mhq %in% aurigan_cases & time_point == "2765") |>
+  mutate(source_title = "Handbook: House Arano",
+         source_loc = "p. 10",
+         source_date = date("2765-01-01"))
+sucs_data <- sucs_data |>
+  filter(!(id_mhq %in% aurigan_cases & time_point == "2765"))
+
 
 # Create final data --------------------------------------------------------
 
@@ -517,15 +574,15 @@ sucs_data <- sucs_data |>
 
 # Create plots to test ----------------------------------------------------
 
-plot_planets <- function(date, title = NULL) {
+plot_planets <- function(date, 
+                         title = NULL, 
+                         xlimits = c(-600, 780), 
+                         ylimits = c(-580, 580),
+                         faction_filter = c("Undiscovered"),
+                         show_id = FALSE) {
+  
   # get the date for each planet closest to the date but not over
-  temp <- sucs_data |>
-    filter(source_date <= date) |>
-    # arrange with most recent date at the top
-    arrange(id_sucs, desc(source_date)) |>
-    # remove duplicate planet entries
-    filter(!duplicated(id_sucs)) |>
-    select(x, y, faction, id_mhq) |>
+  temp <- faction_snapshot(date) |>
     mutate(faction = factor(faction, 
                             levels = sucs_factions$id_sucs,
                             labels = sucs_factions$name))
@@ -537,19 +594,26 @@ plot_planets <- function(date, title = NULL) {
   
   plot_title <- if_else(is.null(title), as.character(date), title)
   
-  temp |>
-    filter(faction != "Undiscovered") |>
+  map <- temp |>
+    filter(!(faction %in% faction_filter)) |>
     ggplot(aes(x = x, y = y, color = faction, fill = faction))+
     #geom_mark_hull(data = filter(temp, faction != "Inhabited"), alpha = 0.3)+
     geom_point()+
-    scale_x_continuous(limits = c(-600, 780))+
-    scale_y_continuous(limits = c(-580, 580))+
+    scale_x_continuous(limits = xlimits)+
+    scale_y_continuous(limits = ylimits)+
     scale_color_manual(values = faction_colors)+
     scale_fill_manual(values = faction_colors)+
     labs(title = plot_title)+
     theme_void()+
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank())
+  
+  if(show_id) {
+    map <- map+
+      geom_text_repel(aes(label = id_mhq), color = "grey95")
+  }
+  
+  return(map)
 }
 
 # change some colors for better comparison
@@ -573,3 +637,13 @@ plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
 plot_planets(date("2571-07-09"), "2571-07-09, Founding of Star League")
 plot_planets(date("2596-09-30"), "2596-09-30, End of Reunification War")
 plot_planets(date("2750-01-01"), "2750-01-01, Height of Star League")
+plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup")
+
+faction_snapshot(date("2765-01-01")) |>
+  filter(faction == "I")
+
+# get close in view
+#plot_planets(date("2765-01-01"), "2765-01-01, Aurigan Area",
+#             xlimits = c(-100, 350), ylimits = c(-530, -425),
+#             show_id = TRUE)
+
