@@ -561,6 +561,26 @@ aurigan_planets_2765 <- sucs_data |>
 sucs_data <- sucs_data |>
   filter(!(id_mhq %in% aurigan_cases & time_point == "2765"))
 
+# Add House Arano 2765 data ------------------------------------------------
+
+bounding_box <- create_box("Modesto", "Amber", "Vakarel", "Skyfog")
+sucs_data <- update_sources(
+  target = "2765", 
+  title = "Handbook: House Arano", 
+  loc = "p. 10",
+  date = date("2765-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "CC", "FWL", "FS", "TC", "MOC")
+)
+
+# now add back in aurigan planets we held
+sucs_data <- sucs_data |>
+  bind_rows(aurigan_planets_2765)
+
+# TODO: I noticed at least one case (Mandalas) that is on the map but is 
+# clearly an error and has been removed from SUCS. Technically, we should
+# leave it in here and add errata, but I am wondering if there are other planets
+# as well and SUCS teams might have a record
 
 # Create final data --------------------------------------------------------
 
