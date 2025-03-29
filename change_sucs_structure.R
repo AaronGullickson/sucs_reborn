@@ -463,6 +463,47 @@ sucs_data <- correct_faction("Alfirk", "2596", "U")
 # War. For map it should be U
 sucs_data <- correct_faction("Ward", "2596", "U")
 
+
+# Add 2750 data -----------------------------------------------------------
+
+bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2750", 
+  title = "Era Report 2750", 
+  loc = "pp. 36-37",
+  # we don't really know the date so assume Jan 1
+  date = date("2750-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "TH", "DC", "FS", "FWL", "LC", "CC",
+               "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
+)
+
+# Issues
+# Antallos (Port Krin) is listed as SL. This is from Merc Supplemental II where
+# is is listed as a joint venture of DC, FS, OA, and TH founded in 2674. Lets
+# change the map reference to "I" and add a text entry
+sucs_data <- correct_faction("Antallos (Port Krin)", "2750", "I")
+sucs_data <- sucs_data |>
+  bind_rows(
+    tibble(
+      id_sucs = 145,
+      id_mhq = "Antallos (Port Krin)",
+      x = 463.228,
+      y = 281.417,
+      source_type = "text",
+      source_title = "Mercenary FM Supplemental 2",
+      source_loc = "p. 12",
+      source_date = date("2674-01-01"),
+      faction = "SL"
+    )
+  )
+# Alfrik - same as problem above
+sucs_data <- correct_faction("Alfirk", "2750", "U")
+# Randis IV is listed as I, but its described in Sarna as being settled by
+# refugees from the succession wars, so not clear what is going on here
+sucs_data <- correct_faction("Randis IV (Hope IV 2988-)", "2750", "U")
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -497,11 +538,13 @@ plot_planets <- function(date, title = NULL) {
   
   temp |>
     filter(faction != "Undiscovered") |>
-    ggplot(aes(x = x, y = y, color = faction))+
+    ggplot(aes(x = x, y = y, color = faction, fill = faction))+
+    #geom_mark_hull(data = filter(temp, faction != "Inhabited"), alpha = 0.3)+
     geom_point()+
-    scale_x_continuous(limits = c(-490, 670))+
-    scale_y_continuous(limits = c(-480, 515))+
+    scale_x_continuous(limits = c(-600, 780))+
+    scale_y_continuous(limits = c(-580, 580))+
     scale_color_manual(values = faction_colors)+
+    scale_fill_manual(values = faction_colors)+
     labs(title = plot_title)+
     theme_void()+
     theme(panel.background = element_rect(fill = "grey20"),
@@ -528,3 +571,4 @@ plot_planets(date("2540-01-01"), "2540-01-01, UHC Pre-Merge")
 plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
 plot_planets(date("2571-07-09"), "2571-07-09, Founding of Star League")
 plot_planets(date("2596-09-30"), "2596-09-30, End of Reunification War")
+plot_planets(date("2750-01-01"), "2750-01-01, Height of Star League")
