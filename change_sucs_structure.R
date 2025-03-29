@@ -240,6 +240,51 @@ sucs_data <- sucs_data |>
 # Add UHC -----------------------------------------------------------------
 
 # add UHC in properly from the Era Digest: Age of war map
+uhc_worlds <- c("Islamabad", "Songgang", "Gambarare", "As Samik", "Panpour",
+                "Naka Pabni", "Agliana", "Birmensdorf", "Gambarare", "Kaiyuh",
+                "Niquinohomo", "Ildrong (Sanurcha 2750-)", "Gurrnazovo", 
+                "Neukirchen (Jodipur 3025-)", "June", "Hoonaar", "Vackisujfalu")
+uhc_worlds[!(uhc_worlds %in% sucs_data$id_mhq)]
+fs_worlds <- c("Tegaldanas", "Belaire", "Darwendale", "Alsek", "Nizina", 
+               "Chirikof", "Ingenstrem", "Noatak", "Kotzebue", "Colorado",
+               "Killarney", "Eustatius", "Jaboatao", "Olindo", "Fetsund",
+               "Great Gorge", "Semichi")
+fs_worlds[!(fs_worlds %in% sucs_data$id_mhq)]
+tc_worlds <- c("Weippe", "Mavegh", "Caldwell", "Pierce", "Tentativa", "Montour",
+               "Cohagen", "Verdigreis", "Cyrton", "Estuan", "Dumassas",
+               "Armington", "Csomad", "Anaheim")
+tc_worlds[!(tc_worlds %in% sucs_data$id_mhq)]
+
+data_2540 <- tibble(
+  id_mhq = c(uhc_worlds, fs_worlds, tc_worlds),
+  time_point = "2540",
+  source_type = "map",
+  source_title = "Era Digest: Age of War",
+  source_loc = "p. 7",
+  # we know they joined FS in 2540 but not when so use Jan 1
+  source_date = date("2540-01-01"),
+  faction = c(rep("UHC", length(uhc_worlds)), 
+              rep("FS", length(fs_worlds)),
+              rep("TC", length(tc_worlds)))
+)
+
+# add in the transfer to FS by end of year
+data_2540 <- data_2540 |>
+  filter(faction == "UHC") |>
+  mutate(source_date = date("2540-12-31"),
+         faction = "FS") |>
+  bind_rows(data_2540)
+
+# integrate sucs id and x, y values
+data_2540 <- sucs_data |>
+  filter(id_mhq %in% unique(data_2540$id_mhq)) |>
+  select(id_sucs, id_mhq, x, y) |>
+  distinct() |> 
+  right_join(data_2540, by = "id_mhq")
+
+# now add to sucs data
+sucs_data <- sucs_data |>
+  bind_rows(data_2540)
 
 # Add 2571 data -----------------------------------------------------------
 
@@ -357,6 +402,10 @@ sucs_data <- sucs_data |>
 
 # Create plots to test ----------------------------------------------------
 
+# change some colors for better comparison
+sucs_factions <- sucs_factions |>
+  mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color))
+
 plot_planets <- function(date, title = NULL) {
   # get the date for each planet closest to the date but not over
   temp <- sucs_data |>
@@ -403,4 +452,5 @@ g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
 combined <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9,
                       ncol = 3, nrow = 3)
 
-plot_planets(date("2571-07-31"), "2571-07-31, Star League Founding")
+plot_planets(date("2540-01-01"), "2540-01-01, UHC Pre-Merge")
+plot_planets(date("2540-01-01"), "2540-12-31, after UHC merge")
