@@ -110,6 +110,7 @@ sucs_data <- sucs_data |>
                        names = c("faction", paste("region", 1:4, sep="")))
 
 # add in MekHQ ids
+# TODO: we are missing a few new ones
 sucs_data <- sucs_data |>
   left_join(id_crosswalk) |>
   select(id_sucs, x, y, id_mhq, time_point, faction, starts_with("region"))
