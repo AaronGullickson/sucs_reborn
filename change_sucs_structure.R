@@ -55,37 +55,23 @@ update_sources <- function(target, title, loc, date,
   
 }
 
-plot_planets <- function(date, title = NULL) {
-  # get the date for each planet closest to the date but not over
-  temp <- sucs_data |>
-    filter(source_date <= date) |>
-    # arrange with most recent date at the top
-    arrange(id_sucs, desc(source_date)) |>
-    # remove duplicate planet entries
-    filter(!duplicated(id_sucs)) |>
-    select(x, y, faction) |>
-    mutate(faction = factor(faction, 
-                            levels = sucs_factions$id_sucs,
-                            labels = sucs_factions$name))
-  
-  # determine color palette
-  faction_colors <- sucs_factions |>
-    filter(name %in% unique(temp$faction)) |>
-    pull("color")
-  
-  plot_title <- if_else(is.null(title), as.character(date), title)
-  
-  temp |>
-    filter(faction != "Undiscovered") |>
-    ggplot(aes(x = x, y = y, color = faction))+
-    geom_point()+
-    scale_x_continuous(limits = c(-480, 620))+
-    scale_y_continuous(limits = c(-480, 510))+
-    scale_color_manual(values = faction_colors)+
-    labs(title = plot_title)+
-    theme_void()+
-    theme(panel.background = element_rect(fill = "grey20"),
-          panel.grid = element_blank())
+correct_faction <- function(id, time_target, new_faction) {
+  sucs_data |>
+    mutate(faction = if_else(id_mhq %in% id & time_point %in% time_target, 
+                             new_faction, faction))
+}
+
+correct_sources <- function(id, time_target,
+                            new_source_title, new_source_loc, new_source_date) {
+  sucs_data |>
+    mutate(
+      source_title = if_else(id_mhq %in% id & time_point %in% time_target, 
+                             new_source_title, source_title),
+      source_loc = if_else(id_mhq %in% id & time_point %in% time_target, 
+                           new_source_loc, source_loc),
+      source_date = if_else(id_mhq %in% id & time_point %in% time_target, 
+                            new_source_date, source_date)
+    )
 }
 
 # Read in data -------------------------------------------------------
@@ -423,6 +409,60 @@ sucs_data <- update_sources(
   factions = c("I", "U", "A", "OA", "DC", "FS")
 )
 
+# Add 2596 End of Reunification War data -----------------------------------
+
+bounding_box <- create_box("Malaga", "Tortuga Prime", "Jápminboddu", "Kossandra's Memory")
+sucs_data <- update_sources(
+  target = "2596", 
+  title = "Historical: Reunification War", 
+  loc = "pp. 158-159",
+  # reunification war ended with surrender of TC on 2596-09-23, p. 93
+  date = date("2596-09-23"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "TH", "DC", "FS", "FWL", "LC", "CC",
+               "OA", "TC", "MOC", "RW", "IP")
+)
+
+# a few errors need to be corrected
+# Brasha - this is showing up as independent based on p. 151 of Major Periphery
+# States which says it was found in the "early 26th century" - but it does not
+# show up on the map in Major Periphery States in 2571 or the 2596 maps from
+# the Reunification War. My guess is this is a typo meant to be 27th century. 
+# In any case, since we are going by maps only here, it needs to be U.
+sucs_data <- correct_faction("Brasha", "2596", "U")
+#sucs_data <- sucs_data |>
+#  mutate(faction = if_else(id_mhq == "Brasha" & time_point == "2596", "U", faction))
+# Gibraltar - this is showing up as independent because of a planet write up
+# in Empire Alone that says it was independent until 2610, despite maps to the
+# contrary
+sucs_data <- correct_faction("Gibraltar", "2596", "FWL")
+#sucs_data <- sucs_data |>
+#  mutate(faction = if_else(id_mhq == "Gibraltar" & time_point == "2596", "FWL", faction))
+# Sherwood - seems to be "corrected" to independent from write up in Touring the 
+# Stars. However, Sherwood does not show up at all in map, so it should be
+# changed to U
+sucs_data <- correct_faction("Sherwood", "2596", "U")
+# Stotzing - This one is listed as independent but doesn't show up on the map.
+# I am guessing this is based on Touring the Stars: Stotzing, but this document
+# says quite clearly "The world was considered officially settled in 2598, 
+# "when its new capital of Alt-Eisenstadt—now known as Sophia—was founded."
+# That would be more than a year after the Reunification War map, so this 
+# should be listed as U
+sucs_data <- correct_faction("Stotzing", "2596", "U")
+# Alfirk - this is listed as an independent world, apparently from very early
+# on based on an entry from the Periphery handbook (2nd edition) and being
+# put on maps in Era Report 3145. But on this map, it is not present, so it
+# should be listed as U. This is the first map where it could be present
+sucs_data <- correct_faction("Alfirk", "2596", "U")
+# Ward - The text on pg. 88 of HBHL says it was founded during "the Exodus
+# from Terra" but it doesn't show up on maps in the same document until the 
+# First Succession War map. It also shows up in the Era Report 2750 map. 
+# Technically, the only named date in the entry on pg. 88 is for 2644, so 
+# its not totally inconsistent that it wasn't founded until after Reunification
+# War. For map it should be U
+sucs_data <- correct_faction("Ward", "2596", "U")
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -434,6 +474,39 @@ sucs_data <- sucs_data |>
 #gs4_create("SUCS reborn", sheets = sucs_data)
 
 # Create plots to test ----------------------------------------------------
+
+plot_planets <- function(date, title = NULL) {
+  # get the date for each planet closest to the date but not over
+  temp <- sucs_data |>
+    filter(source_date <= date) |>
+    # arrange with most recent date at the top
+    arrange(id_sucs, desc(source_date)) |>
+    # remove duplicate planet entries
+    filter(!duplicated(id_sucs)) |>
+    select(x, y, faction, id_mhq) |>
+    mutate(faction = factor(faction, 
+                            levels = sucs_factions$id_sucs,
+                            labels = sucs_factions$name))
+  
+  # determine color palette
+  faction_colors <- sucs_factions |>
+    filter(name %in% unique(temp$faction)) |>
+    pull("color")
+  
+  plot_title <- if_else(is.null(title), as.character(date), title)
+  
+  temp |>
+    filter(faction != "Undiscovered") |>
+    ggplot(aes(x = x, y = y, color = faction))+
+    geom_point()+
+    scale_x_continuous(limits = c(-490, 670))+
+    scale_y_continuous(limits = c(-480, 515))+
+    scale_color_manual(values = faction_colors)+
+    labs(title = plot_title)+
+    theme_void()+
+    theme(panel.background = element_rect(fill = "grey20"),
+          panel.grid = element_blank())
+}
 
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
@@ -449,8 +522,9 @@ g7 <- plot_planets(date("2341-01-01"), "2341-01-01, LC Founding")
 g8 <- plot_planets(date("2366-01-01"), "2366-01-01, Eve of CC Founding (approximate)")
 g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
 
-combined <- ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9,
-                      ncol = 3, nrow = 3)
+ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9, ncol = 3, nrow = 3)
 
 plot_planets(date("2540-01-01"), "2540-01-01, UHC Pre-Merge")
 plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
+plot_planets(date("2571-07-09"), "2571-07-09, Founding of Star League")
+plot_planets(date("2596-09-30"), "2596-09-30, End of Reunification War")
