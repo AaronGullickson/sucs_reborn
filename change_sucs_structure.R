@@ -312,6 +312,39 @@ sucs_data <- update_sources(
   factions = c("I", "U", "A", "TH", "TC", "CC", "MC", "FWL", "LC", "FS")
 )
 
+# Periphery: Magistracy of Canopus
+bounding_box <- create_box("Marantha", "Buenos Aires", "Kanata", "Tetski")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: Major Periphery States", 
+  loc = "p. 93",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "MOC", "CC", "FWL")
+)
+
+# Periphery: Taurian Concordat
+bounding_box <- create_box("Xieng Khouang", "Great Gorge", "Kumqwat", "New Vandenburg")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: Major Periphery States", 
+  loc = "p. 121",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "TC", "CC", "FS")
+)
+
+# Periphery: Outworlds Alliance
+bounding_box <- create_box("Shaul Khala", "Delos IV", "Monywa", "Glenmora")
+sucs_data <- update_sources(
+  target = "2571", 
+  title = "Handbook: Major Periphery States", 
+  loc = "p. 147",
+  date = date("2571-07-09"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "OA", "DC", "FS")
+)
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -349,7 +382,7 @@ plot_planets <- function(date, title = NULL) {
     ggplot(aes(x = x, y = y, color = faction))+
     geom_point()+
     scale_x_continuous(limits = c(-480, 620))+
-    scale_y_continuous(limits = c(-460, 510))+
+    scale_y_continuous(limits = c(-480, 510))+
     scale_color_manual(values = faction_colors)+
     labs(title = plot_title)+
     theme_void()+
