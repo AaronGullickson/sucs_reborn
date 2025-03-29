@@ -639,6 +639,35 @@ sucs_data <- update_sources(
   factions = c("I", "U", "A", "CC", "FWL", "FS", "DC", "LC", "AE", "TH")
 )
 
+# TODO: We also have a 2786 map in 1SW for the whole IS. Should we use that
+# where available?
+
+# Add Operation Klondike maps data -----------------------------------------
+
+# TODO: Do this
+
+
+# Add 2822 End of 1SW data -------------------------------------------------
+
+
+# Add 2830 Start of 2SW data -----------------------------------------------
+
+
+# Add 2864 End of 2SW data ------------------------------------------------
+
+
+# Add 3025 End of 3SW data ------------------------------------------------
+
+# need to deal with House Arano again
+
+
+# Add 3030 End of 4SW data ------------------------------------------------
+
+
+# Add 3039 end of War of 3039 data ----------------------------------------
+
+
+
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
