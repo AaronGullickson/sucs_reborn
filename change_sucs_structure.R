@@ -77,15 +77,20 @@ correct_sources <- function(id, time_target,
     )
 }
 
-faction_snapshot <- function(date) {
+faction_snapshot <- function(base_data, date) {
   # get the date for each planet closest to the date but not over
-  sucs_data |>
+  base_data |>
     filter(source_date <= date) |>
-    # arrange with most recent date at the top
-    arrange(id_sucs, desc(source_date)) |>
+    # create a type priority
+    mutate(source_type = factor(source_type, 
+                                levels = c("errata", "text", "map"))) |>
+    # arrange with most recent date at the top, and then break date
+    # ties by source_type
+    arrange(id_sucs, desc(source_date), source_type) |>
     # remove duplicate planet entries
     filter(!duplicated(id_sucs)) |>
-    select(starts_with("id_"), x, y, faction)
+    select(starts_with("id_"), x, y, faction, 
+           source_type, source_title, source_loc)
 }
 
 # Read in data -------------------------------------------------------
@@ -599,13 +604,37 @@ plot_planets <- function(date,
                          xlimits = c(-600, 780), 
                          ylimits = c(-580, 580),
                          faction_filter = c("Undiscovered"),
+                         source_filter = NULL,
                          show_id = FALSE) {
   
-  # get the date for each planet closest to the date but not over
-  temp <- faction_snapshot(date) |>
+  temp <- sucs_data
+  # apply any filters
+  if(!is.null(faction_filter)) {
+    temp <- temp |>
+      filter(!(faction %in% faction_filter))
+  }
+  if(!is.null(source_filter)) {
+    temp <- temp |>
+      filter(!(source_title %in% source_filter))
+  }
+  
+  # now take a snapshot
+  temp <- temp |>
+    faction_snapshot(date) |>
+    # factor up factions so we can get names and color
     mutate(faction = factor(faction, 
                             levels = sucs_factions$id_sucs,
                             labels = sucs_factions$name))
+  
+  # apply any filters
+  if(!is.null(faction_filter)) {
+    temp <- temp |>
+      filter(!(faction %in% faction_filter))
+  }
+  if(!is.null(source_filter)) {
+    temp <- temp |>
+      filter()
+  }
   
   # determine color palette
   faction_colors <- sucs_factions |>
@@ -615,9 +644,7 @@ plot_planets <- function(date,
   plot_title <- if_else(is.null(title), as.character(date), title)
   
   map <- temp |>
-    filter(!(faction %in% faction_filter)) |>
     ggplot(aes(x = x, y = y, color = faction, fill = faction))+
-    #geom_mark_hull(data = filter(temp, faction != "Inhabited"), alpha = 0.3)+
     geom_point()+
     scale_x_continuous(limits = xlimits)+
     scale_y_continuous(limits = ylimits)+
@@ -657,9 +684,12 @@ plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
 plot_planets(date("2571-07-09"), "2571-07-09, Founding of Star League")
 plot_planets(date("2596-09-30"), "2596-09-30, End of Reunification War")
 plot_planets(date("2750-01-01"), "2750-01-01, Height of Star League")
+plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup",
+             source_filter = "Handbook: House Arano")
 plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup")
 
-faction_snapshot(date("2765-01-01")) |>
+sucs_data |> 
+  faction_snapshot(date("2765-01-01")) |>
   filter(faction == "I")
 
 # get close in view
