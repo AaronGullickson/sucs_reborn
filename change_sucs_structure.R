@@ -946,71 +946,137 @@ plot_planets <- function(date,
                          interactive = TRUE) {
   
   temp <- sucs_data
-  # apply any filters
-  if(!is.null(faction_filter)) {
-    temp <- temp |>
-      filter(!(faction %in% faction_filter))
+  
+  # Apply filters
+  if (!is.null(faction_filter)) {
+    temp <- temp |> filter(!(faction %in% faction_filter))
   }
-  if(!is.null(source_filter)) {
-    temp <- temp |>
-      filter(!(source_title %in% source_filter))
+  if (!is.null(source_filter)) {
+    temp <- temp |> filter(!(source_title %in% source_filter))
   }
   
-  # now take a snapshot
+  # Take a snapshot & create labels
   temp <- temp |>
     faction_snapshot(date) |>
-    # factor up factions so we can get names and color
-    mutate(faction = factor(faction, 
-                            levels = sucs_factions$id_sucs,
-                            labels = sucs_factions$name),
-           text_plotly = paste0("<b>", id_mhq, "</b>\n",
-                                "<i>", faction, "</i>\n",
-                                source_type, ": ", source_title, 
-                                ", ", source_loc, "\n", 
-                                source_date))
+    mutate(
+      faction = factor(faction, levels = sucs_factions$id_sucs, labels = sucs_factions$name),
+      text_plotly = paste0("<b>", id_mhq, "</b><br>",
+                           "<i>", faction, "</i><br>",
+                           source_type, ": ", source_title, 
+                           ", ", source_loc, "<br>", 
+                           source_date)
+    )
   
-  # apply any filters
-  if(!is.null(faction_filter)) {
-    temp <- temp |>
-      filter(!(faction %in% faction_filter))
-  }
-  if(!is.null(source_filter)) {
-    temp <- temp |>
-      filter()
-  }
-  
-  # determine color palette
+  # Determine color palette
   faction_colors <- sucs_factions |>
     filter(name %in% unique(temp$faction)) |>
     pull("color")
   
   plot_title <- if_else(is.null(title), as.character(date), title)
   
-  map <- temp |>
-    ggplot(aes(x = x, y = y, color = faction, text = text_plotly))+
-    geom_point()+
-    scale_x_continuous(limits = xlimits)+
-    scale_y_continuous(limits = ylimits)+
-    scale_color_manual(values = faction_colors)+
-    scale_fill_manual(values = faction_colors)+
-    labs(title = plot_title)+
-    theme_void()+
+  # Base ggplot
+  map <- ggplot(temp, aes(x = x, y = y, text = text_plotly, customdata = id_mhq)) +
+    geom_point(aes(color = faction)) +
+    scale_x_continuous(limits = xlimits) +
+    scale_y_continuous(limits = ylimits) +
+    scale_color_manual(values = faction_colors) +
+    labs(title = plot_title) +
+    theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank())
   
-  if(show_id) {
-    map <- map+
-      geom_text_repel(aes(label = id_mhq), color = "grey95", size = 3)
+  # Add ID labels if required
+  if (show_id) {
+    if (interactive) {
+      # Hide labels initially
+      map <- map + geom_text(aes(label = ""), size = 3, hjust = 1, vjust = 1)
+    } else {
+      map <- map + geom_text_repel(aes(label = id_mhq), color = "grey95", 
+                                   size = 3)
+    }
   }
   
-  if(interactive) {
+  # Convert to plotly
+  if (interactive) {
     map <- ggplotly(map, tooltip = "text") |>
       config(scrollZoom = TRUE) |>
       layout(dragmode = "pan")
+    
+    # JavaScript to show labels when zoomed in
+    map <- map |> htmlwidgets::onRender("
+    function(el, x) {
+      console.log('Binding plotly_relayout event...');
+      var plot = document.getElementById(el.id);
+   
+   let throttleTimeout = null;
+let lastZoomLevel = null;
+
+el.on('plotly_relayout', function(eventData) {
+  console.log('Plotly relayout event detected:', eventData);
+
+  // Access the xaxis and yaxis range directly
+  var xaxisMin = eventData['xaxis.range[0]'];
+  var xaxisMax = eventData['xaxis.range[1]'];
+  var yaxisMin = eventData['yaxis.range[0]'];
+  var yaxisMax = eventData['yaxis.range[1]'];
+
+  // Throttle the event by using requestAnimationFrame for efficient updating
+  if (throttleTimeout) return; // If we are already waiting for an update, skip this event
+
+  throttleTimeout = requestAnimationFrame(function() {
+    // Check if the range values are available
+    if (xaxisMin !== undefined && xaxisMax !== undefined && yaxisMin !== undefined && yaxisMax !== undefined) {
+      var zoomLevelX = Math.abs(xaxisMax - xaxisMin);  // X-axis zoom level
+      var zoomLevelY = Math.abs(yaxisMax - yaxisMin);  // Y-axis zoom level
+      var zoomLevel = Math.max(zoomLevelX, zoomLevelY); // Use the max zoom level between X and Y axes
+
+      var zoomThreshold = 500;  // Zoom threshold set to 300
+      var annotations = [];
+
+      // Only add annotations if zoomed in beyond the threshold
+      if (zoomLevel < zoomThreshold) {
+        console.log('Zoomed in: Showing labels');
+        // Loop through the traces and create annotations only for visible points
+        for (var i = 0; i < x.data.length; i++) {
+          var trace = x.data[i];
+
+          // Loop through each point in the trace and check if it is visible within the current zoom range
+          for (var j = 0; j < trace.x.length; j++) {
+            if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
+              annotations.push({
+                x: trace.x[j],             // x value for the point
+                y: trace.y[j],             // y value for the point
+                text: trace.customdata[j], // customdata holds the label text
+                showarrow: false           // Don't show arrows, just the label
+              });
+            }
+          }
+        }
+      } else {
+        console.log('Zoomed out: Hiding labels');
+      }
+
+      // Apply the annotations to the plot only if the zoom level has changed
+      if (lastZoomLevel !== zoomLevel) {
+        lastZoomLevel = zoomLevel;  // Update last zoom level
+        Plotly.relayout(el, {annotations: annotations});
+      }
+    }
+
+    throttleTimeout = null;  // Reset the throttle timeout
+  });
+});
+
+
+
+
+    }
+  ")
   }
   
   return(map)
 }
+
 
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
@@ -1043,7 +1109,7 @@ plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment")
 plot_planets(date("2822-01-01"), "2822-01-01, End of 1st SW",
              source_filter = "Handbook: House Arano")
 plot_planets(date("2830-01-01"), "2830-01-01, Start of 2nd SW",
-             source_filter = "Handbook: House Arano")
+             source_filter = "Handbook: House Arano", show_id = TRUE)
 
 
 x <- sucs_data |> 
