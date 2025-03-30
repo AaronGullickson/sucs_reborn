@@ -1,6 +1,7 @@
 library(googlesheets4)
 library(tidyverse)
 library(here)
+library(plotly)
 library(ggpubr)
 library(ggrepel)
 
@@ -90,7 +91,7 @@ faction_snapshot <- function(base_data, date) {
     # remove duplicate planet entries
     filter(!duplicated(id_sucs)) |>
     select(starts_with("id_"), x, y, faction, 
-           source_type, source_title, source_loc)
+           source_type, source_title, source_loc, source_date)
 }
 
 # Read in data -------------------------------------------------------
@@ -941,7 +942,8 @@ plot_planets <- function(date,
                          ylimits = c(-580, 580),
                          faction_filter = c("Undiscovered"),
                          source_filter = NULL,
-                         show_id = FALSE) {
+                         show_id = FALSE,
+                         interactive = TRUE) {
   
   temp <- sucs_data
   # apply any filters
@@ -960,7 +962,12 @@ plot_planets <- function(date,
     # factor up factions so we can get names and color
     mutate(faction = factor(faction, 
                             levels = sucs_factions$id_sucs,
-                            labels = sucs_factions$name))
+                            labels = sucs_factions$name),
+           text_plotly = paste0("<b>", id_mhq, "</b>\n",
+                                "<i>", faction, "</i>\n",
+                                source_type, ": ", source_title, 
+                                ", ", source_loc, "\n", 
+                                source_date))
   
   # apply any filters
   if(!is.null(faction_filter)) {
@@ -980,7 +987,7 @@ plot_planets <- function(date,
   plot_title <- if_else(is.null(title), as.character(date), title)
   
   map <- temp |>
-    ggplot(aes(x = x, y = y, color = faction, fill = faction))+
+    ggplot(aes(x = x, y = y, color = faction, text = text_plotly))+
     geom_point()+
     scale_x_continuous(limits = xlimits)+
     scale_y_continuous(limits = ylimits)+
@@ -994,6 +1001,12 @@ plot_planets <- function(date,
   if(show_id) {
     map <- map+
       geom_text_repel(aes(label = id_mhq), color = "grey95", size = 3)
+  }
+  
+  if(interactive) {
+    map <- ggplotly(map, tooltip = "text") |>
+      config(scrollZoom = TRUE) |>
+      layout(dragmode = "pan")
   }
   
   return(map)
@@ -1055,8 +1068,8 @@ x <- sucs_data |>
 #             xlimits = c(-300, 0), ylimits = c(400,650),
 #             show_id = TRUE)
 
-plot_planets(date("2830-01-01"), "Test",
-             source_filter = "Handbook: House Arano",
-             xlimits = c(-700, -300), ylimits = c(-500,-150),
-             show_id = TRUE)
+#plot_planets(date("2830-01-01"), "Test",
+#             source_filter = "Handbook: House Arano",
+#             xlimits = c(-700, -300), ylimits = c(-500,-150),
+#             show_id = TRUE)
 
