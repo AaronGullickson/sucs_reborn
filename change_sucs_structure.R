@@ -270,6 +270,12 @@ sucs_data <- sucs_data |>
     )
   )
 
+## Oberon Confederation ##
+# Sigurd, Oberon VI, and Crellacor are showing up as OC from 2783 but
+# they shouldn't be there until 3025
+sucs_data <- correct_faction(c("Sigurd", "Oberon VI", "Crellacor"),
+                             c("2783", "2786", "2821", "2822", "2830", "2864"),
+                             "I")
 
 
 # Founding state maps from handbooks ----------------------------------------
@@ -747,17 +753,19 @@ sucs_data <- update_sources(
                "CC", "DC", "LC", "FWL", "FS", "MOC", "TC", "CS")
 )
 
-
-
-# Issues
-# No abandoned worlds in FWL?
-# getting Aurigan stuff once again and some independents south of TC
-
-
-# Naikongzu needs to be added as Independent from 1SW map and need to
-# do Tortuga Dominions from 1SW map
-# in general, I think the maps for the Handbooks are cropped enough that
-# we should also take the full 1SW map
+# OK now do the full 1SW map
+bounding_box <- create_box("Hunter's Paradise", "Maripa", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2822", 
+  title = "Historicals: First Succession War", 
+  loc = "p. 112-113",
+  date = date("2821-09-24"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "LC", "FWL", "FS", 
+               "MOC", "OA", "TC", "LL", "IP", "CF",
+               "CS")
+)
 
 # Add 2830 Start of 2SW data -----------------------------------------------
 
@@ -989,8 +997,12 @@ x <- sucs_data |>
 #             xlimits = c(500, 700), ylimits = c(-450, 200),
 #             show_id = TRUE)
 
-plot_planets(date("2890-07-21"), "Test",
-             #source_filter = "Handbook: House Arano",
-             xlimits = c(-150, 350), ylimits = c(-550,-400),
+#plot_planets(date("2890-07-21"), "Test",
+#             #source_filter = "Handbook: House Arano",
+#             xlimits = c(-150, 350), ylimits = c(-550,-400),
+#             show_id = TRUE)
+
+plot_planets(date("2822-01-01"), "Test",
+             xlimits = c(-300, 0), ylimits = c(400,650),
              show_id = TRUE)
 
