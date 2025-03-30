@@ -940,7 +940,7 @@ plot_planets <- function(date,
                          title = NULL, 
                          xlimits = c(-600, 780), 
                          ylimits = c(-580, 580),
-                         faction_filter = c("Undiscovered"),
+                         faction_filter = c("U"),
                          source_filter = NULL,
                          show_id = FALSE,
                          interactive = TRUE) {
@@ -987,10 +987,7 @@ plot_planets <- function(date,
   
   # Add ID labels if required
   if (show_id) {
-    if (interactive) {
-      # Hide labels initially
-      map <- map + geom_text(aes(label = ""), size = 3, hjust = 1, vjust = 1)
-    } else {
+    if (!interactive) {
       map <- map + geom_text_repel(aes(label = id_mhq), color = "grey95", 
                                    size = 3)
     }
@@ -1002,8 +999,9 @@ plot_planets <- function(date,
       config(scrollZoom = TRUE) |>
       layout(dragmode = "pan")
     
-    # JavaScript to show labels when zoomed in
-    map <- map |> htmlwidgets::onRender("
+    if(show_id) {
+      # JavaScript to show labels when zoomed in
+      map <- map |> htmlwidgets::onRender("
     function(el, x) {
       console.log('Binding plotly_relayout event...');
       var plot = document.getElementById(el.id);
@@ -1030,7 +1028,7 @@ el.on('plotly_relayout', function(eventData) {
       var zoomLevelY = Math.abs(yaxisMax - yaxisMin);  // Y-axis zoom level
       var zoomLevel = Math.max(zoomLevelX, zoomLevelY); // Use the max zoom level between X and Y axes
 
-      var zoomThreshold = 500;  // Zoom threshold set to 300
+      var zoomThreshold = 300; // bigger numbers mean labels will appear sooner
       var annotations = [];
 
       // Only add annotations if zoomed in beyond the threshold
@@ -1047,7 +1045,12 @@ el.on('plotly_relayout', function(eventData) {
                 x: trace.x[j],             // x value for the point
                 y: trace.y[j],             // y value for the point
                 text: trace.customdata[j], // customdata holds the label text
-                showarrow: false           // Don't show arrows, just the label
+                showarrow: false,          // Don't show arrows, just the label
+                xanchor: 'left',
+                yanchor: 'bottom',
+                font: {
+                  color: '#f2f2f2',
+                }
               });
             }
           }
@@ -1072,6 +1075,7 @@ el.on('plotly_relayout', function(eventData) {
 
     }
   ")
+    }
   }
   
   return(map)
