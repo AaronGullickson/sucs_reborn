@@ -254,7 +254,9 @@ sucs_data <- correct_faction("McEvedy's Folly",
 # It is listed as SL. This is from Merc Supplemental II where
 # is is listed as a joint venture of DC, FS, OA, and TH founded in 2674. Lets
 # change the map reference to "I" and add a text entry
-sucs_data <- correct_faction("Antallos (Port Krin)", "2750", "I")
+sucs_data <- correct_faction("Antallos (Port Krin)", 
+                             c("2750", "2765"), "I")
+
 sucs_data <- sucs_data |>
   bind_rows(
     tibble(
@@ -262,6 +264,7 @@ sucs_data <- sucs_data |>
       id_mhq = "Antallos (Port Krin)",
       x = 463.228,
       y = 281.417,
+      time_point = "special",
       source_type = "text",
       source_title = "Mercenary FM Supplemental 2",
       source_loc = "p. 12",
@@ -276,6 +279,48 @@ sucs_data <- sucs_data |>
 sucs_data <- correct_faction(c("Sigurd", "Oberon VI", "Crellacor"),
                              c("2783", "2786", "2821", "2822", "2830", "2864"),
                              "I")
+
+## Joppa ##
+# According to Empire Alone planetary write up, Joppa was settled during
+# the Periphery Uprising campaign. However, it does not show up on a map
+# until 3067 as part of MOC. So I think we should remove all of the SL and I 
+# entries from 2596 to 3063 to make room for a text entry.
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "Joppa" & 
+             time_point %in% c("2596", "2750", "2765", "2767", "2783", "2786",
+                               "2821", "2822", "2830", "2864", "3025", "3030", 
+                               "3040", "3049", "3050a", "3050b", "3050c", 
+                               "3051", "3052", "3057", "3058", "3059a", "3059b",
+                               "3059c", "3059d", "3063")))
+
+## St. Andreas ##
+# The St. Andreas entry is from Interstellar Expeditions: Interstellar Players 3
+# and provides an exact date of settlement of 1st of February 2768. It doesn't 
+# change after that, so we should remove all entries from 2786 forward and 
+# replace with a text entry
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "St. Andreas" & 
+             time_point %in% c("2783", "2786", "2821", "2822", "2830", 
+                               "2864", "3025", "3030", "3040", "3049", "3050a",
+                               "3050b", "3050c", "3051", "3052", "3057", "3058", 
+                               "3059a", "3059b", "3059c", "3059d", "3063", 
+                               "3068", "3075", "3079", "3081", "3085", "3095", 
+                               "3130", "3135", "3145", "3151", "3152")))
+sucs_data <- sucs_data |>
+  bind_rows(
+    tibble(
+      id_sucs = 3060,
+      id_mhq = "St. Andreas",
+      x = -582.627,
+      y = -365.812,
+      time_point = "special",
+      source_type = "text",
+      source_title = "IE: Interstellar Players 3",
+      source_loc = "pp. 57-61",
+      source_date = date("2768-02-01"),
+      faction = "I"
+    )
+  )
 
 
 # Founding state maps from handbooks ----------------------------------------
@@ -591,9 +636,6 @@ sucs_data <- correct_faction("Alfirk", "2750", "U")
 
 # Add 2765 Lib of Terra Data -------------------------------------------------
 
-# need to fix Antallos before updating sources or it won't catch
-sucs_data <- correct_faction("Antallos (Port Krin)", "2765", "I")
-
 bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
 sucs_data <- update_sources(
   target = "2765", 
@@ -681,13 +723,6 @@ sucs_data <- update_sources(
 
 # Add 2822 End of 1SW data -------------------------------------------------
 
-# Peratallada - part of Aurigan, should be U in 2822
-sucs_data <- correct_faction("Peratallada", "2822", "U")
-# Wheeler (Perian 2822+/Mystras 3022+) is not on the maps, here but it still 
-# exists and was already founded by 2765. I think we should remove it here
-sucs_data <- sucs_data |>
-  filter(!(time_point == "2822" & id_mhq == "Wheeler (Perian 2822+/Mystras 3022+)"))
-
 # The map in 1SW is missing some periphery planets that are shown in the 
 # later handbooks and have already been integrated into SUCS, so I will go
 # and and use the Handbooks and skip the 1SW
@@ -769,6 +804,18 @@ sucs_data <- update_sources(
 
 # Add 2830 Start of 2SW data -----------------------------------------------
 
+bounding_box <- create_box("Hunter's Paradise", "Maripa", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2830", 
+  title = "Historicals: Second Succession War", 
+  loc = "pp. 18-19",
+  date = date("2830-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "LC", "FWL", "FS", 
+               "MOC", "OA", "TC", "LL", "IP", "CF",
+               "CS")
+)
 
 # Add 2864 End of 2SW data ------------------------------------------------
 
@@ -982,6 +1029,8 @@ plot_planets(date("2783-01-01"), "2783-01-01, Pre-Great House Encroachment")
 plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment")
 plot_planets(date("2822-01-01"), "2822-01-01, End of 1st SW",
              source_filter = "Handbook: House Arano")
+plot_planets(date("2830-01-01"), "2830-01-01, Start of 2nd SW",
+             source_filter = "Handbook: House Arano")
 
 
 x <- sucs_data |> 
@@ -1002,7 +1051,12 @@ x <- sucs_data |>
 #             xlimits = c(-150, 350), ylimits = c(-550,-400),
 #             show_id = TRUE)
 
-plot_planets(date("2822-01-01"), "Test",
-             xlimits = c(-300, 0), ylimits = c(400,650),
+#plot_planets(date("2822-01-01"), "Test",
+#             xlimits = c(-300, 0), ylimits = c(400,650),
+#             show_id = TRUE)
+
+plot_planets(date("2830-01-01"), "Test",
+             source_filter = "Handbook: House Arano",
+             xlimits = c(-700, -300), ylimits = c(-500,-150),
              show_id = TRUE)
 
