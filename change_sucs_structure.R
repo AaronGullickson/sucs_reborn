@@ -735,6 +735,18 @@ sucs_data <- update_sources(
 
 # Add 2864 End of 2SW data ------------------------------------------------
 
+bounding_box <- create_box("Hunter's Paradise", "Maripa", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2864", 
+  title = "Historicals: Second Succession War", 
+  loc = "pp. 78-79",
+  date = date("2864-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "LC", "FWL", "FS", 
+               "MOC", "OA", "TC", "LL", "IP", "CF",
+               "CS")
+)
 
 # Add 3025 End of 3SW data ------------------------------------------------
 
