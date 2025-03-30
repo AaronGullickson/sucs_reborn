@@ -5,94 +5,9 @@ library(plotly)
 library(ggpubr)
 library(ggrepel)
 
+source("functions.R")
+
 # TODO: we could do an "errata" type to handle corrections
-
-
-# Helper functions ---------------------------------------------------
-
-# define a bounding box by planet entries
-create_box <- function(planet_left, planet_right, planet_high, planet_low) {
-  x_left <- system_coords |> 
-    filter(id_mhq == planet_left) |>
-    pull(x)
-  x_right <- system_coords |> 
-    filter(id_mhq == planet_right) |>
-    pull(x)
-  y_high <- system_coords |> 
-    filter(id_mhq == planet_high) |>
-    pull(y)
-  y_low <- system_coords |> 
-    filter(id_mhq == planet_low) |>
-    pull(y)
-  
-  list(x_left = x_left, x_right = x_right, y_high = y_high, y_low = y_low)
-}
-
-is_in_box <- function(x, y, box) {
-  if(is.null(box)) {
-    return(TRUE)
-  }
-  (x >= box$x_left & x <= box$x_right & y <= box$y_high & y >= box$y_low)
-}
-
-
-update_sources <- function(target, title, loc, date, 
-                           box = NULL, factions = NULL) {
-  sucs_data |> 
-    # First, drop any values from sucs_data from the target_time 
-    mutate(
-      # only change values that are from the target time and in
-      # the bounding box and come from acceptable factions
-      change_source = (time_point == target) & is_in_box(x, y, box) & 
-        (is.null(faction) | faction %in% factions),
-      # add source information
-      source_title = case_when(
-        !change_source ~ source_title,
-        time_point == target ~ title),
-      source_loc = case_when(
-        !change_source ~ source_loc,
-        time_point == target ~ loc),
-      source_date = case_when(
-        !change_source ~ source_date,
-        time_point == target ~ date)
-    )
-  
-}
-
-correct_faction <- function(id, time_target, new_faction) {
-  sucs_data |>
-    mutate(faction = if_else(id_mhq %in% id & time_point %in% time_target, 
-                             new_faction, faction))
-}
-
-correct_sources <- function(id, time_target,
-                            new_source_title, new_source_loc, new_source_date) {
-  sucs_data |>
-    mutate(
-      source_title = if_else(id_mhq %in% id & time_point %in% time_target, 
-                             new_source_title, source_title),
-      source_loc = if_else(id_mhq %in% id & time_point %in% time_target, 
-                           new_source_loc, source_loc),
-      source_date = if_else(id_mhq %in% id & time_point %in% time_target, 
-                            new_source_date, source_date)
-    )
-}
-
-faction_snapshot <- function(base_data, date) {
-  # get the date for each planet closest to the date but not over
-  base_data |>
-    filter(source_date <= date) |>
-    # create a type priority
-    mutate(source_type = factor(source_type, 
-                                levels = c("errata", "text", "map"))) |>
-    # arrange with most recent date at the top, and then break date
-    # ties by source_type
-    arrange(id_sucs, desc(source_date), source_type) |>
-    # remove duplicate planet entries
-    filter(!duplicated(id_sucs)) |>
-    select(starts_with("id_"), x, y, faction, 
-           source_type, source_title, source_loc, source_date)
-}
 
 # Read in data -------------------------------------------------------
 
@@ -921,9 +836,6 @@ sucs_data |>
                          "pp. 14-15", source_title)
   )
 
-
-
-
 # Create final data --------------------------------------------------------
 
 sucs_data <- sucs_data |>
@@ -936,169 +848,20 @@ sucs_data <- sucs_data |>
 
 # Create plots to test ----------------------------------------------------
 
-plot_planets <- function(date, 
-                         title = NULL, 
-                         xlimits = c(-600, 780), 
-                         ylimits = c(-580, 580),
-                         faction_filter = c("U"),
-                         source_filter = NULL,
-                         show_id = FALSE,
-                         interactive = TRUE) {
-  
-  temp <- sucs_data
-  
-  # Apply filters
-  if (!is.null(faction_filter)) {
-    temp <- temp |> filter(!(faction %in% faction_filter))
-  }
-  if (!is.null(source_filter)) {
-    temp <- temp |> filter(!(source_title %in% source_filter))
-  }
-  
-  # Take a snapshot & create labels
-  temp <- temp |>
-    faction_snapshot(date) |>
-    mutate(
-      faction = factor(faction, levels = sucs_factions$id_sucs, labels = sucs_factions$name),
-      text_plotly = paste0("<b>", id_mhq, "</b><br>",
-                           "<i>", faction, "</i><br>",
-                           source_type, ": ", source_title, 
-                           ", ", source_loc, "<br>", 
-                           source_date)
-    )
-  
-  # Determine color palette
-  faction_colors <- sucs_factions |>
-    filter(name %in% unique(temp$faction)) |>
-    pull("color")
-  
-  plot_title <- if_else(is.null(title), as.character(date), title)
-  
-  # Base ggplot
-  map <- ggplot(temp, aes(x = x, y = y, text = text_plotly, customdata = id_mhq)) +
-    geom_point(aes(color = faction)) +
-    scale_x_continuous(limits = xlimits) +
-    scale_y_continuous(limits = ylimits) +
-    scale_color_manual(values = faction_colors) +
-    labs(title = plot_title) +
-    theme_void() +
-    theme(panel.background = element_rect(fill = "grey20"),
-          panel.grid = element_blank())
-  
-  # Add ID labels if required
-  if (show_id) {
-    if (!interactive) {
-      map <- map + geom_text_repel(aes(label = id_mhq), color = "grey95", 
-                                   size = 3)
-    }
-  }
-  
-  # Convert to plotly
-  if (interactive) {
-    map <- ggplotly(map, tooltip = "text") |>
-      config(scrollZoom = TRUE) |>
-      layout(dragmode = "pan")
-    
-    if(show_id) {
-      # JavaScript to show labels when zoomed in
-      map <- map |> htmlwidgets::onRender("
-    function(el, x) {
-      console.log('Binding plotly_relayout event...');
-      var plot = document.getElementById(el.id);
-   
-   let throttleTimeout = null;
-let lastZoomLevel = null;
-
-el.on('plotly_relayout', function(eventData) {
-  console.log('Plotly relayout event detected:', eventData);
-
-  // Access the xaxis and yaxis range directly
-  var xaxisMin = eventData['xaxis.range[0]'];
-  var xaxisMax = eventData['xaxis.range[1]'];
-  var yaxisMin = eventData['yaxis.range[0]'];
-  var yaxisMax = eventData['yaxis.range[1]'];
-
-  // Throttle the event by using requestAnimationFrame for efficient updating
-  if (throttleTimeout) return; // If we are already waiting for an update, skip this event
-
-  throttleTimeout = requestAnimationFrame(function() {
-    // Check if the range values are available
-    if (xaxisMin !== undefined && xaxisMax !== undefined && yaxisMin !== undefined && yaxisMax !== undefined) {
-      var zoomLevelX = Math.abs(xaxisMax - xaxisMin);  // X-axis zoom level
-      var zoomLevelY = Math.abs(yaxisMax - yaxisMin);  // Y-axis zoom level
-      var zoomLevel = Math.max(zoomLevelX, zoomLevelY); // Use the max zoom level between X and Y axes
-
-      var zoomThreshold = 300; // bigger numbers mean labels will appear sooner
-      var annotations = [];
-
-      // Only add annotations if zoomed in beyond the threshold
-      if (zoomLevel < zoomThreshold) {
-        console.log('Zoomed in: Showing labels');
-        // Loop through the traces and create annotations only for visible points
-        for (var i = 0; i < x.data.length; i++) {
-          var trace = x.data[i];
-
-          // Loop through each point in the trace and check if it is visible within the current zoom range
-          for (var j = 0; j < trace.x.length; j++) {
-            if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
-              annotations.push({
-                x: trace.x[j],             // x value for the point
-                y: trace.y[j],             // y value for the point
-                text: trace.customdata[j], // customdata holds the label text
-                showarrow: false,          // Don't show arrows, just the label
-                xanchor: 'left',
-                yanchor: 'bottom',
-                font: {
-                  color: '#f2f2f2',
-                }
-              });
-            }
-          }
-        }
-      } else {
-        console.log('Zoomed out: Hiding labels');
-      }
-
-      // Apply the annotations to the plot only if the zoom level has changed
-      if (lastZoomLevel !== zoomLevel) {
-        lastZoomLevel = zoomLevel;  // Update last zoom level
-        Plotly.relayout(el, {annotations: annotations});
-      }
-    }
-
-    throttleTimeout = null;  // Reset the throttle timeout
-  });
-});
-
-
-
-
-    }
-  ")
-    }
-  }
-  
-  return(map)
-}
-
-
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
   mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color),
          color = ifelse(id_sucs == "A", "grey70", color))
 
-g1 <- plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
-g2 <- plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
-g3 <- plot_planets(date("2317-06-26"), "2317-06-26, FedSuns Founding")
-g4 <- plot_planets(date("2319-09-15"), "2319-09-15, Eve of DC Founding (approximate)")
-g5 <- plot_planets(date("2319-09-30"), "2319-09-30, DC Founding (approximate)")
-g6 <- plot_planets(date("2340-12-31"), "2340-12-31, Eve of LC Founding")
-g7 <- plot_planets(date("2341-01-01"), "2341-01-01, LC Founding")
-g8 <- plot_planets(date("2366-01-01"), "2366-01-01, Eve of CC Founding (approximate)")
-g9 <- plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
-
-ggarrange(g1, g2, g3, g4, g5, g6, g7, g8, g9, ncol = 3, nrow = 3)
-
+plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
+plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
+plot_planets(date("2317-06-26"), "2317-06-26, FedSuns Founding")
+plot_planets(date("2319-09-15"), "2319-09-15, Eve of DC Founding (approximate)")
+plot_planets(date("2319-09-30"), "2319-09-30, DC Founding (approximate)")
+plot_planets(date("2340-12-31"), "2340-12-31, Eve of LC Founding")
+plot_planets(date("2341-01-01"), "2341-01-01, LC Founding")
+plot_planets(date("2366-01-01"), "2366-01-01, Eve of CC Founding (approximate)")
+plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
 plot_planets(date("2540-01-01"), "2540-01-01, UHC Pre-Merge")
 plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
 plot_planets(date("2571-07-09"), "2571-07-09, Founding of Star League")
@@ -1114,32 +877,3 @@ plot_planets(date("2822-01-01"), "2822-01-01, End of 1st SW",
              source_filter = "Handbook: House Arano")
 plot_planets(date("2830-01-01"), "2830-01-01, Start of 2nd SW",
              source_filter = "Handbook: House Arano", show_id = TRUE)
-
-
-x <- sucs_data |> 
-  faction_snapshot(date("2822-01-01")) |>
-  filter(faction == "I")
-
-# get close in view
-#plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment",
-#             xlimits = c(-100, 150), ylimits = c(-125, 135),
-#             show_id = TRUE)
-
-#plot_planets(date("2822-01-01"), "Test",
-#             xlimits = c(500, 700), ylimits = c(-450, 200),
-#             show_id = TRUE)
-
-#plot_planets(date("2890-07-21"), "Test",
-#             #source_filter = "Handbook: House Arano",
-#             xlimits = c(-150, 350), ylimits = c(-550,-400),
-#             show_id = TRUE)
-
-#plot_planets(date("2822-01-01"), "Test",
-#             xlimits = c(-300, 0), ylimits = c(400,650),
-#             show_id = TRUE)
-
-#plot_planets(date("2830-01-01"), "Test",
-#             source_filter = "Handbook: House Arano",
-#             xlimits = c(-700, -300), ylimits = c(-500,-150),
-#             show_id = TRUE)
-
