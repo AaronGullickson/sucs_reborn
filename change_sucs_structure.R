@@ -613,19 +613,6 @@ sucs_data <- update_sources(
                "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
 )
 
-# we are getting quite a bit of Aurigan Coalition stuff mixed in here - lets
-# filter all of that out and put it in a separate Aurigan map
-aurigan_cases <- c("Alloway", "Bellerophon", "Bonavista", "Chaadan",
-                   "Don't", "Sacromonte", "Tiburon", 
-                   "Wheeler (Perian 2822+/Mystras 3022+)")
-aurigan_planets_2765 <- sucs_data |>
-  filter(id_mhq %in% aurigan_cases & time_point == "2765") |>
-  mutate(source_title = "Handbook: House Arano",
-         source_loc = "p. 10",
-         source_date = date("2765-01-01"))
-sucs_data <- sucs_data |>
-  filter(!(id_mhq %in% aurigan_cases & time_point == "2765"))
-
 # Amaris Empire data -------------------------------------------------------
 
 # This is the data labeled as 2767 in the SUCS and described as "2765 map with 
@@ -904,6 +891,9 @@ sucs_data |>
     source_loc = if_else(time_point == "3025" & faction == "AuC", 
                          "pp. 14-15", source_title)
   )
+
+# TODO: it seems like most of these planets are reported as abandoned by
+# 3030 - is that canon? from where?
 
 # Create final data --------------------------------------------------------
 
