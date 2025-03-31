@@ -40,7 +40,10 @@ function addPlotlyLabels(el, x) {
                    showarrow: false,
                    xanchor: 'left',
                    yanchor: 'bottom',
-                   font: { color: '#f2f2f2' }
+                   font: { 
+                     color: '#f2f2f2',
+                     size: 8
+                   }
                  });
                }
              }
