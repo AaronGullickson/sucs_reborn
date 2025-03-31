@@ -705,7 +705,7 @@ sucs_data <- update_sources(
 )
 
 # OK now do the full 1SW map
-bounding_box <- create_box("Hunter's Paradise", "Maripa", "Syrstart", "Helvetica")
+bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
 sucs_data <- update_sources(
   target = "2822", 
   title = "Historicals: First Succession War", 
@@ -852,7 +852,8 @@ sucs_data |>
 
 sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
-  select(id_sucs, id_mhq, x, y, starts_with("source_"), faction, starts_with("region")) |>
+  select(id_sucs, id_mhq, x, y, starts_with("source_"), 
+         faction, starts_with("region")) |>
   arrange(id_sucs, source_date)
 
 save(sucs_data, sucs_factions, file = "sucs_data.RData")
@@ -865,28 +866,3 @@ save(sucs_data, sucs_factions, file = "sucs_data.RData")
 sucs_factions <- sucs_factions |>
   mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color),
          color = ifelse(id_sucs == "A", "grey70", color))
-
-plot_planets(date("2271-06-01"), "2271-06-01, Eve of FWL Founding")
-plot_planets(date("2271-06-02"), "2271-06-02, FWL Founding")
-plot_planets(date("2317-06-26"), "2317-06-26, FedSuns Founding")
-plot_planets(date("2319-09-15"), "2319-09-15, Eve of DC Founding (approximate)")
-plot_planets(date("2319-09-30"), "2319-09-30, DC Founding (approximate)")
-plot_planets(date("2340-12-31"), "2340-12-31, Eve of LC Founding")
-plot_planets(date("2341-01-01"), "2341-01-01, LC Founding")
-plot_planets(date("2366-01-01"), "2366-01-01, Eve of CC Founding (approximate)")
-plot_planets(date("2366-07-15"), "2366-07-15, CC Founding (approximate)")
-plot_planets(date("2540-01-01"), "2540-01-01, UHC Pre-Merge")
-plot_planets(date("2540-12-31"), "2540-12-31, after UHC merge")
-plot_planets(date("2571-07-09"), "2571-07-09, Founding of Star League")
-plot_planets(date("2596-09-30"), "2596-09-30, End of Reunification War")
-plot_planets(date("2750-01-01"), "2750-01-01, Height of Star League")
-plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup",
-             source_filter = "Handbook: House Arano")
-plot_planets(date("2765-01-01"), "2765-01-01, Eve of Amaris Coup")
-plot_planets(date("2772-07-01"), "2772-07-01, Amaris Empire")
-plot_planets(date("2783-01-01"), "2783-01-01, Pre-Great House Encroachment")
-plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment")
-plot_planets(date("2822-01-01"), "2822-01-01, End of 1st SW",
-             source_filter = "Handbook: House Arano")
-plot_planets(date("2830-01-01"), "2830-01-01, Start of 2nd SW")
-plot_planets(sucs_data, date("2864-01-01"), "2864-01-01, End of 2nd SW")
