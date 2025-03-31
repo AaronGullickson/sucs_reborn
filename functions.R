@@ -90,30 +90,32 @@ faction_snapshot <- function(base_data, date) {
 # read in javascript code
 js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
 
-plot_planets <- function(date, 
+plot_planets <- function(map_data,
+                         date, 
                          title = NULL, 
                          xlimits = c(-600, 780), 
                          ylimits = c(-580, 580),
                          faction_filter = NULL,
                          source_filter = NULL,
                          show_id = TRUE,
-                         interactive = TRUE) {
-  
-  temp <- sucs_data
+                         interactive = TRUE,
+                         faction_data = sucs_factions) {
   
   # Apply filters
   if (!is.null(faction_filter)) {
-    temp <- temp |> filter(!(faction %in% faction_filter))
+    map_data <- map_data |> filter(!(faction %in% faction_filter))
   }
   if (!is.null(source_filter)) {
-    temp <- temp |> filter(!(source_title %in% source_filter))
+    map_data <- map_data |> filter(!(source_title %in% source_filter))
   }
   
   # Take a snapshot & create labels
-  temp <- temp |>
+  map_data <- map_data |>
     faction_snapshot(date) |>
     mutate(
-      faction = factor(faction, levels = sucs_factions$id_sucs, labels = sucs_factions$name),
+      faction = factor(faction, 
+                       levels = faction_data$id_sucs, 
+                       labels = faction_data$name),
       text_plotly = paste0("<b>", id_mhq, "</b><br>",
                            "<i>", faction, "</i><br>",
                            source_type, ": ", source_title, 
@@ -122,14 +124,15 @@ plot_planets <- function(date,
     )
   
   # Determine color palette
-  faction_colors <- sucs_factions |>
-    filter(name %in% unique(temp$faction)) |>
+  faction_colors <- faction_data |>
+    filter(name %in% unique(map_data$faction)) |>
     pull("color")
   
   plot_title <- if_else(is.null(title), as.character(date), title)
   
   # Base ggplot
-  map <- ggplot(temp, aes(x = x, y = y, text = text_plotly, customdata = id_mhq)) +
+  map <- map_data |>
+    ggplot(aes(x = x, y = y, text = text_plotly, customdata = id_mhq)) +
     geom_point(aes(color = faction)) +
     scale_x_continuous(limits = xlimits) +
     scale_y_continuous(limits = ylimits) +

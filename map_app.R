@@ -41,7 +41,8 @@ ui <- fluidPage(
 server <- function(input, output) {
 
   output$plot <- renderPlotly({ 
-    plot_planets(input$date, as.character(input$date)) |>
+    plot_planets(sucs_data, input$date, as.character(input$date),
+                 faction_data = sucs_factions) |>
       layout(height = 800, width = 1000)
   }) 
 }

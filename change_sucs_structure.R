@@ -889,4 +889,4 @@ plot_planets(date("2786-12-31"), "2786-12-31, Great House Encroachment")
 plot_planets(date("2822-01-01"), "2822-01-01, End of 1st SW",
              source_filter = "Handbook: House Arano")
 plot_planets(date("2830-01-01"), "2830-01-01, Start of 2nd SW")
-plot_planets(date("2864-01-01"), "2864-01-01, End of 2nd SW")
+plot_planets(sucs_data, date("2864-01-01"), "2864-01-01, End of 2nd SW")
