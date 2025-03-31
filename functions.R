@@ -95,19 +95,9 @@ plot_planets <- function(map_data,
                          title = NULL, 
                          xlimits = c(-600, 780), 
                          ylimits = c(-580, 580),
-                         faction_filter = NULL,
-                         source_filter = NULL,
                          show_id = TRUE,
                          interactive = TRUE,
                          faction_data = sucs_factions) {
-  
-  # Apply filters
-  if (!is.null(faction_filter)) {
-    map_data <- map_data |> filter(!(faction %in% faction_filter))
-  }
-  if (!is.null(source_filter)) {
-    map_data <- map_data |> filter(!(source_title %in% source_filter))
-  }
   
   # Take a snapshot & create labels
   map_data <- map_data |>
