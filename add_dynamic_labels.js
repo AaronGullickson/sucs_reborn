@@ -2,13 +2,13 @@
 // appear at certain zoom levels
 
 function addPlotlyLabels(el, x) {
-   console.log('Binding plotly_relayout event...');
+   console.log('Binding plotly_relayout and plotly_restyle events...');
    var plot = document.getElementById(el.id);
 
    let throttleTimeout = null;
 
-   el.on('plotly_relayout', function(eventData) {
-     console.log('Plotly relayout event detected:', eventData);
+   function updateAnnotations(eventData) {
+     console.log('Updating annotations...', eventData);
 
      var xaxisMin = eventData['xaxis.range[0]'];
      var xaxisMax = eventData['xaxis.range[1]'];
@@ -27,23 +27,27 @@ function addPlotlyLabels(el, x) {
 
          if (zoomLevel < zoomThreshold) {
            console.log('Zoomed in: Showing labels');
+
            for (var i = 0; i < x.data.length; i++) {
              var trace = x.data[i];
 
-             for (var j = 0; j < trace.x.length; j++) {
-               if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
-                 annotations.push({
-                   x: trace.x[j],
-                   y: trace.y[j],
-                   text: trace.customdata[j],
-                   showarrow: false,
-                   xanchor: 'left',
-                   yanchor: 'bottom',
-                   font: { 
-                     color: '#f2f2f2',
-                     size: 8
-                   }
-                 });
+             // Check if the trace is visible (trace.visible is 'legendonly' when hidden)
+             if (trace.visible === true || trace.visible === undefined) {
+               for (var j = 0; j < trace.x.length; j++) {
+                 if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
+                   annotations.push({
+                     x: trace.x[j],
+                     y: trace.y[j],
+                     text: trace.customdata[j],
+                     showarrow: false,
+                     xanchor: 'left',
+                     yanchor: 'bottom',
+                     font: { 
+                       color: '#f2f2f2',
+                       size: 8
+                     }
+                   });
+                 }
                }
              }
            }
@@ -55,5 +59,14 @@ function addPlotlyLabels(el, x) {
        }
        throttleTimeout = null;
      });
+   }
+
+   // Listen for zoom/pan events
+   el.on('plotly_relayout', updateAnnotations);
+
+   // Listen for legend clicks (trace visibility changes)
+   el.on('plotly_restyle', function() {
+     console.log('Legend clicked: Updating labels');
+     Plotly.relayout(el, { annotations: [] }); // Clear annotations
    });
 }
