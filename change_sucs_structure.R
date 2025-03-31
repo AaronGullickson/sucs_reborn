@@ -130,19 +130,13 @@ sucs_data <- correct_faction("Stotzing", "2596", "U")
 
 ## Alfirk ##
 # this is listed as an independent world, apparently from very early
-# on based on an entry from the Periphery handbook (2nd edition) and being
-# put on maps in Era Report 3145. But on this map, it is not present. I think 
-# it should be listed as U until 3145 where it makes its first map appearance
-# we can correct with errata if necessary
-sucs_data <- correct_faction("Alfirk", 
-                             c("2596", "2750", "2765", "2767", "2783", "2786",
-                               "2821", "2822", "2830", "2864", "3025", "3030", 
-                               "3040", "3049", "3050a", "3050b", "3050c", 
-                               "3051", "3052", "3057", "3058", "3059a", "3059b",
-                               "3059c", "3059d", "3063", "3067", "3068", "3075",
-                               "3079", "3081", "3085", "3095", "3130", "3135",
-                               "3145", "3151", "3152"),
-                             "U")
+# on based on an entry from the Periphery handbook (2nd edition), but it does
+# not appear on any maps until War of 3039. All cases before that should be
+# removed.
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "Alfirk" & 
+             time_point %in% c("2596", "2750", "2765", "2767", "2783", "2786",
+                               "2821", "2822", "2830", "2864", "3025", "3030")))
 
 ## Ward ## 
 # The text on pg. 88 of HBHL says it was founded during "the Exodus
@@ -1062,6 +1056,21 @@ sucs_data <- update_sources(
 
 # Add 3039 end of War of 3039 data ----------------------------------------
 
+# date from end of war 3040-01-19
+bounding_box <- create_box("New St. Andrews", "Micanos (Mica II, V, VII)", 
+                           "Manaringaine", "Skyfog")
+sucs_data <- update_sources(
+  target = "3040", 
+  title = "Historicals: War of 3039", 
+  loc = "pp. 132-133",
+  date = date("3040-01-19"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
+               "OC", "EF", "GV", "TD")
+)
 
 
 # Handle House Arano data -------------------------------------------------
