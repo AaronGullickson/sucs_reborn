@@ -94,7 +94,7 @@ plot_planets <- function(date,
                          title = NULL, 
                          xlimits = c(-600, 780), 
                          ylimits = c(-580, 580),
-                         faction_filter = c("U"),
+                         faction_filter = NULL,
                          source_filter = NULL,
                          show_id = TRUE,
                          interactive = TRUE) {
