@@ -19,7 +19,7 @@ load("sucs_data.RData")
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("Battletech Universe Faction Map"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
