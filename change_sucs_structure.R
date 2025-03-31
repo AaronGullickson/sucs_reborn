@@ -304,6 +304,12 @@ sucs_data <- correct_faction(c("Prix", "Primus", "New Roland", "Andarmax",
                              c("3030"),
                              "CC")
 
+## New St. Andrews ##
+# This planet first appears on the map in 2930 and needs three cases removed
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "New St. Andrews" & 
+             time_point %in% c("2822", "2830", "2864")))
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -808,12 +814,173 @@ sucs_data <- update_sources(
                "CS")
 )
 
+
+# Add 2930 Marian Hegemony Map --------------------------------------------
+
+# From Major Periphery States
+bounding_box <- create_box("New St. Andrews", "Negushevo", 
+                           "Edmondson", "Algenib")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: Major Periphery States", 
+  loc = "p. 163",
+  date = date("2930-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "MH", "FWL", "MOC", "LL", "IP", "CF")
+)
+
 # Add 3025 End of 3SW data ------------------------------------------------
 
-# this comes from a poster map?
+# Lets start with House Handbooks
 
-# need to deal with House Arano again
+# Handbook: House Davion
+bounding_box <- create_box("Al Hillah", "New Haiti (New Hati)", 
+                           "Kagoshima", "Rockwellawan")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: House Davion", 
+  loc = "p. 70",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "OA", "TC", "TD")
+)
 
+# Handbook: House Kurita
+bounding_box <- create_box("Garrison", "Antallos (Port Krin)", 
+                           "Manaringaine", "Zion")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: House Kurita", 
+  loc = "p. 64",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "OA", "TFR", "OC", "EF")
+)
+
+# Handbook: House Steiner
+bounding_box <- create_box("Haggard", "Otho", 
+                           "Botany Bay", "Maximillian")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: House Steiner", 
+  loc = "p. 47",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "OA", "TFR", "OC", "EF", "MV", "CF")
+)
+
+# Handbook: House Marik
+bounding_box <- create_box("Florida", "Styk", "Glengarry", "Lockton")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: House Marik", 
+  loc = "p. 42",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "MOC", "TFR", "CF", "LL", "IP", "MH")
+)
+
+# Handbook: House Liao
+bounding_box <- create_box("McAffe", "New Avalon", "Clovis", "Rockwellawan")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: House Liao", 
+  loc = "p. 40",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "LC", "CS",
+               "MOC", "TC", "TFR", "SIC")
+)
+
+# Periphery: Magistracy of Canopus
+bounding_box <- create_box("Thraxa", "Borden", "Andurien", "Gettorf")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: Major Periphery States", 
+  loc = "p. 95",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "MOC", "CC", "FWL")
+)
+
+# Periphery: Taurian Concordat
+bounding_box <- create_box("Betelgeuse", "Great Gorge", "Darwendale", "Spencer")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Handbook: Major Periphery States", 
+  loc = "p. 121",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "TC", "CC", "FS")
+)
+
+# Ok, we had a few areas outside the frame of all these maps
+# So lets zoom in on areas outside frame and use the Inner Sphere at War map 
+# as a reference
+# East of Outworlds Alliance
+bounding_box <- create_box("Shiri", "Puttalam", "Feijo", "Kent")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Inner Sphere at War", 
+  loc = "map",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A")
+)
+
+# North of Outworlds Alliance
+bounding_box <- create_box("Michtal", "Blueys", "Blueys", "Azur")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Inner Sphere at War", 
+  loc = "map",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A")
+)
+
+# Azur and Vanburg
+bounding_box <- create_box("Vangburg", "Azur", "Vangburg", "Azur")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Inner Sphere at War", 
+  loc = "map",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A")
+)
+
+# North of Lyran Commonwealth
+bounding_box <- create_box("Mearra", "Beowulf", "Givrodat", "Battaraigi")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Inner Sphere at War", 
+  loc = "map",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A")
+)
+
+# West of Lyran Commonwealth
+bounding_box <- create_box("Hunter's Paradise", "Sialkot", "Rypful", "Lande")
+sucs_data <- update_sources(
+  target = "3025", 
+  title = "Inner Sphere at War", 
+  loc = "map",
+  date = date("3025-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A")
+)
 
 # Add 3030 End of 4SW data ------------------------------------------------
 
@@ -834,7 +1001,7 @@ sucs_data <- update_sources(
 )
 
 # Issues
-# four inhabited system south of TC that are not on map; Aea, Regis Roost,
+# TODO: four inhabited system south of TC that are not on map; Aea, Regis Roost,
 # Carthage, Spitz. They do show up on the House Liao book, but they should be 
 # removed here to ensure we get proper sourcing of the disagreement
 
@@ -880,11 +1047,8 @@ sucs_data <- update_sources(
                "MOC", "TFR", "CF", "LL", "IP", "MH")
 )
 
-# missing Spencer here due to legend issue
-
-
 # Handbook: House Liao
-bounding_box <- create_box("Faleolo", "Argyle", "Denebola", "Hellespont")
+bounding_box <- create_box("Faleolo", "Argyle", "Clovis", "Hellespont")
 sucs_data <- update_sources(
   target = "3030", 
   title = "Handbook: House Liao", 
@@ -895,11 +1059,6 @@ sucs_data <- update_sources(
                "CC", "FS", "FWL", "LC", "CS",
                "MOC", "TC", "TFR", "SIC")
 )
-
-
-# TODO: Ok, we had a few areas outside the frame of all these maps
-# So lets zoom in on areas outside frame and use the Inner Sphere at War map 
-# as a reference
 
 # Add 3039 end of War of 3039 data ----------------------------------------
 
@@ -979,6 +1138,7 @@ arano_data <- arano_data |>
 
 sucs_data <- sucs_data |>
   bind_rows(arano_data)
+
 
 # change source for any 3025 AuC entries to Handbook: House Arano
 sucs_data |>
