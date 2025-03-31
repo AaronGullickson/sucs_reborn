@@ -190,10 +190,13 @@ sucs_data <- sucs_data |>
   )
 
 ## Oberon Confederation ##
-# Sigurd, Oberon VI, and Crellacor are showing up as OC from 2783 but
-# they shouldn't be there until 3025
+# Sigurd, Oberon VI, and Crellacor are showing up as OC from 2783. The OG 
+# Oberon Confederation only shows up on the 2786 map from 1SW, but as 
+# independent in the 2822 maps for that same source. The OC only shows up again
+# in 3025. So I think these planets should be marked as independent for every
+# time_point between 2783 and 2864 except for 2786.
 sucs_data <- correct_faction(c("Sigurd", "Oberon VI", "Crellacor"),
-                             c("2783", "2786", "2821", "2822", "2830", "2864"),
+                             c("2783", "2821", "2822", "2830", "2864"),
                              "I")
 
 ## Joppa ##
@@ -238,8 +241,54 @@ sucs_data <- sucs_data |>
     )
   )
 
+## Frobisher ##
+# This is an IE: ISP3 entry and it says the colony of ... fish people ...
+# was founded in the "late 2690s". It is still existing today, although in a 
+# somewhat ... unusual state. So, like St. Andreas above, we should wipe out
+# all the map references and make a two entries - one for an SL faction and 
+# then a fall of the SL date to I.
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "Frobisher" & 
+             time_point %in% c("2750", "2765", "2767", "2783", "2786", "2821", 
+                               "2822", "2830", "2864", "3025", "3030", "3040", 
+                               "3049", "3050a", "3050b", "3050c", "3051", 
+                               "3052", "3057", "3058", "3059a", "3059b", 
+                               "3059c", "3059d", "3063", "3068", "3075", 
+                               "3079", "3081", "3085", "3095", 
+                               "3130", "3135", "3145", "3151", "3152")))
+sucs_data <- sucs_data |>
+  bind_rows(
+    tibble(
+      id_sucs = 3111,
+      id_mhq = "Frobisher",
+      x = -370.480,
+      y = -470.316,
+      time_point = "special",
+      source_type = "text",
+      source_title = "IE: Interstellar Players 3",
+      source_loc = "p. 81",
+      source_date = date("2699-12-31"),
+      faction = "SL"
+    )
+  )
 
-# Founding state maps from handbooks ----------------------------------------
+sucs_data <- sucs_data |>
+  bind_rows(
+    tibble(
+      id_sucs = 3111,
+      id_mhq = "Frobisher",
+      x = -370.480,
+      y = -470.316,
+      time_point = "special",
+      source_type = "text",
+      source_title = "IE: Interstellar Players 3",
+      source_loc = "p. 81",
+      source_date = date("2786-12-31"),
+      faction = "I"
+    )
+  )
+
+# Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
 
@@ -618,7 +667,6 @@ sucs_data <- update_sources(
 
 # This comes from Lib of Terra, p. 119, after houses gobble up Hegemony worlds
 # I think this should go through the end of 2786
-
 bounding_box <- create_box("Gacrux", "Junction", "Altais", "Lacadon")
 sucs_data <- update_sources(
   target = "2786", 
@@ -629,8 +677,17 @@ sucs_data <- update_sources(
   factions = c("I", "U", "A", "CC", "FWL", "FS", "DC", "LC", "AE", "TH")
 )
 
-# TODO: We also have a 2786 map in 1SW for the whole IS. Should we use that
-# where available?
+# We also have a 2786 map in 1SW for the whole IS. Lets use that as well
+bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica")
+sucs_data <- update_sources(
+  target = "2786", 
+  title = "Historicals: First Succession War", 
+  loc = "pp. 24-25",
+  date = date("2786-12-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", "CC", "FWL", "FS", "DC", "LC", "AE", "TH", "CS",
+               "MOC", "TC", "OA", "IP", "LL", "TD", "OC", "FFR", "CF")
+)
 
 # Add Operation Klondike maps data -----------------------------------------
 
