@@ -31,7 +31,7 @@ ui <- fluidPage(
           dateInput(
             inputId = "date",
             label = h3("Date input"),
-            value = date("2830-01-01")),
+            value = date("3040-12-31")),
           checkboxInput(
             "remove_undiscovered", 
             "Remove Undiscovered?", 
