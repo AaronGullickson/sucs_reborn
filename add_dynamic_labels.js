@@ -6,7 +6,6 @@ function addPlotlyLabels(el, x) {
    var plot = document.getElementById(el.id);
 
    let throttleTimeout = null;
-   let lastZoomLevel = null;
 
    el.on('plotly_relayout', function(eventData) {
      console.log('Plotly relayout event detected:', eventData);
@@ -52,10 +51,7 @@ function addPlotlyLabels(el, x) {
            console.log('Zoomed out: Hiding labels');
          }
 
-         if (lastZoomLevel !== zoomLevel) {
-           lastZoomLevel = zoomLevel;
-           Plotly.relayout(el, { annotations: annotations });
-         }
+         Plotly.relayout(el, { annotations: annotations });
        }
        throttleTimeout = null;
      });
