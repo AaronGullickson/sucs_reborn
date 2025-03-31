@@ -288,6 +288,22 @@ sucs_data <- sucs_data |>
     )
   )
 
+## Andurien Wars ##
+# Several worlds that should be FWL/CC are listed as MOC/DA presumably due
+# to the Andurien Wars, but thats not what shows on this map. That doesn't 
+# start until September anyway, so should be handled by properly entering text
+# entries from Brush Wars whenever we do that as a project.
+# All DA worlds should be changed. We will change them to FWL but a few will
+# then be corrected to CC below
+andurien_3030 <- sucs_data |> 
+  filter(faction == "DA" & time_point == "3030") |> 
+  pull(id_mhq)
+sucs_data <- correct_faction(andurien_3030, "3030", "FWL")
+sucs_data <- correct_faction(c("Prix", "Primus", "New Roland", "Andarmax", 
+                               "Jacomarle", "Drozan", "Renown", "Sax"),
+                             c("3030"),
+                             "CC")
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -801,8 +817,89 @@ sucs_data <- update_sources(
 
 # Add 3030 End of 4SW data ------------------------------------------------
 
-# I think the only source for this is the House Handbooks so will need to do
-# it in steps
+# The only source for this is the House Handbooks so will need to do it in steps
+
+# Handbook: House Davion
+bounding_box <- create_box("Al Hillah", "New Haiti (New Hati)", 
+                           "Kagoshima", "Rockwellawan")
+sucs_data <- update_sources(
+  target = "3030", 
+  title = "Handbook: House Davion", 
+  loc = "p. 72",
+  date = date("3030-01-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "OA", "TC", "TD", "SIC", "TFR")
+)
+
+# Issues
+# four inhabited system south of TC that are not on map; Aea, Regis Roost,
+# Carthage, Spitz. They do show up on the House Liao book, but they should be 
+# removed here to ensure we get proper sourcing of the disagreement
+
+
+# Handbook: House Kurita
+bounding_box <- create_box("Garrison", "Antallos (Port Krin)", 
+                           "Manaringaine", "Zion")
+sucs_data <- update_sources(
+  target = "3030", 
+  title = "Handbook: House Kurita", 
+  loc = "p. 66",
+  date = date("3030-01-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "OA", "TFR", "OC", "EF")
+)
+
+# Handbook: House Steiner
+bounding_box <- create_box("Gillfillan's Gold", "Basalt", 
+                           "Placida", "Shasta")
+sucs_data <- update_sources(
+  target = "3030", 
+  title = "Handbook: House Steiner", 
+  loc = "p. 56",
+  date = date("3030-01-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "OA", "TFR", "OC", "EF", "GV", "CF")
+)
+
+# Handbook: House Marik
+bounding_box <- create_box("Florida", "Gan Singh", "Florida", "Lockton")
+sucs_data <- update_sources(
+  target = "3030", 
+  title = "Handbook: House Marik", 
+  loc = "p. 51",
+  date = date("3030-01-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "DC", "FS", "FWL", "LC", "CS",
+               "MOC", "TFR", "CF", "LL", "IP", "MH")
+)
+
+# missing Spencer here due to legend issue
+
+
+# Handbook: House Liao
+bounding_box <- create_box("Faleolo", "Argyle", "Denebola", "Hellespont")
+sucs_data <- update_sources(
+  target = "3030", 
+  title = "Handbook: House Liao", 
+  loc = "p. 49",
+  date = date("3030-01-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "LC", "CS",
+               "MOC", "TC", "TFR", "SIC")
+)
+
+
+# TODO: Ok, we had a few areas outside the frame of all these maps
+# So lets zoom in on areas outside frame and use the Inner Sphere at War map 
+# as a reference
 
 # Add 3039 end of War of 3039 data ----------------------------------------
 
