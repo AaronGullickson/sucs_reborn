@@ -855,6 +855,7 @@ sucs_data <- sucs_data |>
   select(id_sucs, id_mhq, x, y, starts_with("source_"), faction, starts_with("region")) |>
   arrange(id_sucs, source_date)
 
+save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)
 
