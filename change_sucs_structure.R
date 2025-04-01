@@ -337,6 +337,35 @@ sucs_data <- sucs_data |>
   filter(!(id_mhq == "New St. Andrews" & 
              time_point %in% c("2822", "2830", "2864")))
 
+## Kleinwelt ##
+# This was originally part of MOC but was abandoned by 2864 map. The 
+# SUCK has it as independent from 3040 map onward, but it is only from IE:ISP3
+# entry regarding Marian Hegemony slaves refounding a colony there in 3044.
+# So remove all entries after 2864 and then add a text entry in 3044.
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "Kleinwelt" & 
+             time_point %in% c("2864", "3025", "3030", "3040", 
+                               "3049", "3050a", "3050b", "3050c", "3051", 
+                               "3052", "3057", "3058", "3059a", "3059b", 
+                               "3059c", "3059d", "3063", "3068", "3075", 
+                               "3079", "3081", "3085", "3095", 
+                               "3130", "3135", "3145", "3151", "3152")))
+sucs_data <- sucs_data |>
+  bind_rows(
+    tibble(
+      id_sucs = 1376,
+      id_mhq = "Kleinwelt",
+      x = -334.286,
+      y = -423.676,
+      time_point = "special",
+      source_type = "text",
+      source_title = "IE: Interstellar Players 3",
+      source_loc = "p. 82",
+      source_date = date("3044-12-31"),
+      faction = "I"
+    )
+  )
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -1181,8 +1210,6 @@ sucs_data <- update_sources(
 # now re-add the periphery wave data
 sucs_data <- sucs_data |>
   bind_rows(periphery_3049)
-
-# TODO: Kleinwelt and Alfirk do not appear on this map
 
 # Now do the remaining waves
 
