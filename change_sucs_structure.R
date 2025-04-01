@@ -159,11 +159,17 @@ sucs_data <- correct_faction("Stotzing", "2596", "U")
 # this is listed as an independent world, apparently from very early
 # on based on an entry from the Periphery handbook (2nd edition), but it does
 # not appear on any maps until War of 3039. All cases before that should be
-# removed.
+# removed. 
+# It also does not show up on the 3052 and 3062 Era Report maps, although that 
+# may be due to legend placement
+# It shows up again in Jihad: Final Reckoning, FM 3085, and Jihad Secrets, 
+# Era Report 3145, Shattered Fortress, and Ilkhan's Eyes Only, (not sure 
+# about Era Digest: Dark Ages)
 sucs_data <- sucs_data |>
   filter(!(id_mhq == "Alfirk" & 
              time_point %in% c("2596", "2750", "2765", "2767", "2783", "2786",
-                               "2821", "2822", "2830", "2864", "3025", "3030")))
+                               "2821", "2822", "2830", "2864", "3025", "3030",
+                               "3049", "3052", "3062")))
 
 ## Ward ## 
 # The text on pg. 88 of HBHL says it was founded during "the Exodus
