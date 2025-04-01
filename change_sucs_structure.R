@@ -169,7 +169,9 @@ sucs_data <- sucs_data |>
   filter(!(id_mhq == "Alfirk" & 
              time_point %in% c("2596", "2750", "2765", "2767", "2783", "2786",
                                "2821", "2822", "2830", "2864", "3025", "3030",
-                               "3049", "3052", "3062")))
+                               "3049", "3050a", "3050b", "3050c", "3051", 
+                               "3052", "3057", "3058", "3059a", "3059b", 
+                               "3059c", "3059d" ,"3062", "3063")))
 
 ## Ward ## 
 # The text on pg. 88 of HBHL says it was founded during "the Exodus
@@ -672,10 +674,6 @@ sucs_data <- update_sources(
                "TH", "DC", "FS", "FWL", "LC", "CC",
                "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
 )
-
-# Issues
-# Alfrik - same as problem above
-sucs_data <- correct_faction("Alfirk", "2750", "U")
 
 # Add 2765 Lib of Terra Data -------------------------------------------------
 
@@ -1287,7 +1285,7 @@ sucs_data <- update_sources(
 # TODO: We are missing jointly administered worlds, part of the Disputed
 # faction code issue
 
-# Add Era Report 3062 data ----------------------------------------------------
+# Add Operation Guerrero Era Report 3062 data -------------------------------
 
 # The 3057 column is the August 3057 map but after Chaos March and break off of
 # Lyran Alliance, but it would be nice to recover the August 3057 map before 
@@ -1363,6 +1361,29 @@ lyran_alliance <- sucs_data |>
 
 sucs_data <- sucs_data |>
   bind_rows(lyran_alliance)
+
+
+# Add Era Report 3062 Final Map data --------------------------------------
+
+bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3063", 
+  title = "Era Report 3062", 
+  loc = "pp. 28-29",
+  date = date("3063-07-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "LA", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ", "CDS", "CNC", "CSV",
+               "TCC", "SS", "DS", "ST", "SKC",
+               "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
+               "TD", "RC", "NCR")
+)
+
+# TODO: Noticing Skyfog is still on this map and presumably others, but it 
+# seems like it might be within frame to declare it abandoned, needs a check.
 
 # Add Jihad Final Reckoning data ----------------------------------------------
 
