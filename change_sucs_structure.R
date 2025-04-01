@@ -1289,6 +1289,9 @@ sucs_data <- update_sources(
 
 # Add Era Report 3062 data ----------------------------------------------------
 
+# The 3057 is the August 3057 map but after break off of Lyran Alliance which 
+# I feel is 
+
 # Add Jihad Final Reckoning data ----------------------------------------------
 
 
@@ -1443,7 +1446,8 @@ sucs_data <- sucs_data |>
 sucs_factions <- sucs_factions |>
   mutate(color = if_else(id_sucs == "UHC", "#90EE90", color),
          color = if_else(id_sucs == "U", "hotpink", color),
-         color = if_else(id_sucs == "CSJ", "grey40", color))
+         color = if_else(id_sucs == "CSJ", "grey40", color),
+         color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color))
 
 save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
