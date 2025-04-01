@@ -1073,6 +1073,62 @@ sucs_data <- update_sources(
 )
 
 
+# Era Report 3052 data ----------------------------------------------------
+
+
+# Era Report 3062 data ----------------------------------------------------
+
+# Jihad Final Reckoning data ----------------------------------------------
+
+
+# 3067 map
+
+
+# 3081 map
+
+# 3068 data? Where does
+
+
+# Jihad Secrets: The Blake Documents --------------------------------------
+
+#3075ish?
+
+
+# Field Reports data ------------------------------------------------------
+
+# 3079ish?
+
+# Field Manual 3085 data --------------------------------------------------
+
+# Why is this being used on the 3095 column?
+
+# What about wars of reaving? I don't think we have a map.
+
+# Era Digest Dark Ages data -----------------------------------------------
+
+# 3135?
+
+# Era Report 3145 data ----------------------------------------------------
+
+# 3145
+
+# Shattered Fortress data -------------------------------------------------
+
+
+# Ilclan First Round data -------------------------------------------------
+
+# Tamar Rising, Empire Alone, Dominions Divided, Ilkan's Eyes Only
+
+
+# OTP: Hanseatic Crusade --------------------------------------------------
+
+# Where else can I get Hanseatic League area maps?
+
+
+# Interstellar Expeditions: ISP3 data -------------------------------------
+
+# integrate whatever else I have here - none of it should be considered maps
+
 # Handle House Arano data -------------------------------------------------
 
 # We do Arano last to fix whatever other messes it might have made.
