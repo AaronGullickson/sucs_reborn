@@ -1289,8 +1289,29 @@ sucs_data <- update_sources(
 
 # Add Era Report 3062 data ----------------------------------------------------
 
-# The 3057 is the August 3057 map but after break off of Lyran Alliance which 
-# I feel is 
+# The 3057 column is the August 3057 map but after Chaos March and break off of
+# Lyran Alliance, but it would be nice to recover the August 3057 map before 
+# all that happened. However, it looks almost identical, except for a few things
+# in the clan zone. Plus the regions will be screwed up for the FCL, so lets
+# just go with what we have here.
+bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3057", 
+  title = "Era Report 3062", 
+  loc = "pp. 10-11, 15",
+  date = date("3057-12-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "LA", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ", "CDS", "CNC", "CSV",
+               "TCC", "SS", "DS", "ST", "SKC",
+               "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
+               "TD", "RC")
+)
+
+
 
 # Add Jihad Final Reckoning data ----------------------------------------------
 
@@ -1447,7 +1468,8 @@ sucs_factions <- sucs_factions |>
   mutate(color = if_else(id_sucs == "UHC", "#90EE90", color),
          color = if_else(id_sucs == "U", "hotpink", color),
          color = if_else(id_sucs == "CSJ", "grey40", color),
-         color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color))
+         color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color),
+         color = if_else(id_sucs == "SS", "#CEFF00", color))
 
 save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
