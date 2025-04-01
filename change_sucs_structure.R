@@ -2,8 +2,6 @@ library(googlesheets4)
 library(tidyverse)
 library(here)
 library(plotly)
-library(ggpubr)
-library(ggrepel)
 
 source("functions.R")
 
@@ -1101,16 +1099,167 @@ sucs_data <- update_sources(
                "OC", "EF", "GV", "TD")
 )
 
+# TODO: what do I do with Wynn's Roost?
 
-# Era Report 3052 data ----------------------------------------------------
+# Add Era Report 3052 data ----------------------------------------------------
+
+# The first map says 3050, but the wave data indicates that the periphery
+# wave started in August 3049, so lets date it to 3049-07-30
+# Goddammit! The first 3049 column already incorporates the periphery wave
+# of clan invasions. So I am going to have to do that one first and then
+# correct the periphery planets back to what they should be and do it 
+# again for the whole IS
+
+# Periphery: Operation Revival, Wave 1
+bounding_box <- create_box("Miquelon", "Miyada", 
+                           "Manaringaine", "Tukayyid")
+sucs_data <- update_sources(
+  target = "3049", 
+  title = "Era Report 3052", 
+  loc = "pp. 43, 47, 51, 55, Periphery Campaign",
+  date = date("3049-12-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ",
+               "OC", "EF", "GV")
+)
+
+# ok, save these cases to a separate dataset that will get re-merged back in
+# because otherwise this will get overwritten by the pre-invasion data
+periphery_3049 <- sucs_data |>
+  filter(time_point == "3049") |>
+  mutate(time_point = "3049p")
+
+# ok now go back and correct periphery factions for before clan invasion
+# Independents
+sucs_data <- correct_faction(c("Santander V (Santander's World)",
+                               "Von Strang's World (Erin 2830-)",
+                               "Star's End (Novo Cressidas)"),
+                             "3049",
+                             "I")
+# Greater Valkyrate
+sucs_data <- correct_faction(c("Erewhon", "Lackhove", "Gotterdammerung",
+                               "Last Chance", "Botany Bay", "Butte Hold"),
+                             "3049",
+                             "GV")
+# Oberon Confederation
+sucs_data <- correct_faction(c("Placida", "The Rock", "Ferris (OC)", 
+                               "Blackstone", "Sigurd", "Oberon VI",
+                               "Crellacor", "Gustrell", "Paulus Prime",
+                               "Drask's Den"),
+                             "3049",
+                             "OC")
+# Elysian Fields
+sucs_data <- correct_faction(c("Manaringaine", "Nyserta", "Elissa", "Porthos"),
+                             "3049",
+                             "EF")
+
+# Now run 3049 again for the whole IS for 3049-07-31
+bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3049", 
+  title = "Era Report 3052", 
+  loc = "pp. 10-11",
+  date = date("3049-07-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
+               "OC", "EF", "GV", "TD", "RC")
+)
+
+# now re-add the periphery wave data
+sucs_data <- sucs_data |>
+  bind_rows(periphery_3049)
+
+# TODO: Kleinwelt and Alfirk do not appear on this map
+
+# Now do the remaining waves
+
+# Wave I
+bounding_box <- create_box("Miquelon", "Miyada", 
+                           "Manaringaine", "Tukayyid")
+sucs_data <- update_sources(
+  target = "3050a", 
+  title = "Era Report 3052", 
+  loc = "pp. 43, 47, 51, 55, Wave 1",
+  date = date("3050-04-30"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ",
+               "OC", "EF", "GV")
+)
+# Wave II
+sucs_data <- update_sources(
+  target = "3050b", 
+  title = "Era Report 3052", 
+  loc = "pp. 43, 47, 51, 55, Wave 2",
+  date = date("3050-05-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ",
+               "OC", "EF", "GV")
+)
+# Wave III
+sucs_data <- update_sources(
+  target = "3050c", 
+  title = "Era Report 3052", 
+  loc = "pp. 43, 47, 51, 55, Wave 3",
+  date = date("3050-07-15"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ",
+               "OC", "EF", "GV")
+)
+# Wave IV
+sucs_data <- update_sources(
+  target = "3051", 
+  title = "Era Report 3052", 
+  loc = "pp. 43, 47, 51, 55, Wave 4",
+  date = date("3050-10-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ",
+               "OC", "EF", "GV")
+)
+# Wave V - This is the same as large April Map, so just use that
+bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3052", 
+  title = "Era Report 3052", 
+  loc = "pp. 22-23",
+  date = date("3052-04-30"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "FCL", "FCF", "DC", "CS",
+               "SIC", "FR",
+               "CWF", "CJF", "CGB", "CSJ", "CDS", "CNC", "CSV",
+               "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
+               "TD", "RC")
+)
+
+# TODO: We are missing jointly administered worlds, part of the Disputed
+# faction code issue
+
+# Add Era Report 3062 data ----------------------------------------------------
+
+# Add Jihad Final Reckoning data ----------------------------------------------
 
 
-# Era Report 3062 data ----------------------------------------------------
-
-# Jihad Final Reckoning data ----------------------------------------------
-
-
-# 3067 map
+# Add 3067 map
 
 
 # 3081 map
@@ -1159,6 +1308,9 @@ sucs_data <- update_sources(
 # integrate whatever else I have here - none of it should be considered maps
 
 # Handle House Arano data -------------------------------------------------
+
+# TODO: These are still kind of a cluster - waiting to finish the rest before
+# fixing
 
 # We do Arano last to fix whatever other messes it might have made.
 # The Arano stuff is quite a mess. I think the best way to handle this 
@@ -1251,8 +1403,14 @@ sucs_data |>
 sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
   select(id_sucs, id_mhq, x, y, starts_with("source_"), 
-         faction, starts_with("region")) |>
+         faction, starts_with("region"), capital) |>
   arrange(id_sucs, source_date)
+
+# change some colors for better comparison
+sucs_factions <- sucs_factions |>
+  mutate(color = if_else(id_sucs == "UHC", "#90EE90", color),
+         color = if_else(id_sucs == "U", "hotpink", color),
+         color = if_else(id_sucs == "CSJ", "grey40", color))
 
 save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
@@ -1260,7 +1418,3 @@ save(sucs_data, sucs_factions, file = "sucs_data.RData")
 
 # Create plots to test ----------------------------------------------------
 
-# change some colors for better comparison
-sucs_factions <- sucs_factions |>
-  mutate(color = ifelse(id_sucs == "UHC", "#90EE90", color),
-         color = ifelse(id_sucs == "A", "grey70", color))
