@@ -1294,16 +1294,51 @@ sucs_data <- update_sources(
 # all that happened. However, it looks almost identical, except for a few things
 # in the clan zone. Plus the regions will be screwed up for the FCL, so lets
 # just go with what we have here.
-bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
-                           "Manaringaine", "Crawford's Delight")
-sucs_data <- update_sources(
+# Ok more complications, it looks like the LA regions were not changed until 
+# the 3058 column, so our regions are wrong in 3057. However 3058 has other 
+# changes in it that are clearly not map based - like the Falcon incursion and 
+# creation of NCR (or at least not for a map of this time period)
+
+# lets start by taking the map on pg. 16 and setting that to the end of the 
+# year but do it as a separate map
+bounding_box <- create_box("Marik", "Sanilac", 
+                           "Dromini VI", "No Return")
+chaos_march <- update_sources(
   target = "3057", 
   title = "Era Report 3062", 
-  loc = "pp. 10-11, 15",
+  loc = "p. 16",
   date = date("3057-12-31"), 
   box = bounding_box, 
   factions = c("I", "U", "A", 
                "CC", "FS", "FWL", "LA", "FCF", "DC", "CS",
+               "TCC", "SS", "DS", "ST", "SKC")) |>
+  mutate(time_point = "3057cm")
+
+# now lets switch LA back to FCL and chaos march back to respective factions
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(time_point == "3057" & faction == "LA", "FCL", faction))
+# chaos march is a bit harder, but lets try just swapping in values from 3052
+# for everything in the chaos march bounding box. 
+pre_chaos_march <- sucs_data |>
+  filter(is_in_box(x, y, bounding_box) & time_point == "3052") |>
+  mutate(time_point = "3057",
+         source_title = NA, source_loc = NA, source_date = NA)
+
+# remove the actual 3057 values in this box and swap back in the new ones
+sucs_data <- sucs_data |>
+  filter(!(is_in_box(x, y, bounding_box) & time_point == "3057")) |>
+  bind_rows(pre_chaos_march)
+
+bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+                            "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3057", 
+  title = "Era Report 3062", 
+  loc = "pp. 10-11",
+  date = date("3057-07-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "FCL", "FCF", "DC", "CS",
                "SIC", "FR",
                "CWF", "CJF", "CGB", "CSJ", "CDS", "CNC", "CSV",
                "TCC", "SS", "DS", "ST", "SKC",
@@ -1311,7 +1346,23 @@ sucs_data <- update_sources(
                "TD", "RC")
 )
 
+# add back in chaos march data
+sucs_data <- sucs_data |>
+  bind_rows(chaos_march)
 
+# The final step is to add a text entry for the switch over of all FCL to LA
+# on 18 Sept 3057, but leave out the Sarna March
+lyran_alliance <- sucs_data |>
+  filter(time_point == "3057" & faction == "FCL" & region1 != "Sarna March") |>
+  mutate(time_point = "3057la", 
+         source_type = "text", 
+         source_title = "Era Report 3062",
+         source_loc = "p. 15",
+         source_date = date("3057-09-18"),
+         faction = "LA")
+
+sucs_data <- sucs_data |>
+  bind_rows(lyran_alliance)
 
 # Add Jihad Final Reckoning data ----------------------------------------------
 
