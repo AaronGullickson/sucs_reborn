@@ -41,14 +41,34 @@ sucs_data <- sucs_data |>
 
 # break up faction data into faction and regions. The max depth here is 5
 sucs_data <- sucs_data |>
+  # first remove parentheticals for disputed cases, so commas won't get 
+  # processed incorrectly
+  mutate(disputed_cases = str_extract(faction, "(?<=\\()[^()]+(?=\\))"),
+         faction = str_remove(faction, "\\s*\\([^\\)]+\\)")) |>
+  # now get capital information
+  mutate(capital = case_when(
+           str_detect(faction, "Faction Capital") ~ "Faction",
+           str_detect(faction, "Major Capital") ~ "Major",
+           str_detect(faction, "Minor Capital") ~ "Minor"
+         ),
+         faction = str_remove(
+           faction, 
+           "(,Faction Capital|,Major Capital|,Minor Capital)"
+         )) |>
+  # now split faction into separate variables by commas
   separate_wider_delim(faction, ",", too_few = "align_start",
-                       names = c("faction", paste("region", 1:4, sep="")))
-
+                       names = c("faction", paste("region", 1:3, sep=""))) |>
+  # now put back in disputed cases
+  mutate(faction = if_else(is.na(disputed_cases), 
+                           faction, 
+                           paste0(faction, "(", disputed_cases, ")")))
+  
 # add in MekHQ ids
 # TODO: we are missing a few new ones
 sucs_data <- sucs_data |>
   left_join(id_crosswalk) |>
-  select(id_sucs, x, y, id_mhq, time_point, faction, starts_with("region"))
+  select(id_sucs, x, y, id_mhq, time_point, 
+         faction, starts_with("region"), capital)
 
 # get the coordinates by mekhq id for bounding boxes
 system_coords <- sucs_data |>
@@ -62,7 +82,16 @@ sucs_data <- sucs_data |>
          source_loc = as.character(NA), 
          source_date = as_date(NA)) |>
   select(starts_with("id_"), x, y, time_point, starts_with("source_"), 
-         faction, starts_with("region"))
+         faction, starts_with("region"), capital)
+
+
+# Address disputed faction codes ------------------------------------------
+
+disputed <- sucs_data |> filter(str_detect(faction, "^D\\("))
+disputed |> pull(faction) |> unique() |> sort()
+
+table(disputed$faction, disputed$time_point)
+
 
 
 # Fix some cases ----------------------------------------------------------
