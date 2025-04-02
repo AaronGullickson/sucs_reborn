@@ -66,8 +66,7 @@ server <- function(input, output) {
       filter(!input$remove_undiscovered | faction != "U") |>
       filter(source_type %in% input$source_types) |>
       filter(source_title %in% input$sources) |>
-      plot_planets(input$date, as.character(input$date),
-                   faction_data = sucs_factions) |>
+      plot_planets(input$date, faction_data = sucs_factions) |>
       layout(height = 800, width = 1000)
   }) 
 }
