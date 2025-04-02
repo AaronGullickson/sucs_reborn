@@ -1482,6 +1482,8 @@ sucs_data <- update_sources(
 
 # TODO: Kleinwelt and Frobisher are both showing in 3081 data
 # TODO: McEvedy's Folly should be a dead world according to map
+# TODO: Star's End shows up as I even though in Clan Hells' Horses zone
+
 
 
 # TODO: 3068 data? Where does it come from?
