@@ -406,8 +406,22 @@ sucs_data <- sucs_data |>
 
 # TODO: Skyfog is showing as part of MOC long after it is abandoned
 # because of an out of frame issue
-# TODO: Vannes, Sentarus, and Far Reach are showing as independent long 
-# after they drop off maps because of an out of frame issue
+
+## Sentarus ## 
+# Sentarus is showing as independent long after they drop off maps due to an
+# out of frame issue. According to Sarna "none of the maps from later eras 
+# present in the Handbooks series of sourcebooks extend far enough into the 
+# Periphery to confirm or deny the continued presence of this system during 
+# the Succession Wars era." However the SUCK data has the planet abandoned
+# in 3025, but there is no reference for this decision. The area it is in
+# does come back into frame in 3151 with Shattered Fortress, so we will pick
+# up the abandoned code then - I will leave as is until I hear more about why
+# it was listed as abandoned in 3025.
+
+## Vannes and Far Reach ##
+# Like Sentarus, these are showing as independent long after they drop off 
+# maps due to an out of frame issue. However, these are later confirmed as of 
+# FM 3085 to belong to the Chainelane Islands, so we should pick them up there
 
 # Add Founding House Maps------------------------------------------------
 
