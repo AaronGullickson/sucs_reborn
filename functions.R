@@ -1,3 +1,11 @@
+TIME_POINTS <- c("2271", "2317", "2319", "2341", "2366", "2571", "2596", "2750",
+                 "2765", "2767", "2783", "2786", "2821", "2822", "2830", "2864",
+                 "3025", "3030", "3040", "3049", "3050a", "3050b", "3050c", 
+                 "3051", "3052", "3057", "3058", "3059a", "3059b", "3059c", 
+                 "3059d", "3063", "3067", "3068", "3075", "3079", "3081", 
+                 "3085", "3095", "3130", "3135", "3145", "3151", "3152")
+
+
 # Helper functions --------------------------------------------------------
 
 # define a bounding box by planet entries
@@ -18,6 +26,7 @@ create_box <- function(planet_left, planet_right, planet_high, planet_low) {
   list(x_left = x_left, x_right = x_right, y_high = y_high, y_low = y_low)
 }
 
+# check if x and y are in the box
 is_in_box <- function(x, y, box) {
   if(is.null(box)) {
     return(TRUE)
@@ -25,6 +34,14 @@ is_in_box <- function(x, y, box) {
   (x >= box$x_left & x <= box$x_right & y <= box$y_high & y >= box$y_low)
 }
 
+# get all time points within a range
+time_point_range <- function(start, 
+                             end = TIME_POINTS[length(TIME_POINTS)]) {
+  TIME_POINTS[which(TIME_POINTS == start):which(TIME_POINTS == end)]
+}
+
+
+# Modify data functions ---------------------------------------------------
 
 update_sources <- function(map_data, target, title, loc, date, 
                            box = NULL, factions = NULL) {
@@ -66,6 +83,11 @@ correct_sources <- function(map_data, id, time_target,
       source_date = if_else(id_mhq %in% id & time_point %in% time_target, 
                             new_source_date, source_date)
     )
+}
+
+remove_cases <- function(map_data, id, time_target) {
+  map_data |>
+    filter(!(id_mhq == id & time_point %in% time_target))
 }
 
 faction_snapshot <- function(base_data, date) {

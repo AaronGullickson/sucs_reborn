@@ -129,10 +129,7 @@ sucs_data <- sucs_data |>
                     "2821", "2822", "2830", "2864"),
                   "U")
 sucs_data <- sucs_data |>
-  filter(!(time_point %in% c("3025", "3030", "3040", "3049", "3050a", "3050b",
-                             "3050c", "3051", "3052", "3057", "3058", "3059a",
-                             "3059b", "3059c", "3059d") &
-             id_mhq == "McEvans' Sacrifice"))
+  remove_cases("McEvans' Sacrifice", time_point_range("3025", "3059d"))
 
 ## Brasha ##
 # This is showing up as independent based on p. 151 of Major Periphery
@@ -178,12 +175,9 @@ sucs_data <- sucs_data |>
 # Era Report 3145, Shattered Fortress, and Ilkhan's Eyes Only, (not sure 
 # about Era Digest: Dark Ages)
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "Alfirk" & 
-             time_point %in% c("2596", "2750", "2765", "2767", "2783", "2786",
-                               "2821", "2822", "2830", "2864", "3025", "3030",
-                               "3049", "3050a", "3050b", "3050c", "3051", 
-                               "3052", "3057", "3058", "3059a", "3059b", 
-                               "3059c", "3059d" ,"3062", "3063")))
+  remove_cases("Alfirk", 
+               c(time_point_range("2596", "3030"), 
+                 time_point_range("3049", "3063")))
 
 ## Ward ## 
 # The text on pg. 88 of HBHL says it was founded during "the Exodus
@@ -214,8 +208,7 @@ sucs_data <- sucs_data |>
 # is is listed as a joint venture of DC, FS, OA, and TH founded in 2674. Lets
 # change the map reference to "I" and add a text entry
 sucs_data <- sucs_data |>
-  correct_faction("Antallos (Port Krin)", 
-                  c("2750", "2765"), "I")
+  correct_faction("Antallos (Port Krin)", c("2750", "2765"), "I")
 
 sucs_data <- sucs_data |>
   bind_rows(
@@ -250,12 +243,7 @@ sucs_data <- sucs_data |>
 # until 3067 as part of MOC. So I think we should remove all of the SL and I 
 # entries from 2596 to 3063 to make room for a text entry.
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "Joppa" & 
-             time_point %in% c("2596", "2750", "2765", "2767", "2783", "2786",
-                               "2821", "2822", "2830", "2864", "3025", "3030", 
-                               "3040", "3049", "3050a", "3050b", "3050c", 
-                               "3051", "3052", "3057", "3058", "3059a", "3059b",
-                               "3059c", "3059d", "3063")))
+  remove_cases("Joppa", time_point_range("2596", "3063"))
 
 ## St. Andreas ##
 # The St. Andreas entry is from Interstellar Expeditions: Interstellar Players 3
@@ -263,13 +251,8 @@ sucs_data <- sucs_data |>
 # change after that, so we should remove all entries from 2786 forward and 
 # replace with a text entry
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "St. Andreas" & 
-             time_point %in% c("2783", "2786", "2821", "2822", "2830", 
-                               "2864", "3025", "3030", "3040", "3049", "3050a",
-                               "3050b", "3050c", "3051", "3052", "3057", "3058", 
-                               "3059a", "3059b", "3059c", "3059d", "3063", 
-                               "3067", "3068", "3075", "3079", "3081", "3085", 
-                               "3095", "3130", "3135", "3145", "3151", "3152")))
+  remove_cases("St. Andreas", time_point_range("2783"))
+  
 sucs_data <- sucs_data |>
   bind_rows(
     tibble(
@@ -293,14 +276,8 @@ sucs_data <- sucs_data |>
 # all the map references and make a two entries - one for an SL faction and 
 # then a fall of the SL date to I.
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "Frobisher" & 
-             time_point %in% c("2750", "2765", "2767", "2783", "2786", "2821", 
-                               "2822", "2830", "2864", "3025", "3030", "3040", 
-                               "3049", "3050a", "3050b", "3050c", "3051", 
-                               "3052", "3057", "3058", "3059a", "3059b", 
-                               "3059c", "3059d", "3063", "3067", "3068", "3075", 
-                               "3079", "3081", "3085", "3095", 
-                               "3130", "3135", "3145", "3151", "3152")))
+  remove_cases("Frobisher", time_point_range("2750"))
+  
 sucs_data <- sucs_data |>
   bind_rows(
     tibble(
@@ -354,8 +331,7 @@ sucs_data <- sucs_data |>
 ## New St. Andrews ##
 # This planet first appears on the map in 2930 and needs three cases removed
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "New St. Andrews" & 
-             time_point %in% c("2822", "2830", "2864")))
+  remove_cases("New St. Andrews", time_point_range("2822", "2864"))
 
 ## Kleinwelt ##
 # This was originally part of MOC but was abandoned by 2864 map. The 
@@ -363,13 +339,8 @@ sucs_data <- sucs_data |>
 # entry regarding Marian Hegemony slaves refounding a colony there in 3044.
 # So remove all entries after 2864 and then add a text entry in 3044.
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "Kleinwelt" & 
-             time_point %in% c("3025", "3030", "3040", 
-                               "3049", "3050a", "3050b", "3050c", "3051", 
-                               "3052", "3057", "3058", "3059a", "3059b", 
-                               "3059c", "3059d", "3063", "3067", "3068", "3075", 
-                               "3079", "3081", "3085", "3095", 
-                               "3130", "3135", "3145", "3151", "3152")))
+  remove_cases("Kleinwelt", time_point_range("3025"))
+
 sucs_data <- sucs_data |>
   bind_rows(
     tibble(
@@ -414,13 +385,7 @@ sucs_data <- sucs_data |>
 # that the planet is still around in at least 3030. So we should just remove
 # entries past 2864 to indicate that this is the last map entry we have.
 sucs_data <- sucs_data |>
-  filter(!(id_mhq == "Wynn's Roost" & 
-             time_point %in% c("3025", "3030", "3040", 
-                               "3049", "3050a", "3050b", "3050c", "3051", 
-                               "3052", "3057", "3058", "3059a", "3059b", 
-                               "3059c", "3059d", "3063", "3067", "3068", "3075", 
-                               "3079", "3081", "3085", "3095", 
-                               "3130", "3135", "3145", "3151", "3152")))
+  remove_cases("Wynn's Roost", time_point_range("3025"))
 
 # TODO: Skyfog is showing as part of MOC long after it is abandoned
 # because of an out of frame issue. It is also coded in the SUCK data as 
@@ -1621,9 +1586,6 @@ sucs_data <- sucs_data |>
   )
 
 # TODO: McEvedy's Folly should be a dead world according to map
-
-# TODO: 3068 data? Where does it come from?
-
 
 # Jihad Secrets: The Blake Documents --------------------------------------
 
