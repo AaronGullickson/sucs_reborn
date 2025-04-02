@@ -12,6 +12,7 @@ library(googlesheets4)
 library(tidyverse)
 library(here)
 library(plotly)
+library(randomcoloR)
 source("functions.R")
 load("sucs_data.RData")
 source_types <- unique(sucs_data$source_type)
@@ -32,6 +33,11 @@ ui <- fluidPage(
             inputId = "date",
             label = h3("Date input"),
             value = date("3085-10-31")),
+          selectInput( 
+            "select_color", 
+            "Color by:", 
+            list("Faction" = "faction", "Source" = "source") 
+          ),
           checkboxInput(
             "remove_undiscovered", 
             "Remove Undiscovered?", 
@@ -66,7 +72,9 @@ server <- function(input, output) {
       filter(!input$remove_undiscovered | faction != "U") |>
       filter(source_type %in% input$source_types) |>
       filter(source_title %in% input$sources) |>
-      plot_planets(input$date, faction_data = sucs_factions) |>
+      plot_planets(input$date, 
+                   choice_color = input$select_color,
+                   faction_data = sucs_factions) |>
       layout(height = 800, width = 1000)
   }) 
 }

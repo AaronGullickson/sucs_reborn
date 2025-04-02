@@ -117,6 +117,7 @@ plot_planets <- function(map_data,
                          title = NULL, 
                          show_id = TRUE,
                          interactive = TRUE,
+                         choice_color = "faction",
                          faction_data = sucs_factions) {
   
   # Take a snapshot & create labels
@@ -140,9 +141,18 @@ plot_planets <- function(map_data,
                            source_str, source_date_str)
     )
   
+  
   # Determine color palette - give a named vector to make sure colors match
   # in subsets
-  faction_colors <- faction_data |> select(name, color) |> deframe()
+  if(choice_color == "faction") {
+    map_data$var_color <- map_data$faction
+    color_palette <- faction_data |> select(name, color) |> deframe()
+  } else {
+    map_data$var_color <- map_data$source_title
+    color_palette <- randomColor(length(unique(map_data$source_title)))
+    names(color_palette) <- unique(map_data$source_title)
+  }
+  
   
   plot_title <- ifelse(is.null(title), as.character(date), title)
   
@@ -157,16 +167,17 @@ plot_planets <- function(map_data,
   
   # Base ggplot
   map <- map_data |>
-    ggplot(aes(x = x, y = y, text = text_plotly, customdata = id_mhq)) +
+    ggplot(aes(x = x, y = y, text = text_plotly, color = var_color,
+               customdata = id_mhq)) +
     # some fancy stuff here for capital rings
-    geom_point(data = faction_capital_data, aes(color = faction), size = 4)+
+    geom_point(data = faction_capital_data, size = 4)+
     geom_point(data = faction_capital_data, color = "grey20", size = 2.5)+
-    geom_point(data = major_capital_data, aes(color = faction), size = 3.5)+
+    geom_point(data = major_capital_data, size = 3.5)+
     geom_point(data = major_capital_data, color = "grey20", size = 2.5)+
-    geom_point(data = minor_capital_data, aes(color = faction), size = 3)+
+    geom_point(data = minor_capital_data, size = 3)+
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
-    geom_point(aes(color = faction), size = 2) +
-    scale_color_manual(values = faction_colors) +
+    geom_point(size = 2) +
+    scale_color_manual(values = color_palette) +
     labs(title = plot_title) +
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
