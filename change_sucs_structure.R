@@ -1385,6 +1385,55 @@ sucs_data <- update_sources(
 # TODO: Noticing Skyfog is still on this map and presumably others, but it 
 # seems like it might be within frame to declare it abandoned, needs a check.
 
+
+# Add Operation Bulldog Wave data -----------------------------------------
+
+bounding_box <- create_box("Skallevoll", "Loysville", 
+                           "Santander V (Santander's World)", "Arkab")
+sucs_data <- update_sources(
+  target = "3059a", 
+  title = "Era Report 3062", 
+  loc = "p. 21, wave 1",
+  date = date("3059-06-25"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CSJ", "CGB", "CNC", "CWF", 
+               "DC")
+)
+
+sucs_data <- update_sources(
+  target = "3059b", 
+  title = "Era Report 3062", 
+  loc = "p. 21, wave 2",
+  date = date("3059-07-07"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CSJ", "CGB", "CNC", "CWF", 
+               "DC")
+)
+
+sucs_data <- update_sources(
+  target = "3059c", 
+  title = "Era Report 3062", 
+  loc = "p. 21, wave 3",
+  date = date("3059-08-13"),  # TODO: this is a guess
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CSJ", "CGB", "CNC", "CWF", 
+               "DC")
+)
+
+sucs_data <- update_sources(
+  target = "3059d", 
+  title = "Era Report 3062", 
+  loc = "p. 21, wave 4",
+  date = date("3059-11-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CSJ", "CGB", "CNC", "CWF", 
+               "DC")
+)
+
 # Add Jihad Final Reckoning data ----------------------------------------------
 
 
