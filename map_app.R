@@ -29,6 +29,7 @@ ui <- page_fillable(
     card_header("Battletech Universe Faction Map"),
     layout_sidebar(
       sidebar = sidebar(
+        width = 350,
         dateInput(
           inputId = "date",
           label = "Choose a date",
@@ -64,6 +65,8 @@ ui <- page_fillable(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
+  bs_themer()
+  
   output$plot <- renderPlotly({ 
     sucs_data |>
       filter(!input$remove_undiscovered | faction != "U") |>
