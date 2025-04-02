@@ -93,8 +93,6 @@ js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
 plot_planets <- function(map_data,
                          date, 
                          title = NULL, 
-                         xlimits = c(-600, 780), 
-                         ylimits = c(-580, 580),
                          show_id = TRUE,
                          interactive = TRUE,
                          faction_data = sucs_factions) {
@@ -124,8 +122,6 @@ plot_planets <- function(map_data,
   map <- map_data |>
     ggplot(aes(x = x, y = y, text = text_plotly, customdata = id_mhq)) +
     geom_point(aes(color = faction)) +
-    scale_x_continuous(limits = xlimits) +
-    scale_y_continuous(limits = ylimits) +
     scale_color_manual(values = faction_colors) +
     labs(title = plot_title) +
     theme_void() +
@@ -144,7 +140,10 @@ plot_planets <- function(map_data,
     # Convert to plotly
     map <- ggplotly(map, tooltip = "text") |>
       config(scrollZoom = TRUE) |>
-      layout(dragmode = "pan")
+      layout(dragmode = "pan",
+             # set the default zoom to cover the IS and Periphery
+             xaxis = list(range = list(-600, 780)), 
+             yaxis = list(range = list(-580, 580)))
     
     if(show_id) {
       map <- map |> htmlwidgets::onRender(js_dynamic_labels)
