@@ -1461,8 +1461,30 @@ sucs_data <- update_sources(
 # on the map
 
 # 3081 map
+bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3081", 
+  title = "Jihad: Final Reckoning", 
+  loc = "pp. 62-63",
+  date = date("3081-03-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "LA", "DC", "RS",
+               "CS", "WB",
+               "CWF", "CJF", "CGB", "CNC", "CHH",
+               "MCM", "PR", "DO", "DA", "DGM", "MSC", "TP", "DoO", "RFS", "PG", 
+               "MA", "DTA", "OZP", "SHC", 
+               "RCM", "FvC",
+               "MOC", "TC", "CDP", "OA", "MH",
+               "TD", "RC", "FrR")
+)
 
-# 3068 data? Where does it come from?
+# TODO: Kleinwelt and Frobisher are both showing in 3081 data
+# TODO: McEvedy's Folly should be a dead world according to map
+
+
+# TODO: 3068 data? Where does it come from?
 
 
 # Jihad Secrets: The Blake Documents --------------------------------------
