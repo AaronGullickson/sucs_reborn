@@ -1508,6 +1508,12 @@ sucs_data <- update_sources(
 
 # Jihad Secrets: The Blake Documents --------------------------------------
 
+# There are a couple of CoF entries in here but it is too early for that. All
+# of the CoF entries that I can see should be WB
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(time_point == "3075" & faction == "CoF", 
+                           "WB", faction))
+
 #3075ish?
 bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
                            "Manaringaine", "Crawford's Delight")
@@ -1518,7 +1524,7 @@ sucs_data <- update_sources(
   date = date("3075-01-01"), 
   box = bounding_box, 
   factions = c("I", "U", "A", 
-               "CC", "FS", "LA", "DC", "FWL",
+               "CC", "FS", "LA", "DC", "FWL", "CoF",
                "CS", "WB",
                "CWF", "CJF", "CGB", "CNC", "CHH",
                "AB", "RCM", "FvC", "MC", "KP",
@@ -1526,9 +1532,25 @@ sucs_data <- update_sources(
                "TD", "RC", "FrR")
 )
 
-# Field Reports data ------------------------------------------------------
+# Add Field Reports data ------------------------------------------------------
 
-# 3079ish?
+# August 3079
+
+# DCMS
+bounding_box <- create_box("Leskovik", "Sterlington", 
+                           "Elissa", "Towne")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: DCMS", 
+  loc = "p. 21",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "LA", "DC", "RS", "CoF",
+               "CS", "WB",
+               "CWF", "CJF", "CGB", "CNC", "CHH",
+               "AB", "OA")
+)
 
 # Field Manual 3085 data --------------------------------------------------
 
