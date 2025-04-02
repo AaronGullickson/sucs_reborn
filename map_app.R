@@ -24,6 +24,9 @@ special_factions <- c("Abandoned" = "A", "Inhabited"= "I","Undiscovered" = "U")
 # Define UI for application that draws a histogram
 #ui <- fluidPage(
 ui <- page_fillable(
+  title = "Battletech Universe Faction Map",
+  card(
+    card_header("Battletech Universe Faction Map"),
     layout_sidebar(
       sidebar = sidebar(
         dateInput(
@@ -55,46 +58,7 @@ ui <- page_fillable(
       ),
       plotlyOutput(outputId = "plot")
     )
-  
-    # Application title
-    #titlePanel("Battletech Universe Faction Map"),
-
-    # Sidebar with a slider input for number of bins 
-    # sidebarLayout(
-    #     sidebarPanel(
-    #       dateInput(
-    #         inputId = "date",
-    #         label = "Choose a date",
-    #         value = date("3085-10-31")),
-    #       selectInput( 
-    #         "select_color", 
-    #         "Color by:", 
-    #         list("Faction" = "faction", "Source" = "source") 
-    #       ),
-    #       checkboxInput(
-    #         "remove_undiscovered", 
-    #         "Remove Undiscovered?", 
-    #         TRUE
-    #       ), 
-    #       checkboxGroupInput( 
-    #         "source_types", 
-    #         "Source Types:", 
-    #         source_types,
-    #         selected = source_types
-    #       ),
-    #       checkboxGroupInput( 
-    #         "sources", 
-    #         "Sources:", 
-    #         sources,
-    #         selected = sources
-    #       )
-    #     ),
-    # 
-    #     # Show a plot of the generated distribution
-    #     mainPanel(
-    #       plotlyOutput(outputId = "plot")
-    #     )
-    # )
+  )
 )
 
 # Define server logic required to draw a histogram
