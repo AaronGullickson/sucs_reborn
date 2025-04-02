@@ -45,7 +45,7 @@ ui <- page_fillable(
           list("Faction" = "faction", "Source" = "source") 
         ),
         downloadButton("download", "Download CSV file"),
-        checkboxInput(
+        input_switch(
           "remove_undiscovered", 
           "Remove Undiscovered?", 
           TRUE
