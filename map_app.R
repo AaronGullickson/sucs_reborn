@@ -25,6 +25,7 @@ special_factions <- c("Abandoned" = "A", "Inhabited"= "I","Undiscovered" = "U")
 #ui <- fluidPage(
 ui <- page_fillable(
   title = "Battletech Universe Faction Map",
+  theme = bs_theme(bootswatch = "superhero"),
   card(
     card_header("Battletech Universe Faction Map"),
     layout_sidebar(
@@ -65,7 +66,8 @@ ui <- page_fillable(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-  bs_themer()
+  # uncomment out to test out bootstrap themes
+  #bs_themer()
   
   output$plot <- renderPlotly({ 
     sucs_data |>

@@ -179,11 +179,14 @@ plot_planets <- function(map_data,
     geom_point(data = minor_capital_data, size = 3)+
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
     geom_point(size = 2) +
-    scale_color_manual(values = color_palette) +
-    labs(title = plot_title, color = legend_name) +
+    scale_color_manual(values = color_palette)+
+    labs(title = plot_title, color = legend_name)+
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
-          panel.grid = element_blank())
+          panel.grid = element_blank(),
+          # these colors work well with superhero theme - change if it changes
+          plot.background = element_rect(fill = "#3B4D5B"),
+          text = element_text(color = "#EBEBEB"))
   
   # Add ID labels if required
   if (show_id) {
