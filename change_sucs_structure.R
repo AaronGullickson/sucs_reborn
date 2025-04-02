@@ -1552,6 +1552,68 @@ sucs_data <- update_sources(
                "AB", "OA")
 )
 
+# CCAF
+bounding_box <- create_box("Deschenes", "New Valencia", 
+                           "Marcus", "Flaum")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: CCAF", 
+  loc = "p. 21",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "FWL", "CC", "RS", "CoF",
+               "CS", "WB",
+               "TC")
+)
+
+# FWLM
+bounding_box <- create_box("Valerius", "Milos", 
+                           "Maisons", "Canopus IV")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: FWLM", 
+  loc = "p. 17",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "LA", "FWL", "CC", "RS", "CoF",
+               "CS", "WB",
+               "CF", "MOC", "MH", "RCM")
+)
+
+# LAAF
+bounding_box <- create_box("Otisberg", "Kawich", 
+                           "New Caledonia", "Sterling")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: LAAF", 
+  loc = "p. 19",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "LA", "FWL", "CC", "DC", "RS", "CoF",
+               "CJF", "CWF", "CHH", "CGB",
+               "CS", "WB",
+               "CF", "MH", "AB")
+)
+
+# AFFS
+bounding_box <- create_box("Errai", "New Haiti (New Hati)", 
+                           "Umijiri", "Hyalite")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: AFFS", 
+  loc = "p. 21",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "CC", "DC", "RS", "CoF",
+               "CS", "WB",
+               "TC", "AB", "TD", "OA", "FvC")
+)
+
+
 # Field Manual 3085 data --------------------------------------------------
 
 # Why is this being used on the 3095 column?
