@@ -383,6 +383,14 @@ sucs_data <- correct_faction("Star's End (Novo Cressidas)",
 sucs_data <- correct_faction("Farstar", 
                              c("3063", "3067", "3068", "3075"), "I")
 
+## Tharkad ##
+# Tharkad is listed as WOB in 3067 and 3068, but the 3067 map date is in 
+# October 3067 which is before the Whitting Conference, and even after that 
+# it was in dispute at most. 
+sucs_data <- correct_faction("Tharkad", 
+                             c( "3067", "3068"), "LA")
+
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -1469,8 +1477,6 @@ sucs_data <- update_sources(
                "TD", "RC", "FrR")
 )
 
-# TODO: Its reporting Tharkad as WOB controlled but this is October before
-# WHitting conference, and in any case it was disputed for quite some time
 # TODO: McEvedy's Folly is showing up as MOC controlled
 # TODO: The Saiph Triumvarate is showing up here but it shows as independent 
 # on the map
@@ -1519,9 +1525,6 @@ sucs_data <- update_sources(
                "MOC", "TC", "CDP", "OA", "MH", "CF",
                "TD", "RC", "FrR")
 )
-
-# TODO: Farstar is missing
-
 
 # Field Reports data ------------------------------------------------------
 
