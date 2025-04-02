@@ -376,6 +376,12 @@ sucs_data <- correct_faction("Star's End (Novo Cressidas)",
                              c("3081", "3085"), "CHH")
 
 
+## Farstar ##
+# Farstar is listed as part of Clan Snow Raven in in 3063, 3067,	3068,	and 3075
+# but the Sarna entry clearly says:
+# "Notably, there is no indication that the Clan actually took control of the world."
+sucs_data <- correct_faction("Farstar", 
+                             c("3063", "3067", "3068", "3075"), "I")
 
 # Add Founding House Maps------------------------------------------------
 
@@ -1497,6 +1503,24 @@ sucs_data <- update_sources(
 # Jihad Secrets: The Blake Documents --------------------------------------
 
 #3075ish?
+bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3075", 
+  title = "Jihad Secrets: The Blake Documents", 
+  loc = "pp. 64-65",
+  date = date("3075-01-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "LA", "DC", "FWL",
+               "CS", "WB",
+               "CWF", "CJF", "CGB", "CNC", "CHH",
+               "AB", "RCM", "FvC", "MC", "KP",
+               "MOC", "TC", "CDP", "OA", "MH", "CF",
+               "TD", "RC", "FrR")
+)
+
+# TODO: Farstar is missing
 
 
 # Field Reports data ------------------------------------------------------
