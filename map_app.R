@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(bslib)
 library(googlesheets4)
 library(tidyverse)
 library(here)
@@ -21,47 +22,79 @@ sources <- sort(unique(sucs_data$source_title))
 special_factions <- c("Abandoned" = "A", "Inhabited"= "I","Undiscovered" = "U")
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
-
+#ui <- fluidPage(
+ui <- page_fillable(
+    layout_sidebar(
+      sidebar = sidebar(
+        dateInput(
+          inputId = "date",
+          label = "Choose a date",
+          value = date("3085-10-31")),
+        selectInput( 
+          "select_color", 
+          "Color by:", 
+          list("Faction" = "faction", "Source" = "source") 
+        ),
+        checkboxInput(
+          "remove_undiscovered", 
+          "Remove Undiscovered?", 
+          TRUE
+        ), 
+        checkboxGroupInput( 
+          "source_types", 
+          "Source Types:", 
+          source_types,
+          selected = source_types
+        ),
+        checkboxGroupInput( 
+          "sources", 
+          "Sources:", 
+          sources,
+          selected = sources
+        )
+      ),
+      plotlyOutput(outputId = "plot")
+    )
+  
     # Application title
-    titlePanel("Battletech Universe Faction Map"),
+    #titlePanel("Battletech Universe Faction Map"),
 
     # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-          dateInput(
-            inputId = "date",
-            label = h3("Date input"),
-            value = date("3085-10-31")),
-          selectInput( 
-            "select_color", 
-            "Color by:", 
-            list("Faction" = "faction", "Source" = "source") 
-          ),
-          checkboxInput(
-            "remove_undiscovered", 
-            "Remove Undiscovered?", 
-            TRUE
-          ), 
-          checkboxGroupInput( 
-            "source_types", 
-            "Source Types:", 
-            source_types,
-            selected = source_types
-          ),
-          checkboxGroupInput( 
-            "sources", 
-            "Sources:", 
-            sources,
-            selected = sources
-          )
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-          plotlyOutput(outputId = "plot")
-        )
-    )
+    # sidebarLayout(
+    #     sidebarPanel(
+    #       dateInput(
+    #         inputId = "date",
+    #         label = "Choose a date",
+    #         value = date("3085-10-31")),
+    #       selectInput( 
+    #         "select_color", 
+    #         "Color by:", 
+    #         list("Faction" = "faction", "Source" = "source") 
+    #       ),
+    #       checkboxInput(
+    #         "remove_undiscovered", 
+    #         "Remove Undiscovered?", 
+    #         TRUE
+    #       ), 
+    #       checkboxGroupInput( 
+    #         "source_types", 
+    #         "Source Types:", 
+    #         source_types,
+    #         selected = source_types
+    #       ),
+    #       checkboxGroupInput( 
+    #         "sources", 
+    #         "Sources:", 
+    #         sources,
+    #         selected = sources
+    #       )
+    #     ),
+    # 
+    #     # Show a plot of the generated distribution
+    #     mainPanel(
+    #       plotlyOutput(outputId = "plot")
+    #     )
+    # )
 )
 
 # Define server logic required to draw a histogram
@@ -74,8 +107,7 @@ server <- function(input, output) {
       filter(source_title %in% input$sources) |>
       plot_planets(input$date, 
                    choice_color = input$select_color,
-                   faction_data = sucs_factions) |>
-      layout(height = 800, width = 1000)
+                   faction_data = sucs_factions)
   }) 
 }
 
