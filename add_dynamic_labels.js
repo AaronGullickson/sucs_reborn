@@ -22,7 +22,7 @@ function addPlotlyLabels(el, x) {
          var zoomLevelY = Math.abs(yaxisMax - yaxisMin);
          var zoomLevel = Math.max(zoomLevelX, zoomLevelY);
 
-         var zoomThreshold = 300;
+         var zoomThreshold = 500;
          var annotations = [];
 
          if (zoomLevel < zoomThreshold) {
