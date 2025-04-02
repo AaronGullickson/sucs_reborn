@@ -1724,12 +1724,14 @@ sucs_data <- update_sources(
                "HL", "NC")
 )
 
+# TODO: Add Field Report: Clans data
+
 
 # Field Manual 3085 data --------------------------------------------------
 
-# Why is this being used on the 3095 column?
+# Ignore the 3095 column for now - changes from FM 3085 are mostly IE:ISP 3
 
-# What about wars of reaving? I don't think we have a map.
+# TODO: What about wars of reaving? I don't think we have a map.
 
 # Era Digest Dark Ages data -----------------------------------------------
 
