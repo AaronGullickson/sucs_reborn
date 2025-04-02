@@ -19,7 +19,11 @@ load("sucs_data.RData")
 source_types <- unique(sucs_data$source_type)
 names(source_types) <- str_to_title(source_types)
 sources <- sort(unique(sucs_data$source_title))
-special_factions <- c("Abandoned" = "A", "Inhabited"= "I","Undiscovered" = "U")
+time_periods <- tribble(
+  ~period,  ~date,
+  "Free Worlds League Founding", date("2271-06-02"),
+  "Federated Suns Founding", date("2317-06-26"),
+)
 
 # Define UI for application that draws a histogram
 #ui <- fluidPage(
@@ -40,6 +44,7 @@ ui <- page_fillable(
           "Color by:", 
           list("Faction" = "faction", "Source" = "source") 
         ),
+        downloadButton("download", "Download CSV file"),
         checkboxInput(
           "remove_undiscovered", 
           "Remove Undiscovered?", 
@@ -78,6 +83,18 @@ server <- function(input, output) {
                    choice_color = input$select_color,
                    faction_data = sucs_factions)
   }) 
+  
+  output$download <- downloadHandler(
+    filename = paste0("battletech_map_", input$date, ".csv"),
+    content = function(file) {
+      sucs_data |>
+        filter(!input$remove_undiscovered | faction != "U") |>
+        filter(source_type %in% input$source_types) |>
+        filter(source_title %in% input$sources) |>
+        faction_snapshot(input$date) |>
+        write_csv(file)
+    }
+  )
 }
 
 # Run the application 
