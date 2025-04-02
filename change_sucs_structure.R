@@ -90,8 +90,6 @@ disputed |> pull(faction) |> unique() |> sort()
 
 table(disputed$faction, disputed$time_point)
 
-
-
 # Fix some cases ----------------------------------------------------------
 
 # There are some cases that if we fix them at the top, it will be easier
@@ -390,6 +388,26 @@ sucs_data <- correct_faction("Farstar",
 # it was in dispute at most. 
 sucs_data <- correct_faction("Tharkad", 
                              c( "3067", "3068"), "LA")
+
+## Wynn's Roost ##
+# This shows up on maps through the 2864 2nd Succession War maps and 
+# then drops off from all subsequent maps. However ToS: Wynn's Roost indicates
+# that the planet is still around in at least 3030. So we should just remove
+# entries past 2864 to indicate that this is the last map entry we have.
+sucs_data <- sucs_data |>
+  filter(!(id_mhq == "Wynn's Roost" & 
+             time_point %in% c("3025", "3030", "3040", 
+                               "3049", "3050a", "3050b", "3050c", "3051", 
+                               "3052", "3057", "3058", "3059a", "3059b", 
+                               "3059c", "3059d", "3063", "3067", "3068", "3075", 
+                               "3079", "3081", "3085", "3095", 
+                               "3130", "3135", "3145", "3151", "3152")))
+
+
+# TODO: Skyfog is showing as part of MOC long after it is abandoned
+# because of an out of frame issue
+# TODO: Vannes, Sentarus, and Far Reach are showing as independent long 
+# after they drop off maps because of an out of frame issue
 
 # Add Founding House Maps------------------------------------------------
 
@@ -1154,8 +1172,6 @@ sucs_data <- update_sources(
                "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
                "OC", "EF", "GV", "TD")
 )
-
-# TODO: what do I do with Wynn's Roost?
 
 # Add Era Report 3052 data ----------------------------------------------------
 
