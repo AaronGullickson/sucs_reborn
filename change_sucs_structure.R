@@ -409,6 +409,15 @@ sucs_data <- sucs_data |>
 # maps due to an out of frame issue. However, these are later confirmed as of 
 # FM 3085 to belong to the Chainelane Islands, so we should pick them up there
 
+## Dante and Quatre Belle ##
+# These cases are listed as belonging to Clan Snow Raven in the SUCK for 
+# 3075, 3079, and 3081 but that is not what the maps show. They show is still
+# as OA. The switch to the Raven Alliance happens in the 3085 map.
+sucs_data <- sucs_data |>
+  correct_faction(c("Dante", "Quatre Belle"), 
+                  time_point_range( "3075", "3081"), 
+                  "OA")
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -1477,7 +1486,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "FWL", "LA", "FCF", "DC", "CS",
                  "SIC", "FR",
-                 "CWF", "CJF", "CGB", "CSJ", "CDS", "CNC", "CSV",
+                 "CWF", "CJF", "GBD", "CSJ", "CDS", "CNC", "CSV",
                  "TCC", "SS", "DS", "ST", "SKC",
                  "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
                  "TD", "RC", "NCR")
@@ -1486,6 +1495,9 @@ sucs_data <- sucs_data |>
 # TODO: Noticing Skyfog is still on this map and presumably others, but it 
 # seems like it might be within frame to declare it abandoned, needs a check.
 
+# TODO: The map says Clan Ghost Bear not Ghost Bear Dominion. Sarna says the
+# founding date of the GBD is 3060 based on the Touring the Stars Dark Age 
+# document. Can't find any other references for the exact switch.
 
 # Add Operation Bulldog Wave data -----------------------------------------
 
@@ -1554,7 +1566,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "FWL", "LA", "DC", 
                  "CS", "FR", "WB",
-                 "CWF", "CJF", "CGB", "CNC",
+                 "CWF", "CJF", "GBD", "CNC",
                  "TCC", "SS", "DS", "ST", "SKC",
                  "MOC", "TC", "CDP", "OA", "CF", "MH",
                  "TD", "RC", "FrR")
@@ -1577,7 +1589,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "LA", "DC", "RS",
                  "CS", "WB",
-                 "CWF", "CJF", "CGB", "CNC", "CHH",
+                 "CWF", "CJF", "GBD", "CNC", "CHH",
                  "MCM", "PR", "DO", "DA", "DGM", "MSC", "TP", "DoO", "RFS", "PG", 
                  "MA", "DTA", "OZP", "SHC", 
                  "RCM", "FvC",
@@ -1608,7 +1620,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "LA", "DC", "FWL", "CoF",
                  "CS", "WB",
-                 "CWF", "CJF", "CGB", "CNC", "CHH",
+                 "CWF", "CJF", "GBD", "CNC", "CHH",
                  "AB", "RCM", "FvC", "MC", "KP",
                  "MOC", "TC", "CDP", "OA", "MH", "CF",
                  "TD", "RC", "FrR")
@@ -1631,7 +1643,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "FS", "LA", "DC", "RS", "CoF",
                  "CS", "WB",
-                 "CWF", "CJF", "CGB", "CNC", "CHH",
+                 "CWF", "CJF", "GBD", "CNC", "CHH",
                  "AB", "OA")
   )
 
@@ -1689,7 +1701,7 @@ sucs_data <- sucs_data |>
     box = bounding_box, 
     factions = c("I", "U", "A", 
                  "LA", "FWL", "CC", "DC", "RS", "CoF",
-                 "CJF", "CWF", "CHH", "CGB",
+                 "CJF", "CWF", "CHH", "GBD",
                  "CS", "WB",
                  "CF", "MH", "AB")
   )
@@ -1787,8 +1799,80 @@ sucs_data <- sucs_data |>
                  "HL", "NC")
   )
 
-# TODO: Add Field Report: Clans data
+# Field Reports: Clan, Ghost Bear map
+bounding_box <- create_box("Dompaire", "Pesht", 
+                           "Manaringaine", "Buckminster")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3079", 
+    title = "Field Report: Clans", 
+    loc = "p. 25",
+    date = date("3079-08-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "DC", "LA",
+                 "GBD", "CHH", "CWF", "CJF")
+  )
 
+# Field Reports: Clan, Jade Falcon map
+bounding_box <- create_box("Jatznik", "Liezen", 
+                           "Manaringaine", "Crevedia")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3079", 
+    title = "Field Report: Clans", 
+    loc = "p. 26",
+    date = date("3079-08-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "LA",
+                 "GBD", "CHH", "CWF", "CJF")
+  )
+
+# Field Reports: Clan, Wolf, Hell's Horses map
+bounding_box <- create_box("Santana", "Casere", 
+                           "Manaringaine", "Blue Diamond")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3079", 
+    title = "Field Report: Clans", 
+    loc = "p. 27",
+    date = date("3079-08-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "LA", "DC",
+                 "GBD", "CHH", "CWF", "CJF")
+  )
+
+# Field Reports: Clan, Snow Ravens and OA
+bounding_box <- create_box("Damevang", "Delos IV", 
+                           "Kokpekty", "Parma")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3079", 
+    title = "Field Report: Clans", 
+    loc = "p. 28",
+    date = date("3079-08-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "FS", "DC", "OA",
+                 "CSR")
+  )
+
+# Field Reports: Clan, RoS
+bounding_box <- create_box("Rasalas", "Matar", 
+                           "Kirkcaldy", "Park Place")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3079", 
+    title = "Field Report: Clans", 
+    loc = "p. 29",
+    date = date("3079-08-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "FS", "DC", "LA", "LA", "FWL", "RS",
+                 "AB")
+  )
 
 # Field Manual 3085 data --------------------------------------------------
 
