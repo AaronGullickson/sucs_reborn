@@ -252,8 +252,8 @@ sucs_data <- sucs_data |>
                                "2864", "3025", "3030", "3040", "3049", "3050a",
                                "3050b", "3050c", "3051", "3052", "3057", "3058", 
                                "3059a", "3059b", "3059c", "3059d", "3063", 
-                               "3068", "3075", "3079", "3081", "3085", "3095", 
-                               "3130", "3135", "3145", "3151", "3152")))
+                               "3067", "3068", "3075", "3079", "3081", "3085", 
+                               "3095", "3130", "3135", "3145", "3151", "3152")))
 sucs_data <- sucs_data |>
   bind_rows(
     tibble(
@@ -282,7 +282,7 @@ sucs_data <- sucs_data |>
                                "2822", "2830", "2864", "3025", "3030", "3040", 
                                "3049", "3050a", "3050b", "3050c", "3051", 
                                "3052", "3057", "3058", "3059a", "3059b", 
-                               "3059c", "3059d", "3063", "3068", "3075", 
+                               "3059c", "3059d", "3063", "3067", "3068", "3075", 
                                "3079", "3081", "3085", "3095", 
                                "3130", "3135", "3145", "3151", "3152")))
 sucs_data <- sucs_data |>
@@ -346,10 +346,10 @@ sucs_data <- sucs_data |>
 # So remove all entries after 2864 and then add a text entry in 3044.
 sucs_data <- sucs_data |>
   filter(!(id_mhq == "Kleinwelt" & 
-             time_point %in% c("2864", "3025", "3030", "3040", 
+             time_point %in% c("3025", "3030", "3040", 
                                "3049", "3050a", "3050b", "3050c", "3051", 
                                "3052", "3057", "3058", "3059a", "3059b", 
-                               "3059c", "3059d", "3063", "3068", "3075", 
+                               "3059c", "3059d", "3063", "3067", "3068", "3075", 
                                "3079", "3081", "3085", "3095", 
                                "3130", "3135", "3145", "3151", "3152")))
 sucs_data <- sucs_data |>
@@ -367,6 +367,15 @@ sucs_data <- sucs_data |>
       faction = "I"
     )
   )
+
+## Star's End ## 
+# This is listed as independent in 3081 but the map does not show this. Sarna
+# describes the Hell's Horses as leaving at some point, but the references
+# listed don't actually indicate this. The same problem exists in 3085.
+sucs_data <- correct_faction("Star's End (Novo Cressidas)", 
+                             c("3081", "3085"), "CHH")
+
+
 
 # Add Founding House Maps------------------------------------------------
 
@@ -1480,11 +1489,7 @@ sucs_data <- update_sources(
                "TD", "RC", "FrR")
 )
 
-# TODO: Kleinwelt and Frobisher are both showing in 3081 data
 # TODO: McEvedy's Folly should be a dead world according to map
-# TODO: Star's End shows up as I even though in Clan Hells' Horses zone
-
-
 
 # TODO: 3068 data? Where does it come from?
 
