@@ -199,8 +199,8 @@ plot_planets <- function(map_data,
       config(scrollZoom = TRUE) |>
       layout(dragmode = "pan",
              # set the default zoom to cover the IS and Periphery
-             xaxis = list(range = list(-600, 780)), 
-             yaxis = list(range = list(-580, 580)))
+             xaxis = list(range = list(-610, 795)), 
+             yaxis = list(range = list(-595, 600)))
     
     if(show_id) {
       map <- map |> htmlwidgets::onRender(js_dynamic_labels)
