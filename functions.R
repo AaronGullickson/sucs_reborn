@@ -102,7 +102,7 @@ faction_snapshot <- function(base_data, date) {
     arrange(id_sucs, desc(source_date), source_type) |>
     # remove duplicate planet entries
     filter(!duplicated(id_sucs)) |>
-    select(starts_with("id_"), x, y, faction, 
+    select(starts_with("id_"), x, y, faction, starts_with("region"), capital,
            source_type, source_title, source_loc, source_date)
 }
 
@@ -126,11 +126,18 @@ plot_planets <- function(map_data,
       faction = factor(faction, 
                        levels = faction_data$id_sucs, 
                        labels = faction_data$name),
+      capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
+      region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
+      region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),
+      region3_str = if_else(is.na(region3), "", paste0(region3, "<br>")),
+      source_str = paste0("<i>Source:</i> ", 
+                          paste(source_type, source_title, source_loc, 
+                                sep = ", ")),
+      source_date_str = paste0("<br><i>Source Date:</i> ", source_date),
       text_plotly = paste0("<b>", id_mhq, "</b><br>",
-                           "<i>", faction, "</i><br>",
-                           source_type, ": ", source_title, 
-                           ", ", source_loc, "<br>", 
-                           source_date)
+                           faction, "<br>",
+                           capital_str, region1_str, region2_str, region3_str,
+                           source_str, source_date_str)
     )
   
   # Determine color palette
