@@ -147,10 +147,12 @@ plot_planets <- function(map_data,
   if(choice_color == "faction") {
     map_data$var_color <- map_data$faction
     color_palette <- faction_data |> select(name, color) |> deframe()
+    legend_name <- "Faction"
   } else {
     map_data$var_color <- map_data$source_title
     color_palette <- randomColor(length(unique(map_data$source_title)))
     names(color_palette) <- unique(map_data$source_title)
+    legend_name <- "Source"
   }
   
   
@@ -178,7 +180,7 @@ plot_planets <- function(map_data,
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
     geom_point(size = 2) +
     scale_color_manual(values = color_palette) +
-    labs(title = plot_title) +
+    labs(title = plot_title, color = legend_name) +
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank())
