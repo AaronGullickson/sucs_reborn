@@ -1436,13 +1436,33 @@ sucs_data <- update_sources(
 
 # Add Jihad Final Reckoning data ----------------------------------------------
 
-
 # Add 3067 map
+bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
+                           "Manaringaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3067", 
+  title = "Jihad: Final Reckoning", 
+  loc = "pp. 42-43",
+  date = date("3067-10-31"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "CC", "FS", "FWL", "LA", "DC", 
+               "CS", "FR", "WB",
+               "CWF", "CJF", "CGB", "CNC",
+               "TCC", "SS", "DS", "ST", "SKC",
+               "MOC", "TC", "CDP", "OA", "CF", "MH",
+               "TD", "RC", "FrR")
+)
 
+# TODO: Its reporting Tharkad as WOB controlled but this is October before
+# WHitting conference, and in any case it was disputed for quite some time
+# TODO: McEvedy's Folly is showing up as MOC controlled
+# TODO: The Saiph Triumvarate is showing up here but it shows as independent 
+# on the map
 
 # 3081 map
 
-# 3068 data? Where does
+# 3068 data? Where does it come from?
 
 
 # Jihad Secrets: The Blake Documents --------------------------------------
