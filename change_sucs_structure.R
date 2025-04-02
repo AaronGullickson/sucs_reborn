@@ -1613,6 +1613,8 @@ sucs_data <- update_sources(
                "TC", "AB", "TD", "OA", "FvC")
 )
 
+# TODO: Periphery and Clan field reports, including Hanseatic League maps
+
 
 # Field Manual 3085 data --------------------------------------------------
 
