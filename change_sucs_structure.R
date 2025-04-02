@@ -90,6 +90,13 @@ disputed |> pull(faction) |> unique() |> sort()
 
 table(disputed$faction, disputed$time_point)
 
+
+## Malagrotta Cooperative ##
+# The three planets of the Malagrotta Cooperative are listed as D(MC,FS) in
+# 3079. The AFFS and Periphery maps from Field Reports show them as FS, but 
+# the AFFS map marks them off as "disputed."
+
+
 # Fix some cases ----------------------------------------------------------
 
 # There are some cases that if we fix them at the top, it will be easier
@@ -403,9 +410,11 @@ sucs_data <- sucs_data |>
                                "3079", "3081", "3085", "3095", 
                                "3130", "3135", "3145", "3151", "3152")))
 
-
 # TODO: Skyfog is showing as part of MOC long after it is abandoned
-# because of an out of frame issue
+# because of an out of frame issue. It is also coded in the SUCK data as 
+# IE which I think is a little weird. Its area does seem to come back into frame
+# in the Field Report: Periphery map for the MOC and its not there, so maybe
+# it should be listed as abandoned?
 
 ## Sentarus ## 
 # Sentarus is showing as independent long after they drop off maps due to an
@@ -1243,7 +1252,7 @@ sucs_data <- correct_faction(c("Manaringaine", "Nyserta", "Elissa", "Porthos"),
                              "EF")
 
 # Now run 3049 again for the whole IS for 3049-07-31
-bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+bounding_box <- create_box("New St. Andrews", "Micanos (Mica II, V, VII)", 
                            "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3049", 
@@ -1319,7 +1328,7 @@ sucs_data <- update_sources(
                "OC", "EF", "GV")
 )
 # Wave V - This is the same as large April Map, so just use that
-bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+bounding_box <- create_box("New St. Andrews", "Micanos (Mica II, V, VII)", 
                            "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3052", 
@@ -1380,7 +1389,7 @@ sucs_data <- sucs_data |>
   filter(!(is_in_box(x, y, bounding_box) & time_point == "3057")) |>
   bind_rows(pre_chaos_march)
 
-bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+bounding_box <- create_box("New St. Andrews", "Micanos (Mica II, V, VII)", 
                             "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3057", 
@@ -1418,7 +1427,7 @@ sucs_data <- sucs_data |>
 
 # Add Era Report 3062 Final Map data --------------------------------------
 
-bounding_box <- create_box("New St. Andrews", "Fletcher's Feast", 
+bounding_box <- create_box("New St. Andrews", "Micanos (Mica II, V, VII)", 
                            "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3063", 
@@ -1490,7 +1499,7 @@ sucs_data <- update_sources(
 # Add Jihad Final Reckoning data ----------------------------------------------
 
 # Add 3067 map
-bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
+bounding_box <- create_box("Hunter's Paradise", "Micanos (Mica II, V, VII)", 
                            "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3067", 
@@ -1512,7 +1521,7 @@ sucs_data <- update_sources(
 # on the map
 
 # 3081 map
-bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
+bounding_box <- create_box("Hunter's Paradise", "Micanos (Mica II, V, VII)", 
                            "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3081", 
@@ -1545,7 +1554,7 @@ sucs_data <- sucs_data |>
                            "WB", faction))
 
 #3075ish?
-bounding_box <- create_box("Hunter's Paradise", "Fletcher's Feast", 
+bounding_box <- create_box("Hunter's Paradise", "Micanos (Mica II, V, VII)", 
                            "Manaringaine", "Crawford's Delight")
 sucs_data <- update_sources(
   target = "3075", 
@@ -1643,7 +1652,77 @@ sucs_data <- update_sources(
                "TC", "AB", "TD", "OA", "FvC")
 )
 
-# TODO: Periphery and Clan field reports, including Hanseatic League maps
+# Periphery - MOC
+bounding_box <- create_box("Thraxa", "Jacson", 
+                           "Palladaine", "Crawford's Delight")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: Periphery", 
+  loc = "p. 20",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "CC", "FWL",
+               "CS", "WB",
+               "MOC", "FrR")
+)
+
+# Periphery - TC
+bounding_box <- create_box("Safe Port", "Lastpost", 
+                           "Kigamboni", "Hellespont")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: Periphery", 
+  loc = "p. 21",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS", "CC", "FWL",
+               "CS", "WB",
+               "TC", "CDP")
+)
+
+# Periphery - Filtvelt Coalition
+bounding_box <- create_box("Gurrnazovo", "Micanos (Mica II, V, VII)", 
+                           "Brookeland", "Pirates Haven (50) (Badlands Cluster 3025-)")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: Periphery", 
+  loc = "p. 22",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FS",
+               "TD", "FvC")
+)
+
+# Periphery - MH
+bounding_box <- create_box("New St. Andrews", "Eromanga", 
+                           "Galisteo", "Vixen")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: Periphery", 
+  loc = "p. 23",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "FWL",
+               "CS", "WB",
+               "MH", "CF", "OA", "RCM")
+)
+
+# Periphery - Hanseatic League
+bounding_box <- create_box("Anklan", "Hamburg", 
+                           "Granada", "Gateway")
+sucs_data <- update_sources(
+  target = "3079", 
+  title = "Field Report: Periphery", 
+  loc = "p. 24",
+  date = date("3079-08-01"), 
+  box = bounding_box, 
+  factions = c("I", "U", "A", 
+               "HL", "NC")
+)
 
 
 # Field Manual 3085 data --------------------------------------------------
