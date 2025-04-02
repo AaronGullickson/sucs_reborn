@@ -1652,6 +1652,16 @@ sucs_data <- sucs_data |>
   )
 
 # FWLM
+# TODO: The map shows the FWL still together except for Tamarind-Abbey and Rim 
+# Commonality. The SUCK data also adds in Regulus as distinct. However, the map 
+# is for August 3079 and the FWL was dissolved by an act of parliament on 
+# 3079-01-28 (Jihad Final Reckoning p. 24). So really the map is wrong. 
+# I can think of two ways to solve this (a) break it all up, which could
+# be done by moving region1 up to faction where we have it or I if not (and
+# changing capitals); (b) put it all back in FWL, except for ones the map
+# shows as distinct. The (b) part is more accurate to what the map says, but 
+# it would screw up breaking up the FWL later with a text entry unless we 
+# also errata the map. 
 bounding_box <- create_box("Valerius", "Milos", 
                            "Maisons", "Canopus IV")
 sucs_data <- sucs_data |>
