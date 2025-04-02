@@ -1899,7 +1899,7 @@ sucs_data <- sucs_data |>
     date = date("3085-10-01"), 
     box = bounding_box, 
     factions = c("I", "U", "A", 
-                 "CC", "FS", "LA", "DC", "RS",
+                 "CC", "FS", "LC", "DC", "RS",
                  "CS", "WB",
                  "CWF", "CJF", "GBD", "CNC", "CHH", "RA",
                  "MSC", "PR", "DO", "DA", "DGM", "TP", "RFS", "MA", "DTA", 
