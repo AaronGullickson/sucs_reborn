@@ -96,7 +96,6 @@ table(disputed$faction, disputed$time_point)
 # 3079. The AFFS and Periphery maps from Field Reports show them as FS, but 
 # the AFFS map marks them off as "disputed."
 
-
 # Fix some cases ----------------------------------------------------------
 
 # There are some cases that if we fix them at the top, it will be easier
@@ -192,7 +191,7 @@ sucs_data <- sucs_data |>
 
 ## McEvedy's Folly ##
 # This is shown as SL in 2765 based on Touring the Stars - McEvedy's Folly, but it 
-# does not show up on maps until 3067, so make it until thens
+# does not show up on maps until 3067, so make it U until then
 # record as "U" here.
 sucs_data <- sucs_data |>
   correct_faction("McEvedy's Folly", 
@@ -201,7 +200,9 @@ sucs_data <- sucs_data |>
                     "3040", "3049", "3050a", "3050b", "3050c", 
                     "3051", "3052", "3057", "3058", "3059a", "3059b",
                     "3059c", "3059d", "3063"), 
-                  "U")
+                  "U") |>
+  # Its also gone from 3085 map
+  remove_cases("McEvedy's Folly", "3085")
 
 ## Antallos (Port Krin) ##
 # It is listed as SL. This is from Merc Supplemental II where
@@ -417,6 +418,18 @@ sucs_data <- sucs_data |>
   correct_faction(c("Dante", "Quatre Belle"), 
                   time_point_range( "3075", "3081"), 
                   "OA")
+
+## The Barrens ##
+# Several planets on the 3085 map are marked as independent but are actually
+# part of CHH. I think this is because they form the breakoff New Oberon 
+# Confederation in 3086 as discussed in Interstellar Expeditions: Interstellar 
+# Players 3, p. 43: "Formation of the Barrens: A Timeline. They should go 
+# back to CHH for the map though.
+chh_runaways <- c("Von Strang's World (Erin 2830-)", "Placida", "Blackstone",
+                  "Oberon VI", "Crellacor", "Drask's Den", "Paulus Prime", 
+                  "The Rock", "Ferris (OC)", "Manaringaine")
+sucs_data <- sucs_data |>
+  correct_faction(chh_runaways, "3085", "CHH")
 
 # Add Founding House Maps------------------------------------------------
 
@@ -1599,7 +1612,7 @@ sucs_data <- sucs_data |>
 
 # TODO: McEvedy's Folly should be a dead world according to map
 
-# Jihad Secrets: The Blake Documents --------------------------------------
+# Add Jihad Secrets: The Blake Documents --------------------------------------
 
 # There are a couple of CoF entries in here but it is too early for that. All
 # of the CoF entries that I can see should be WB
@@ -1874,11 +1887,28 @@ sucs_data <- sucs_data |>
                  "AB")
   )
 
-# Field Manual 3085 data --------------------------------------------------
+# Add Field Manual 3085 data --------------------------------------------------
+
+bounding_box <- create_box("Hunter's Paradise", "Micanos (Mica II, V, VII)", 
+                           "Idrmach/Idrmarch", "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3085", 
+    title = "Field Manual 3085", 
+    loc = "pp. 126-127",
+    date = date("3085-10-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LA", "DC", "RS",
+                 "CS", "WB",
+                 "CWF", "CJF", "GBD", "CNC", "CHH", "RA",
+                 "MSC", "PR", "DO", "DA", "DGM", "TP", "RFS", "MA", "DTA", 
+                 "RCM", "SHC",  
+                 "MOC", "TC", "CDP", "OA", "MH",
+                 "TD", "RC", "FrR", "CI", "FvC")
+  )
 
 # Ignore the 3095 column for now - changes from FM 3085 are mostly IE:ISP 3
-
-# TODO: What about wars of reaving? I don't think we have a map.
 
 # Era Digest Dark Ages data -----------------------------------------------
 
