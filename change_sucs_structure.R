@@ -115,7 +115,8 @@ sucs_data <- correct_faction("Randis IV (Hope IV 2988-)",
 # from the 3063 map in the Era Report 3062 book. I think the Arano entry 
 # should be handled with those other cases. So, I am going to list as U
 # for all entries before 3025, and then remove entries betweent 3025 and 3063
-# to handle them with Arano case
+# to handle them with Arano case.
+# TODO: This is currently not showing up in Jihad era maps even though it should
 sucs_data <- correct_faction("McEvans' Sacrifice", 
                              c("2596", "2750", "2765", "2767", "2783", "2786",
                                "2821", "2822", "2830", "2864"),
@@ -389,7 +390,6 @@ sucs_data <- correct_faction("Farstar",
 # it was in dispute at most. 
 sucs_data <- correct_faction("Tharkad", 
                              c( "3067", "3068"), "LA")
-
 
 # Add Founding House Maps------------------------------------------------
 
