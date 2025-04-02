@@ -26,9 +26,9 @@ is_in_box <- function(x, y, box) {
 }
 
 
-update_sources <- function(target, title, loc, date, 
+update_sources <- function(map_data, target, title, loc, date, 
                            box = NULL, factions = NULL) {
-  sucs_data |> 
+  map_data |> 
     # First, drop any values from sucs_data from the target_time 
     mutate(
       # only change values that are from the target time and in
@@ -49,15 +49,15 @@ update_sources <- function(target, title, loc, date,
   
 }
 
-correct_faction <- function(id, time_target, new_faction) {
-  sucs_data |>
+correct_faction <- function(map_data, id, time_target, new_faction) {
+  map_data |>
     mutate(faction = if_else(id_mhq %in% id & time_point %in% time_target, 
                              new_faction, faction))
 }
 
-correct_sources <- function(id, time_target,
+correct_sources <- function(map_data, id, time_target,
                             new_source_title, new_source_loc, new_source_date) {
-  sucs_data |>
+  map_data |>
     mutate(
       source_title = if_else(id_mhq %in% id & time_point %in% time_target, 
                              new_source_title, source_title),
