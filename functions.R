@@ -123,9 +123,27 @@ plot_planets <- function(map_data,
                          choice_color = "faction",
                          faction_data = sucs_factions) {
   
-  # Take a snapshot & create labels
+  # Take a snapshot
   map_data <- map_data |>
-    faction_snapshot(date) |>
+    faction_snapshot(date)
+  
+  # get string for disputed cases
+  map_data <- map_data |>
+    mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
+    separate_wider_delim(disputed, ",", too_few = "align_start", 
+                         names_sep = "") |>
+    # we don't know how many there are so pivot longer to get names
+    pivot_longer(starts_with("disputed")) |>
+    mutate(value = factor(value, 
+                          levels = faction_data$id_sucs, 
+                          labels = faction_data$name)) |>
+    # now reshape back wider and concatenate disputed cases
+    pivot_wider() |>
+    unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE)
+    
+  
+  # now organize the rest of the labels
+  map_data <- map_data |>
     mutate(
       # first clean the disputed parenthetical away
       faction = str_remove(faction, "\\s*\\([^\\)]+\\)"),
@@ -134,6 +152,9 @@ plot_planets <- function(map_data,
                        levels = faction_data$id_sucs, 
                        labels = faction_data$name),
       # construct strings for the map display
+      faction_str = if_else(disputed == "", 
+                            paste0(faction, "<br>"),
+                            paste0(faction, " (", disputed, ")<br>")),
       capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
       region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
       region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),
@@ -143,7 +164,7 @@ plot_planets <- function(map_data,
                                 sep = ", ")),
       source_date_str = paste0("<br><i>Source Date:</i> ", source_date),
       text_plotly = paste0("<b>", id_mhq, "</b><br>",
-                           faction, "<br>",
+                           faction_str,
                            capital_str, region1_str, region2_str, region3_str,
                            source_str, source_date_str)
     )
