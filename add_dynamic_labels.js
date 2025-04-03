@@ -30,6 +30,8 @@ function addPlotlyLabels(el, x) {
 
            for (var i = 0; i < x.data.length; i++) {
              var trace = x.data[i];
+             
+             if (trace.mode !== "markers") continue; // Only process scatter points
 
              // Check if the trace is visible (trace.visible is 'legendonly' when hidden)
              if (trace.visible === true || trace.visible === undefined) {

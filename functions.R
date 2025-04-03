@@ -112,6 +112,22 @@ faction_snapshot <- function(base_data, date) {
 # read in javascript code
 js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
 
+# Function to expand points slightly outward
+expand_points <- function(df, add_factor = 20) {
+  # Calculate the centroid of the points
+  centroid_x <- mean(df$x)
+  centroid_y <- mean(df$y)
+  
+  # Apply an additive boundary: Move points away from the centroid by a fixed amount (add_factor)
+  df <- df |>
+    mutate(
+      x = x + (x - centroid_x) * add_factor / sqrt((x - centroid_x)^2 + (y - centroid_y)^2),
+      y = y + (y - centroid_y) * add_factor / sqrt((x - centroid_x)^2 + (y - centroid_y)^2)
+    )
+  
+  return(df)
+}
+
 plot_planets <- function(map_data,
                          date, 
                          title = NULL, 
@@ -167,20 +183,30 @@ plot_planets <- function(map_data,
   minor_capital_data <- map_data |> 
     filter(capital == "Minor")
   
+  # Compute convex hull & expand it
+  hull_data <- map_data |>
+    filter(!(faction %in% c("Inhabited", "Abandoned", "Undiscovered"))) |>
+    group_by(var_color) |>
+    slice(chull(x, y)) |>
+    group_modify(~ expand_points_additive(.x))
+    
   # Base ggplot
-  map <- map_data |>
-    ggplot(aes(x = x, y = y, text = text_plotly, color = var_color,
-               customdata = id_mhq)) +
+  map <- ggplot(map_data, aes(x = x, y = y, text = text_plotly, customdata = id_mhq))+
+    # add polygon around points
+    geom_polygon(data = hull_data, aes(x = x, y = y, fill = var_color, group = var_color), 
+                 alpha = 0.2, color = "black", show.legend = FALSE, inherit.aes = FALSE)+
     # some fancy stuff here for capital rings
-    geom_point(data = faction_capital_data, size = 4)+
+    geom_point(data = faction_capital_data, aes(color = var_color), size = 4)+
     geom_point(data = faction_capital_data, color = "grey20", size = 2.5)+
-    geom_point(data = major_capital_data, size = 3.5)+
+    geom_point(data = major_capital_data, aes(color = var_color), size = 3.5)+
     geom_point(data = major_capital_data, color = "grey20", size = 2.5)+
-    geom_point(data = minor_capital_data, size = 3)+
+    geom_point(data = minor_capital_data, aes(color = var_color), size = 3)+
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
-    geom_point(size = 2) +
+    geom_point(size = 2, aes(color = var_color)) +
     scale_color_manual(values = color_palette)+
+    scale_fill_manual(values = color_palette)+
     labs(title = plot_title, color = legend_name)+
+    guides(fill = "none")+
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank(),
