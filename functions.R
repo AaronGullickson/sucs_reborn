@@ -195,7 +195,7 @@ plot_planets <- function(map_data,
     group_by(var_color) |>
     group_split() |>
     map(function(df) {
-      concaveman(as.matrix(df[, c("x", "y")]), concavity = 1) |>
+      concaveman(as.matrix(df[, c("x", "y")]), concavity = 2) |>
         as_tibble() |>
         rename(x = V1, y = V2) |>
         mutate(var_color = unique(df$var_color))
