@@ -184,11 +184,24 @@ plot_planets <- function(map_data,
     filter(capital == "Minor")
   
   # Compute convex hull & expand it
+  #hull_data <- map_data |>
+  #  filter(!(faction %in% c("Inhabited", "Abandoned", "Undiscovered"))) |>
+  #  group_by(var_color) |>
+  #  slice(chull(x, y)) |>
+  #  group_modify(~ expand_points_additive(.x))
+  
   hull_data <- map_data |>
     filter(!(faction %in% c("Inhabited", "Abandoned", "Undiscovered"))) |>
     group_by(var_color) |>
-    slice(chull(x, y)) |>
-    group_modify(~ expand_points_additive(.x))
+    group_split() |>
+    map(function(df) {
+      concaveman(as.matrix(df[, c("x", "y")]), concavity = 1) |>
+        as_tibble() |>
+        rename(x = V1, y = V2) |>
+        mutate(var_color = unique(df$var_color))
+    }) |>
+    bind_rows()
+  
     
   # Base ggplot
   map <- ggplot(map_data, aes(x = x, y = y, text = text_plotly, customdata = id_mhq))+
