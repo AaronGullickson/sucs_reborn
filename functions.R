@@ -51,7 +51,10 @@ update_sources <- function(map_data, target, title, loc, date,
       # only change values that are from the target time and in
       # the bounding box and come from acceptable factions
       change_source = (time_point == target) & is_in_box(x, y, box) & 
-        (is.null(faction) | faction %in% factions),
+        (is.null(faction) | 
+           faction %in% factions | 
+           # always accept disputed codes
+           str_detect(faction, "^D\\(")),
       # add source information
       source_title = case_when(
         !change_source ~ source_title,
@@ -124,9 +127,13 @@ plot_planets <- function(map_data,
   map_data <- map_data |>
     faction_snapshot(date) |>
     mutate(
+      # first clean the disputed parenthetical away
+      faction = str_remove(faction, "\\s*\\([^\\)]+\\)"),
+      # now turn faction into factor
       faction = factor(faction, 
                        levels = faction_data$id_sucs, 
                        labels = faction_data$name),
+      # construct strings for the map display
       capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
       region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
       region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),

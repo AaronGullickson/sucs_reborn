@@ -2037,14 +2037,13 @@ sucs_data <- sucs_data |>
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
   mutate(color = if_else(id_sucs == "UHC", "#90EE90", color),
-         color = if_else(id_sucs == "U", "hotpink", color),
-         color = if_else(id_sucs == "CSJ", "grey40", color),
+         color = if_else(id_sucs == "U", "grey", color),
+         color = if_else(id_sucs == "CSJ", "darkslategrey", color),
          color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color),
-         color = if_else(id_sucs == "SS", "#CEFF00", color))
+         color = if_else(id_sucs == "SS", "#CEFF00", color),
+         color = if_else(id_sucs == "D", "#E40078", color),
+         color = if_else(id_sucs == "CS", "snow", color))
 
 save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)
-
-# Create plots to test ----------------------------------------------------
-
