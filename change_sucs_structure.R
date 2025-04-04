@@ -1950,6 +1950,26 @@ sucs_data <- sucs_data |>
 # Era Report 3145 data ----------------------------------------------------
 
 # 3135
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3135", 
+    title = "Era Report 3145", 
+    loc = "pp. 10-11",
+    date = date("3135-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS", "TR",
+                 "CS",
+                 "CWF", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "RF", "MSC", "DTA", "RCM", "DA", "OP",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI")
+  )
+
 
 # 3145
 
