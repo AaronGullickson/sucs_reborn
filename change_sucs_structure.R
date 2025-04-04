@@ -2018,10 +2018,30 @@ sucs_data <- sucs_data |>
   )
 
 
-# Ilclan First Round data -------------------------------------------------
+# Add Ilclan First Round data -------------------------------------------------
 
-# Tamar Rising, Empire Alone, Dominions Divided, Ilkan's Eyes Only
-
+# According to SUCS, they just used Ilkhan's Eyes Only which is a slightlly 
+# later date (July 3152) than the others (June 3152).
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3152", 
+    title = "Ilkhan's Eyes Only", 
+    loc = "pp. 170-171",
+    date = date("3152-07-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "FWL", "SL",
+                 "CS",
+                 "WE", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "DA", "IoS", "AML", "VM", "ALC", "TamP", "MaC",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI", "TiC",
+                 "RU", "NOC", "FCo", "RB", "THa")
+  )
 
 # OTP: Hanseatic Crusade --------------------------------------------------
 
@@ -2112,7 +2132,7 @@ sucs_data <- sucs_data |>
 
 
 # change source for any 3025 AuC entries to Handbook: House Arano
-sucs_data |>
+sucs_data <- sucs_data |>
   mutate(
     source_title = if_else(time_point == "3025" & faction == "AuC", 
                            "Handbook: House Arano", source_title),
