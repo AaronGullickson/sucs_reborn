@@ -431,6 +431,19 @@ chh_runaways <- c("Von Strang's World (Erin 2830-)", "Placida", "Blackstone",
 sucs_data <- sucs_data |>
   correct_faction(chh_runaways, "3085", "CHH")
 
+# Several states in The Barrens are described in IE:ISP3, but ot shown 
+# on an actual map until Ilkhan's Eyes Only. However, SUCK has them as early as 
+# 3085 in the data. All entries between 3085 and 3152 should be moved back to 
+# I. We also need to remove any capital information
+sucs_data <- sucs_data |>
+  mutate(capital = if_else(time_point %in% time_point_range("3085", "3151") &
+                             faction %in% c("RU", "NOC", "FCo", "RB", "THa"), 
+                           NA, capital))
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(time_point %in% time_point_range("3085", "3151") &
+                             faction %in% c("RU", "NOC", "FCo", "RB", "THa"), 
+                           "I", faction))
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -1910,11 +1923,33 @@ sucs_data <- sucs_data |>
 
 # Ignore the 3095 column for now - changes from FM 3085 are mostly IE:ISP 3
 
-# Era Digest Dark Ages data -----------------------------------------------
+# Add Era Digest Dark Ages data -----------------------------------------------
 
-# 3135?
+# From 3130 according to map, unclear what day/month
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Manaringaine", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3130", 
+    title = "Era Digest: Dark Ages", 
+    loc = "p. 12",
+    date = date("3130-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS",
+                 "CS",
+                 "CWF", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "RF", "MSC", "DTA", "RCM", "DA", "OP",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL")
+  )
+
 
 # Era Report 3145 data ----------------------------------------------------
+
+# 3135
 
 # 3145
 
