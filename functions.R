@@ -219,7 +219,7 @@ plot_planets <- function(map_data,
   #  group_modify(~ expand_points_additive(.x))
   
   hull_data <- map_data |>
-    filter(!(faction %in% c("Inhabited", "Abandoned", "Undiscovered"))) |>
+    filter(!(faction %in% c("Inhabited", "Abandoned", "Undiscovered", "Disputed"))) |>
     group_by(var_color) |>
     group_split() |>
     map(function(df) {
