@@ -2154,6 +2154,7 @@ sucs_factions <- sucs_factions |>
     color = if_else(id_sucs == "SS", "#CEFF00", color),
     color = if_else(id_sucs == "D", "#E40078", color),
     color = if_else(id_sucs == "CS", "#FFFAFA", color),
+    color = if_else(id_sucs == "DD", "#422649", color),
     name = if_else(id_sucs == "I", "Independent", name),
     name = if_else(id_sucs == "U", "Unsettled", name)
   )
