@@ -22,12 +22,12 @@ names(source_types) <- str_to_title(source_types)
 sources <- sort(unique(sucs_data$source_title))
 time_periods <- list(
   "Major Houses Founded (2366)" = "2366-12-31",
-  "Founding of the Star League (2750)" = "2571-12-31",
+  "Founding of the Star League (2571)" = "2571-12-31",
   "End of Reunification War (2596)" = "2596-12-31",
   "Height of the Star League (2750)" = "2750-12-31",
-  "Start of First Succession War (2864)" = "2786-01-01",
-  "End of First Succession War (2864)" = "2822-12-31",
-  "Start of Second Succession War (2864)" = "2830-01-01",
+  "Start of First Succession War (2786)" = "2786-01-01",
+  "End of First Succession War (2822)" = "2822-12-31",
+  "Start of Second Succession War (2830)" = "2830-01-01",
   "End of Second Succession War (2864)" = "2864-12-31",
   "End of Third Succession War (3025)" = "3025-12-31",
   "End of Fourth Succession War (3030)" = "3030-01-31",
@@ -39,7 +39,12 @@ time_periods <- list(
   "Mid Jihad (3075)" = "3075-12-31",
   "Late Jihad (3079)" = "3079-12-31",
   "End of the Jihad (3081)" = "3081-12-31",
-  "Early Republic of the Sphere (3085)" = "3085-12-31"
+  "Early Republic of the Sphere (3085)" = "3085-12-31",
+  "Dark Age, Devlin Stone Retirement (3130)" = "3130-01-01",
+  "Early Dark Age (3135)" = "3135-01-01",
+  "Late Dark Age (3145)" = "3145-01-01",
+  "The Fall of the Republic (3151)" = "3151-01-01",
+  "Dawn of the IlClan (3152)" = "3152-07-01"
 )
 
 # Define UI for application that draws a histogram
@@ -61,7 +66,7 @@ ui <- page_fillable(
         dateInput(
           inputId = "date",
           label = h4("Or choose a specific date..."),
-          value = date("3085-10-31")),
+          value = date("3152-07-01")),
         selectInput( 
           "select_color", 
           h4("Color by:"), 

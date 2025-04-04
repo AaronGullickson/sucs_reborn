@@ -431,6 +431,19 @@ chh_runaways <- c("Von Strang's World (Erin 2830-)", "Placida", "Blackstone",
 sucs_data <- sucs_data |>
   correct_faction(chh_runaways, "3085", "CHH")
 
+# Several states in The Barrens are described in IE:ISP3, but ot shown 
+# on an actual map until Ilkhan's Eyes Only. However, SUCK has them as early as 
+# 3085 in the data. All entries between 3085 and 3152 should be moved back to 
+# I. We also need to remove any capital information
+sucs_data <- sucs_data |>
+  mutate(capital = if_else(time_point %in% time_point_range("3085", "3151") &
+                             faction %in% c("RU", "NOC", "FCo", "RB", "THa"), 
+                           NA, capital))
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(time_point %in% time_point_range("3085", "3151") &
+                             faction %in% c("RU", "NOC", "FCo", "RB", "THa"), 
+                           "I", faction))
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -1910,21 +1923,125 @@ sucs_data <- sucs_data |>
 
 # Ignore the 3095 column for now - changes from FM 3085 are mostly IE:ISP 3
 
-# Era Digest Dark Ages data -----------------------------------------------
+# Add Era Digest Dark Ages data -----------------------------------------------
 
-# 3135?
+# From 3130 according to map, unclear what day/month
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Manaringaine", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3130", 
+    title = "Era Digest: Dark Ages", 
+    loc = "p. 12",
+    date = date("3130-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS",
+                 "CS",
+                 "CWF", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "RF", "MSC", "DTA", "RCM", "DA", "OP",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL")
+  )
 
-# Era Report 3145 data ----------------------------------------------------
+
+# Add Era Report 3145 data ----------------------------------------------------
+
+# 3135
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3135", 
+    title = "Era Report 3145", 
+    loc = "pp. 10-11",
+    date = date("3135-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS", "TR",
+                 "CS",
+                 "CWF", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "RF", "MSC", "DTA", "RCM", "DA", "OP",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI")
+  )
+
+
+
+
+# Add Shattered Fortress data -------------------------------------------------
 
 # 3145
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3145", 
+    title = "Shattered Fortress", 
+    loc = "pp. 38-39",
+    date = date("3145-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS", "TR", "FWL",
+                 "CS",
+                 "WE", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "RF", "DA", "GL",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI")
+  )
 
-# Shattered Fortress data -------------------------------------------------
+# 3145
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3151", 
+    title = "Shattered Fortress", 
+    loc = "pp. 102-103",
+    date = date("3151-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS", "TR", "FWL",
+                 "CS",
+                 "WE", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "DA", "GL",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI", "TiC")
+  )
 
 
-# Ilclan First Round data -------------------------------------------------
+# Add Ilclan First Round data -------------------------------------------------
 
-# Tamar Rising, Empire Alone, Dominions Divided, Ilkan's Eyes Only
-
+# According to SUCS, they just used Ilkhan's Eyes Only which is a slightlly 
+# later date (July 3152) than the others (June 3152).
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3152", 
+    title = "Ilkhan's Eyes Only", 
+    loc = "pp. 170-171",
+    date = date("3152-07-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "FWL", "SL",
+                 "CS",
+                 "WE", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "DA", "IoS", "AML", "VM", "ALC", "TamP", "MaC",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI", "TiC",
+                 "RU", "NOC", "FCo", "RB", "THa")
+  )
 
 # OTP: Hanseatic Crusade --------------------------------------------------
 
@@ -2015,7 +2132,7 @@ sucs_data <- sucs_data |>
 
 
 # change source for any 3025 AuC entries to Handbook: House Arano
-sucs_data |>
+sucs_data <- sucs_data |>
   mutate(
     source_title = if_else(time_point == "3025" & faction == "AuC", 
                            "Handbook: House Arano", source_title),
@@ -2037,14 +2154,13 @@ sucs_data <- sucs_data |>
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
   mutate(color = if_else(id_sucs == "UHC", "#90EE90", color),
-         color = if_else(id_sucs == "U", "hotpink", color),
-         color = if_else(id_sucs == "CSJ", "grey40", color),
+         color = if_else(id_sucs == "U", "grey", color),
+         color = if_else(id_sucs == "CSJ", "darkslategrey", color),
          color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color),
-         color = if_else(id_sucs == "SS", "#CEFF00", color))
+         color = if_else(id_sucs == "SS", "#CEFF00", color),
+         color = if_else(id_sucs == "D", "#E40078", color),
+         color = if_else(id_sucs == "CS", "snow", color))
 
 save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)
-
-# Create plots to test ----------------------------------------------------
-
