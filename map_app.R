@@ -18,7 +18,7 @@ source("functions.R")
 load("sucs_data.RData")
 source_types <- unique(sucs_data$source_type)
 names(source_types) <- str_to_title(source_types)
-sources <- sort(unique(sucs_data$source_title))
+isp_list <- c("Interstellar Players", "IE: Interstellar Players 3")
 time_periods <- list(
   "Major Houses Founded (2366)" = "2366-12-31",
   "Founding of the Star League (2571)" = "2571-12-31",
@@ -39,7 +39,7 @@ time_periods <- list(
   "Late Jihad (3079)" = "3079-12-31",
   "End of the Jihad (3081)" = "3081-12-31",
   "Early Republic of the Sphere (3085)" = "3085-12-31",
-  "Dark Age, Devlin Stone Retirement (3130)" = "3130-01-01",
+  "Late Republic of the Sphere (3130)" = "3130-01-01",
   "Early Dark Age (3135)" = "3135-01-01",
   "Late Dark Age (3145)" = "3145-01-01",
   "The Fall of the Republic (3151)" = "3151-01-01",
@@ -56,23 +56,36 @@ ui <- page_fillable(
     layout_sidebar(
       sidebar = sidebar(
         width = 350,
-        radioButtons( 
-          inputId = "era", 
+        # radioButtons( 
+        #   inputId = "era", 
+        #   label = h4("Pick an era..."), 
+        #   choices = time_periods,
+        #   selected = character(0)
+        # ), 
+        selectizeInput( 
+          inputId = "era",
           label = h4("Pick an era..."), 
           choices = time_periods,
-          selected = character(0)
-        ), 
+          selected = "3152-07-01"
+        ),
         dateInput(
           inputId = "date",
           label = h4("Or choose a specific date..."),
-          value = date("3152-07-01")),
+          value = date("3152-07-01"),
+        ),
         selectInput( 
           "select_color", 
           h4("Color by:"), 
           list("Faction" = "faction", "Source" = "source") 
         ),
         downloadButton("download", "Download CSV file"),
-        h4("Further Filters"),
+        h4("Further Map Controls"),
+        checkboxGroupInput( 
+          "source_types", 
+          h5("Source Types:"), 
+          source_types,
+          selected = source_types
+        ),
         input_switch(
           "show_unsettled", 
           "Show unsettled planets?", 
@@ -83,17 +96,15 @@ ui <- page_fillable(
           "Show hidden/secret planets?", 
           TRUE
         ),
-        checkboxGroupInput( 
-          "source_types", 
-          h5("Source Types:"), 
-          source_types,
-          selected = source_types
+        input_switch(
+          "show_isp", 
+          "Show Interstellar Players data?", 
+          TRUE
         ),
-        checkboxGroupInput( 
-          "sources", 
-          h5("Sources:"), 
-          sources,
-          selected = sources
+        input_switch(
+          "show_arano", 
+          "Show House Arano data?", 
+          TRUE
         )
       ),
       plotlyOutput(outputId = "plot")
@@ -116,8 +127,9 @@ server <- function(input, output, session) {
     sucs_data |>
       filter(input$show_unsettled | faction != "U") |>
       filter(input$show_hidden | !hidden) |>
+      filter(input$show_isp | !(source_title %in% isp_list)) |>
+      filter(input$show_arano | source_title != "Handbook: House Arano") |>
       filter(source_type %in% input$source_types) |>
-      filter(source_title %in% input$sources) |>
       plot_planets(input$date, 
                    choice_color = input$select_color,
                    faction_data = sucs_factions)
@@ -129,6 +141,8 @@ server <- function(input, output, session) {
       sucs_data |>
         filter(input$show_unsettled | faction != "U") |>
         filter(input$show_hidden | !hidden) |>
+        filter(input$show_isp | !(source_title %in% isp_list)) |>
+        filter(input$show_arano | source_title != "Handbook: House Arano") |>
         filter(source_type %in% input$source_types) |>
         filter(source_title %in% input$sources) |>
         faction_snapshot(input$date) |>
