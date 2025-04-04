@@ -750,7 +750,7 @@ sucs_data <- sucs_data |>
                  "OA", "TC", "MOC", "RW", "IP", "TD", "LL")
   )
 
-# Amaris Empire data -------------------------------------------------------
+# Add Amaris Empire data -----------------------------------------------------
 
 # This is the data labeled as 2767 in the SUCS and described as "2765 map with 
 # the core TH worlds shifted to AE because of the Coup". Its unclear if it comes
@@ -2016,9 +2016,36 @@ sucs_data <- sucs_data |>
 # Where else can I get Hanseatic League area maps?
 
 
-# Interstellar Expeditions: ISP3 data -------------------------------------
+# Add Interstellar Expeditions: ISP3 data -----------------------------------
 
-# integrate whatever else I have here - none of it should be considered maps
+# do the Jarnfolk separately, because that map actually comes from Interstellar
+# Players, p. 109. It also gets Alfirk. The date is unclear but the entry
+# with it lists first contact as 3066-03-30, so go with that.
+jarnfolk <- sucs_data |> 
+  filter(time_point == "3095" & (faction == "JF" | id_mhq == "Alfirk"))  |>
+  mutate(time_point = "special",
+         source_type = "map",
+         source_title = "Interstellar Players", 
+         source_loc = "p. 109",
+         source_date = date("3066-03-30"))
+sucs_data <- sucs_data |>
+  bind_rows(jarnfolk)
+  
+
+# The 3095 data is for IE: ISP3 data, ignore everything else
+bounding_box <- create_box("Heidrunn", 
+                           "Star Cluster 643", 
+                           "Star Cluster P24", 
+                           "Leviathans Rest")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "pp. 30, 48, 61, 75",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE", "AP", "NDC")
+  )
 
 # Handle House Arano data -------------------------------------------------
 
