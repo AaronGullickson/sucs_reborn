@@ -93,6 +93,26 @@ remove_cases <- function(map_data, id, time_target) {
     filter(!(id_mhq == id & time_point %in% time_target))
 }
 
+make_new_entry <- function(map_data, id, time, type, title, loc, date, fac) {
+  case <- map_data |> filter(id_mhq == id)
+  map_data <- map_data |>
+    bind_rows(
+      tibble(
+        id_sucs = case$id_sucs[1],
+        id_mhq = id,
+        x = case$x[1],
+        y = case$y[1],
+        time_point = time,
+        source_type =type,
+        source_title = title,
+        source_loc = loc,
+        source_date = date,
+        faction = fac
+      )
+    )
+}
+
+
 faction_snapshot <- function(base_data, date) {
   # get the date for each planet closest to the date but not over
   base_data |>
