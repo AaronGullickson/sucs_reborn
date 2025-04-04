@@ -93,7 +93,8 @@ remove_cases <- function(map_data, id, time_target) {
     filter(!(id_mhq == id & time_point %in% time_target))
 }
 
-make_new_entry <- function(map_data, id, time, type, title, loc, date, fac) {
+make_new_entry <- function(map_data, id, time, type, title, loc, date, faction,
+                           hidden = FALSE) {
   case <- map_data |> filter(id_mhq == id)
   map_data <- map_data |>
     bind_rows(
@@ -107,7 +108,8 @@ make_new_entry <- function(map_data, id, time, type, title, loc, date, fac) {
         source_title = title,
         source_loc = loc,
         source_date = date,
-        faction = fac
+        faction = faction,
+        hidden = hidden
       )
     )
 }

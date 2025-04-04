@@ -39,9 +39,8 @@ sucs_data <- sucs_data |>
 
 # break up faction data into faction and regions. The max depth here is 5
 sucs_data <- sucs_data |>
-  # first remove parentheticals for disputed cases, so commas won't get 
-  # processed incorrectly
-  mutate(disputed_cases = str_extract(faction, "(?<=\\()[^()]+(?=\\))"),
+  # first extract and then remove parentheticals
+  mutate(parenthetical = str_extract(faction, "(?<=\\()[^()]+(?=\\))"),
          faction = str_remove(faction, "\\s*\\([^\\)]+\\)")) |>
   # now get capital information
   mutate(capital = case_when(
@@ -56,17 +55,19 @@ sucs_data <- sucs_data |>
   # now split faction into separate variables by commas
   separate_wider_delim(faction, ",", too_few = "align_start",
                        names = c("faction", paste("region", 1:3, sep=""))) |>
-  # now put back in disputed cases
-  mutate(faction = if_else(is.na(disputed_cases), 
-                           faction, 
-                           paste0(faction, "(", disputed_cases, ")")))
+  # now deal with parentheticals
+  mutate(
+    # identify hidden worlds
+    hidden = !is.na(parenthetical) & parenthetical == "H",
+    # put back in disputed codes
+    faction = if_else(faction == "D", 
+                      paste0(faction, "(", parenthetical, ")"),
+                      faction))
 
 # add in MekHQ ids
 # TODO: we are missing a few new ones
 sucs_data <- sucs_data |>
-  left_join(id_crosswalk) |>
-  select(id_sucs, x, y, id_mhq, time_point, 
-         faction, starts_with("region"), capital)
+  left_join(id_crosswalk)
 
 # get the coordinates by mekhq id for bounding boxes
 system_coords <- sucs_data |>
@@ -80,7 +81,7 @@ sucs_data <- sucs_data |>
          source_loc = as.character(NA), 
          source_date = as_date(NA)) |>
   select(starts_with("id_"), x, y, time_point, starts_with("source_"), 
-         faction, starts_with("region"), capital)
+         faction, starts_with("region"), capital, hidden)
 
 
 # Address disputed faction codes ------------------------------------------
@@ -400,7 +401,7 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |>
   make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
                  "IE: Interstellar Players 3",
-                 "pg. 20 (date approximate)", date("2830-12-31"), "CS")
+                 "pg. 20 (date approximate)", date("2830-12-31"), "CS", TRUE)
 # remove the abandoned entry in 2864
 sucs_data <- sucs_data |>
   remove_cases("Tangerz (Mayadi 2822+)", "2864")
@@ -2113,7 +2114,7 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
   select(id_sucs, id_mhq, x, y, starts_with("source_"), 
-         faction, starts_with("region"), capital) |>
+         faction, starts_with("region"), capital, hidden) |>
   arrange(id_sucs, source_date)
 
 # change some colors for better comparison

@@ -74,10 +74,15 @@ ui <- page_fillable(
         downloadButton("download", "Download CSV file"),
         h4("Further Filters"),
         input_switch(
-          "remove_undiscovered", 
-          "Remove Undiscovered?", 
-          TRUE
+          "show_unsettled", 
+          "Show unsettled planets?", 
+          FALSE
         ), 
+        input_switch(
+          "show_hidden", 
+          "Show hidden/secret planets?", 
+          TRUE
+        ),
         checkboxGroupInput( 
           "source_types", 
           h5("Source Types:"), 
@@ -109,7 +114,8 @@ server <- function(input, output, session) {
   
   output$plot <- renderPlotly({ 
     sucs_data |>
-      filter(!input$remove_undiscovered | faction != "U") |>
+      filter(input$show_unsettled | faction != "U") |>
+      filter(input$show_hidden | !hidden) |>
       filter(source_type %in% input$source_types) |>
       filter(source_title %in% input$sources) |>
       plot_planets(input$date, 
@@ -121,7 +127,8 @@ server <- function(input, output, session) {
     filename = paste0("battletech_map_", input$date, ".csv"),
     content = function(file) {
       sucs_data |>
-        filter(!input$remove_undiscovered | faction != "U") |>
+        filter(input$show_unsettled | faction != "U") |>
+        filter(input$show_hidden | !hidden) |>
         filter(source_type %in% input$source_types) |>
         filter(source_title %in% input$sources) |>
         faction_snapshot(input$date) |>
