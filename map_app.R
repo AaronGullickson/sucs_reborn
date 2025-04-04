@@ -160,7 +160,6 @@ server <- function(input, output, session) {
         filter(input$show_isp | !(source_title %in% isp_list)) |>
         filter(input$show_arano | source_title != "Handbook: House Arano") |>
         filter(source_type %in% input$source_types) |>
-        filter(source_title %in% input$sources) |>
         faction_snapshot(input$date) |>
         write_csv(file)
     }
