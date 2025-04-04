@@ -1971,9 +1971,51 @@ sucs_data <- sucs_data |>
   )
 
 
-# 3145
+
 
 # Shattered Fortress data -------------------------------------------------
+
+# 3145
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3145", 
+    title = "Era Report 3145", 
+    loc = "pp. 38-39",
+    date = date("3145-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS", "TR", "FWL",
+                 "CS",
+                 "WE", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "RF", "DA", "GL",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI")
+  )
+
+# 3145
+bounding_box <- create_box("Hunter's Paradise", 
+                           "Carcri", 
+                           "Idrmach/Idrmarch", 
+                           "Crawford's Delight")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3151", 
+    title = "Era Report 3145", 
+    loc = "pp. 102-103",
+    date = date("3151-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", 
+                 "CC", "FS", "LC", "DC", "RS", "TR", "FWL",
+                 "CS",
+                 "WE", "CJF", "RD", "CNC", "CHH", "RA", "CSF",
+                 "DA", "GL",
+                 "MOC", "TC", "OA", "MH",
+                 "CDP", "TD", "RC", "RT", "FrR", "FvC", "LL", "CI", "TiC")
+  )
 
 
 # Ilclan First Round data -------------------------------------------------

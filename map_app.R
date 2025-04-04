@@ -40,7 +40,9 @@ time_periods <- list(
   "End of the Jihad (3081)" = "3081-12-31",
   "Early Republic of the Sphere (3085)" = "3085-12-31",
   "Dark Age, Devlin Stone Retirement (3130)" = "3130-01-01",
-  "Early Dark Age (3135)" = "3135-01-01"
+  "Early Dark Age (3135)" = "3135-01-01",
+  "Late Dark Age (3145)" = "3145-01-01",
+  "Dawn of the IlClan (3151)" = "3151-01-01"
 )
 
 # Define UI for application that draws a histogram
@@ -62,7 +64,7 @@ ui <- page_fillable(
         dateInput(
           inputId = "date",
           label = h4("Or choose a specific date..."),
-          value = date("3135-01-01")),
+          value = date("3145-01-01")),
         selectInput( 
           "select_color", 
           h4("Color by:"), 
