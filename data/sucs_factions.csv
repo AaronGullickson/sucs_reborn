@@ -44,7 +44,7 @@ OC,Oberon Confederation,#FFE599
 FFR,Finmark Free Republic,#5D8593
 SLIE,Star League-in-Exile,#8E926F
 CF,Circinus Federation,#5F60A5
-CS,ComStar,snow
+CS,ComStar,#FFFAFA
 CWV,Clan Wolverine,#7B6248
 CWM,Clan Widowmaker,#7A6A34
 CMN,Clan Mongoose,#CFBCD1
@@ -63,7 +63,7 @@ CCY,Clan Coyote,#583822
 CHH,Clan Hell's Horses,#FAA61B
 CJF,Clan Jade Falcon,#ABD375
 CSF,Clan Sea Fox,#8690A3
-CSJ,Clan Smoke Jaguar,darkslategrey
+CSJ,Clan Smoke Jaguar,#2f4f4f
 CSA,Clan Star Adder,#32382F
 C,Clans,#8E926F
 HL,Hanseatic League,#DB7093
@@ -144,5 +144,5 @@ A,Abandoned,#202020
 CI,Chainelane Isles,#949D93
 D,Disputed,#E40078
 (X),Apocryphal,NA
-I,Inhabited,#FFFFFF
-U,Undiscovered,grey
+I,Independent,#FFFFFF
+U,Unsettled,#7f7f7f

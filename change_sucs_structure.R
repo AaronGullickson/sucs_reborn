@@ -2146,13 +2146,17 @@ sucs_data <- sucs_data |>
 
 # change some colors for better comparison
 sucs_factions <- sucs_factions |>
-  mutate(color = if_else(id_sucs == "UHC", "#90EE90", color),
-         color = if_else(id_sucs == "U", "grey", color),
-         color = if_else(id_sucs == "CSJ", "darkslategrey", color),
-         color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color),
-         color = if_else(id_sucs == "SS", "#CEFF00", color),
-         color = if_else(id_sucs == "D", "#E40078", color),
-         color = if_else(id_sucs == "CS", "snow", color))
+  mutate(
+    color = if_else(id_sucs == "UHC", "#90EE90", color),
+    color = if_else(id_sucs == "U", "#7f7f7f", color),
+    color = if_else(id_sucs == "CSJ", "#2f4f4f", color),
+    color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color),
+    color = if_else(id_sucs == "SS", "#CEFF00", color),
+    color = if_else(id_sucs == "D", "#E40078", color),
+    color = if_else(id_sucs == "CS", "#FFFAFA", color),
+    name = if_else(id_sucs == "I", "Independent", name),
+    name = if_else(id_sucs == "U", "Unsettled", name)
+  )
 
 write_csv(sucs_data, file = here("data", "sucs_data.csv"))
 write_csv(sucs_factions, file = here("data", "sucs_factions.csv"))
