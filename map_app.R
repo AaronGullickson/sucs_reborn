@@ -19,9 +19,13 @@ library(randomcoloR)
 # load custom functions
 source("functions.R")
 
-# load the data 
-sucs_data <- read_csv(here("data", "sucs_data.csv"))
-sucs_factions <- read_csv(here("data", "sucs_factions.csv"))
+# load the data - comment out one to read locally or remotely
+#data_address <- here("data", "sucs_data.csv")
+data_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv"
+#factions_address <- here("data", "sucs_factions.csv")
+factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_factions.csv"
+sucs_data <- read_csv(data_address)
+sucs_factions <- read_csv(factions_address)
 
 # get required lists and vectors
 source_types <- unique(sucs_data$source_type)
