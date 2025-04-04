@@ -1947,7 +1947,7 @@ sucs_data <- sucs_data |>
   )
 
 
-# Era Report 3145 data ----------------------------------------------------
+# Add Era Report 3145 data ----------------------------------------------------
 
 # 3135
 bounding_box <- create_box("Hunter's Paradise", 
@@ -1973,7 +1973,7 @@ sucs_data <- sucs_data |>
 
 
 
-# Shattered Fortress data -------------------------------------------------
+# Add Shattered Fortress data -------------------------------------------------
 
 # 3145
 bounding_box <- create_box("Hunter's Paradise", 
@@ -1983,7 +1983,7 @@ bounding_box <- create_box("Hunter's Paradise",
 sucs_data <- sucs_data |>
   update_sources(
     target = "3145", 
-    title = "Era Report 3145", 
+    title = "Shattered Fortress", 
     loc = "pp. 38-39",
     date = date("3145-01-01"), 
     box = bounding_box, 
@@ -2004,7 +2004,7 @@ bounding_box <- create_box("Hunter's Paradise",
 sucs_data <- sucs_data |>
   update_sources(
     target = "3151", 
-    title = "Era Report 3145", 
+    title = "Shattered Fortress", 
     loc = "pp. 102-103",
     date = date("3151-01-01"), 
     box = bounding_box, 
