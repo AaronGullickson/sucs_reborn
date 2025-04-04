@@ -2155,10 +2155,10 @@ sucs_factions <- sucs_factions |>
     color = if_else(id_sucs == "D", "#E40078", color),
     color = if_else(id_sucs == "CS", "#FFFAFA", color),
     color = if_else(id_sucs == "DD", "#422649", color),
+    color = if_else(id_sucs == "WE", "#AC5A30", color),
     name = if_else(id_sucs == "I", "Independent", name),
     name = if_else(id_sucs == "U", "Unsettled", name)
   )
-
 write_csv(sucs_data, file = here("data", "sucs_data.csv"))
 write_csv(sucs_factions, file = here("data", "sucs_factions.csv"))
 #save(sucs_data, sucs_factions, file = "sucs_data.RData")
