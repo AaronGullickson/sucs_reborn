@@ -212,20 +212,9 @@ sucs_data <- sucs_data |>
   correct_faction("Antallos (Port Krin)", c("2750", "2765"), "I")
 
 sucs_data <- sucs_data |>
-  bind_rows(
-    tibble(
-      id_sucs = 145,
-      id_mhq = "Antallos (Port Krin)",
-      x = 463.228,
-      y = 281.417,
-      time_point = "special",
-      source_type = "text",
-      source_title = "Mercenary FM Supplemental 2",
-      source_loc = "p. 12",
-      source_date = date("2674-01-01"),
-      faction = "SL"
-    )
-  )
+  make_new_entry("Antallos (Port Krin)", "special", "text", 
+                 "Mercenary FM Supplemental 2", "p. 12", date("2674-01-01"),
+                 "SL")
 
 ## Oberon Confederation ##
 # Sigurd, Oberon VI, and Crellacor are showing up as OC from 2783. The OG 
@@ -255,20 +244,8 @@ sucs_data <- sucs_data |>
   remove_cases("St. Andreas", time_point_range("2783"))
   
 sucs_data <- sucs_data |>
-  bind_rows(
-    tibble(
-      id_sucs = 3060,
-      id_mhq = "St. Andreas",
-      x = -582.627,
-      y = -365.812,
-      time_point = "special",
-      source_type = "text",
-      source_title = "IE: Interstellar Players 3",
-      source_loc = "pp. 57-61",
-      source_date = date("2768-02-01"),
-      faction = "I"
-    )
-  )
+  make_new_entry("St. Andreas", "special", "text", "IE: Interstellar Players 3",
+                 "pp. 57-61", date("2768-02-01"), "I")
 
 ## Frobisher ##
 # This is an IE: ISP3 entry and it says the colony of ... fish people ...
@@ -280,36 +257,12 @@ sucs_data <- sucs_data |>
   remove_cases("Frobisher", time_point_range("2750"))
   
 sucs_data <- sucs_data |>
-  bind_rows(
-    tibble(
-      id_sucs = 3111,
-      id_mhq = "Frobisher",
-      x = -370.480,
-      y = -470.316,
-      time_point = "special",
-      source_type = "text",
-      source_title = "IE: Interstellar Players 3",
-      source_loc = "p. 81",
-      source_date = date("2699-12-31"),
-      faction = "SL"
-    )
-  )
+  make_new_entry("Frobisher", "special", "text", "IE: Interstellar Players 3",
+                 "p. 81", date("2699-12-31"), "SL")
 
 sucs_data <- sucs_data |>
-  bind_rows(
-    tibble(
-      id_sucs = 3111,
-      id_mhq = "Frobisher",
-      x = -370.480,
-      y = -470.316,
-      time_point = "special",
-      source_type = "text",
-      source_title = "IE: Interstellar Players 3",
-      source_loc = "p. 81",
-      source_date = date("2786-12-31"),
-      faction = "I"
-    )
-  )
+  make_new_entry("Frobisher", "special", "text", "IE: Interstellar Players 3",
+                 "p. 81", date("2786-12-31"), "I")
 
 ## Andurien Wars ##
 # Several worlds that should be FWL/CC are listed as MOC/DA presumably due
@@ -343,20 +296,8 @@ sucs_data <- sucs_data |>
   remove_cases("Kleinwelt", time_point_range("3025"))
 
 sucs_data <- sucs_data |>
-  bind_rows(
-    tibble(
-      id_sucs = 1376,
-      id_mhq = "Kleinwelt",
-      x = -334.286,
-      y = -423.676,
-      time_point = "special",
-      source_type = "text",
-      source_title = "IE: Interstellar Players 3",
-      source_loc = "p. 82",
-      source_date = date("3044-12-31"),
-      faction = "I"
-    )
-  )
+  make_new_entry("Kleinwelt", "special", "text", "IE: Interstellar Players 3", 
+                 "p. 82", date("3044-12-31"), "I")
 
 ## Star's End ## 
 # This is listed as independent in 3081 but the map does not show this. Sarna
@@ -458,7 +399,7 @@ sucs_data <- sucs_data |>
 # is filtered out.
 sucs_data <- sucs_data |>
   make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
-                 "Interstellar Expeditions: Interstellar Players 3",
+                 "IE: Interstellar Players 3",
                  "pg. 20 (date approximate)", date("2830-12-31"), "CS")
 # remove the abandoned entry in 2864
 sucs_data <- sucs_data |>
@@ -466,7 +407,7 @@ sucs_data <- sucs_data |>
 # add an abandoned entry mid 2900s
 sucs_data <- sucs_data |>
   make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
-                 "Interstellar Expeditions: Interstellar Players 3",
+                 "IE: Interstellar Players 3",
                  "pg. 20 (date approximate)", date("2950-01-01"), "A")
 
 
@@ -2139,17 +2080,15 @@ auc_2890 <- tibble(id_mhq = c("Coromodir", "Itrom", "Guldra", "Tyrlon")) |>
 arano_data <- arano_data |>
   bind_rows(
     tibble(
-      tibble(
-        id_sucs = auc_2890$id_sucs,
-        id_mhq = auc_2890$id_mhq,
-        x = auc_2890$x,
-        y = auc_2890$y,
-        source_type = "map",
-        source_title = "Handbook: House Arano",
-        source_loc = "p. 12",
-        source_date = date("2890-07-21"),
-        faction = "AuC"
-      )
+      id_sucs = auc_2890$id_sucs,
+      id_mhq = auc_2890$id_mhq,
+      x = auc_2890$x,
+      y = auc_2890$y,
+      source_type = "map",
+      source_title = "Handbook: House Arano",
+      source_loc = "p. 12",
+      source_date = date("2890-07-21"),
+      faction = "AuC"
     )
   )
 
