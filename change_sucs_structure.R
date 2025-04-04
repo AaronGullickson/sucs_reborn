@@ -444,6 +444,32 @@ sucs_data <- sucs_data |>
                              faction %in% c("RU", "NOC", "FCo", "RB", "THa"), 
                            "I", faction))
 
+## The Hidden Five ##
+# We know three of these:
+# Tangerz (Mayadi 2822+) - Its supposed to be a dead world from a bioplague
+# since sometime in the 2900s. Its listed as RS from 3095 because of an RoS team
+# that scouted it out according to IE:ISP3. I don't think that qualifies.
+sucs_data <- sucs_data |>
+  correct_faction("Tangerz (Mayadi 2822+)", time_point_range("3095"), "A")
+# The other question is when it was occupied. It disappears off maps by 
+# the 2830 map, although its unclear when ComStar takes over these planets
+# I think the best assumption is that they are taken over rather than abandoned
+# but lets leave an abandoned code in 2830 so we get abandoned if this source
+# is filtered out.
+sucs_data <- sucs_data |>
+  make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
+                 "Interstellar Expeditions: Interstellar Players 3",
+                 "pg. 20 (date approximate)", date("2830-12-31"), "CS")
+# remove the abandoned entry in 2864
+sucs_data <- sucs_data |>
+  remove_cases("Tangerz (Mayadi 2822+)", "2864")
+# add an abandoned entry mid 2900s
+sucs_data <- sucs_data |>
+  make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
+                 "Interstellar Expeditions: Interstellar Players 3",
+                 "pg. 20 (date approximate)", date("2950-01-01"), "A")
+
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -2137,7 +2163,7 @@ sucs_data <- sucs_data |>
     source_title = if_else(time_point == "3025" & faction == "AuC", 
                            "Handbook: House Arano", source_title),
     source_loc = if_else(time_point == "3025" & faction == "AuC", 
-                         "pp. 14-15", source_title)
+                         "pp. 14-15", source_loc)
   )
 
 # TODO: it seems like most of these planets are reported as abandoned by
