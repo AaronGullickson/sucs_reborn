@@ -2154,6 +2154,8 @@ sucs_factions <- sucs_factions |>
          color = if_else(id_sucs == "D", "#E40078", color),
          color = if_else(id_sucs == "CS", "snow", color))
 
-save(sucs_data, sucs_factions, file = "sucs_data.RData")
+write_csv(sucs_data, file = here("data", "sucs_data.csv"))
+write_csv(sucs_factions, file = here("data", "sucs_factions.csv"))
+#save(sucs_data, sucs_factions, file = "sucs_data.RData")
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)

@@ -7,6 +7,7 @@
 #    https://shiny.posit.co/
 #
 
+# load libraries
 library(shiny)
 library(bslib)
 library(googlesheets4)
@@ -14,8 +15,15 @@ library(tidyverse)
 library(here)
 library(plotly)
 library(randomcoloR)
+
+# load custom functions
 source("functions.R")
-load("sucs_data.RData")
+
+# load the data 
+sucs_data <- read_csv(here("data", "sucs_data.csv"))
+sucs_factions <- read_csv(here("data", "sucs_factions.csv"))
+
+# get required lists and vectors
 source_types <- unique(sucs_data$source_type)
 names(source_types) <- str_to_title(source_types)
 isp_list <- c("Interstellar Players", "IE: Interstellar Players 3")
