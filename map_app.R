@@ -56,18 +56,16 @@ ui <- page_fillable(
     layout_sidebar(
       sidebar = sidebar(
         width = 350,
-        # radioButtons( 
-        #   inputId = "era", 
-        #   label = h4("Pick an era..."), 
-        #   choices = time_periods,
-        #   selected = character(0)
-        # ), 
         selectizeInput( 
           inputId = "era",
           label = h4("Pick an era..."), 
           choices = time_periods,
           selected = "3152-07-01"
         ),
+        sliderInput(
+          inputId = "year", 
+          label = h4("Or select a year..."), 
+          min = 2271, max = 3152, value = 3152, sep = ""), 
         dateInput(
           inputId = "date",
           label = h4("Or choose a specific date..."),
@@ -117,6 +115,12 @@ server <- function(input, output, session) {
 
   # uncomment out to test out bootstrap themes
   #bs_themer()
+  
+  observeEvent(input$year,{
+    updateDateInput(session, "date", 
+                    value = date(paste(input$year, "01", "01", sep = "-")))
+    
+  })
   
   observeEvent(input$era,{
     updateDateInput(session, "date", value = date(input$era))
