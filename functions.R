@@ -93,16 +93,25 @@ remove_cases <- function(map_data, id, time_target) {
     filter(!(id_mhq == id & time_point %in% time_target))
 }
 
-make_new_entry <- function(map_data, id, time, type, title, loc, date, faction,
+make_new_entries <- function(map_data, id, time, type, title, loc, date, faction,
                            hidden = FALSE) {
-  case <- map_data |> filter(id_mhq == id)
+  id <- sort(id)
+  case <- map_data |> filter(id_mhq %in% id) |>
+    filter(!duplicated(id_sucs)) |>
+    arrange(id_mhq)
+  if(nrow(case) != length(id)) {
+    stop("Length of ids and cases found do not match in make_new_entries")
+  }
+  id_sucs <- case |> pull(id_sucs)
+  x <- case |> pull(x)
+  y <- case |> pull(y)
   map_data <- map_data |>
     bind_rows(
       tibble(
-        id_sucs = case$id_sucs[1],
+        id_sucs = id_sucs,
         id_mhq = id,
-        x = case$x[1],
-        y = case$y[1],
+        x = x,
+        y = y,
         time_point = time,
         source_type =type,
         source_title = title,
@@ -144,12 +153,19 @@ faction_snapshot <- function(base_data, date) {
   # get the date for each planet closest to the date but not over
   base_data |>
     filter(source_date <= date) |>
-    # create a type priority
-    mutate(source_type = factor(source_type, 
-                                levels = c("errata", "text", "map"))) |>
+    
+    mutate(
+      # create a type priority
+      source_type = factor(source_type, levels = c("errata", "text", "map")),
+      # create a faction type for priority
+      faction_priority = case_when(
+        faction == "Abandoned" | faction == "Unsettled" ~ 1,
+        TRUE ~ 2
+      )) |>
     # arrange with most recent date at the top, and then break date
     # ties by source_type
-    arrange(id_sucs, desc(source_date), source_type) |>
+    arrange(id_sucs, desc(source_date), source_type, desc(faction_priority)) |>
     # remove duplicate planet entries
-    filter(!duplicated(id_sucs))
+    filter(!duplicated(id_sucs)) |>
+    select(-faction_priority)
 }

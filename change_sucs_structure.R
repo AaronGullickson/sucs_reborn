@@ -63,7 +63,7 @@ sucs_data <- sucs_data |>
     faction = if_else(faction == "D", 
                       paste0(faction, "(", parenthetical, ")"),
                       faction)
-    )
+  )
 
 # add in MekHQ ids
 # TODO: we are missing a few new ones
@@ -214,9 +214,9 @@ sucs_data <- sucs_data |>
   correct_faction("Antallos (Port Krin)", c("2750", "2765"), "I")
 
 sucs_data <- sucs_data |>
-  make_new_entry("Antallos (Port Krin)", "special", "text", 
-                 "Mercenary FM Supplemental 2", "p. 12", date("2674-01-01"),
-                 "SL")
+  make_new_entries("Antallos (Port Krin)", "special", "text", 
+                   "Mercenary FM Supplemental 2", "p. 12", date("2674-01-01"),
+                   "SL")
 
 ## Oberon Confederation ##
 # Sigurd, Oberon VI, and Crellacor are showing up as OC from 2783. The OG 
@@ -244,10 +244,10 @@ sucs_data <- sucs_data |>
 # replace with a text entry
 sucs_data <- sucs_data |>
   remove_cases("St. Andreas", time_point_range("2783"))
-  
+
 sucs_data <- sucs_data |>
-  make_new_entry("St. Andreas", "special", "text", "IE: Interstellar Players 3",
-                 "pp. 57-61", date("2768-02-01"), "I")
+  make_new_entries("St. Andreas", "special", "text", "IE: Interstellar Players 3",
+                   "pp. 57-61", date("2768-02-01"), "I")
 
 ## Frobisher ##
 # This is an IE: ISP3 entry and it says the colony of ... fish people ...
@@ -257,14 +257,14 @@ sucs_data <- sucs_data |>
 # then a fall of the SL date to I.
 sucs_data <- sucs_data |>
   remove_cases("Frobisher", time_point_range("2750"))
-  
-sucs_data <- sucs_data |>
-  make_new_entry("Frobisher", "special", "text", "IE: Interstellar Players 3",
-                 "p. 81", date("2699-12-31"), "SL")
 
 sucs_data <- sucs_data |>
-  make_new_entry("Frobisher", "special", "text", "IE: Interstellar Players 3",
-                 "p. 81", date("2786-12-31"), "I")
+  make_new_entries("Frobisher", "special", "text", "IE: Interstellar Players 3",
+                   "p. 81", date("2699-12-31"), "SL")
+
+sucs_data <- sucs_data |>
+  make_new_entries("Frobisher", "special", "text", "IE: Interstellar Players 3",
+                   "p. 81", date("2786-12-31"), "I")
 
 ## Andurien Wars ##
 # Several worlds that should be FWL/CC are listed as MOC/DA presumably due
@@ -298,8 +298,8 @@ sucs_data <- sucs_data |>
   remove_cases("Kleinwelt", time_point_range("3025"))
 
 sucs_data <- sucs_data |>
-  make_new_entry("Kleinwelt", "special", "text", "IE: Interstellar Players 3", 
-                 "p. 82", date("3044-12-31"), "I")
+  make_new_entries("Kleinwelt", "special", "text", "IE: Interstellar Players 3", 
+                   "p. 82", date("3044-12-31"), "I")
 
 ## Star's End ## 
 # This is listed as independent in 3081 but the map does not show this. Sarna
@@ -358,14 +358,14 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |>
   remove_cases("Skyfog", time_point_range("3025", "3085"))
 sucs_data <- sucs_data |>
-  make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
-                 "p. 80", date("3003-01-01"), "IE")
+  make_new_entries("Skyfog", "special", "text", "IE: Interstellar Players 3", 
+                   "p. 80", date("3003-01-01"), "IE")
 
 # we also need to add a text entry about its abandonment during the Amaris
 # Coup in 2769
 sucs_data <- sucs_data |>
-  make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
-                 "p. 80", date("2769-12-31"), "A")
+  make_new_entries("Skyfog", "special", "text", "IE: Interstellar Players 3", 
+                   "p. 80", date("2769-12-31"), "A")
 
 
 ## Sentarus ## 
@@ -431,18 +431,76 @@ sucs_data <- sucs_data |>
 # but lets leave an abandoned code in 2830 so we get abandoned if this source
 # is filtered out.
 sucs_data <- sucs_data |>
-  make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
-                 "IE: Interstellar Players 3",
-                 "pg. 20 (date approximate)", date("2830-12-31"), "CS", TRUE)
+  make_new_entries("Tangerz (Mayadi 2822+)", "special", "text", 
+                   "IE: Interstellar Players 3",
+                   "pg. 20 (date approximate)", date("2830-12-31"), "CS", TRUE)
 # remove the abandoned entry in 2864
 sucs_data <- sucs_data |>
   remove_cases("Tangerz (Mayadi 2822+)", "2864")
 # add an abandoned entry mid 2900s
 sucs_data <- sucs_data |>
-  make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
-                 "IE: Interstellar Players 3",
-                 "pg. 20 (date approximate)", date("2950-01-01"), "A")
+  make_new_entries("Tangerz (Mayadi 2822+)", "special", "text", 
+                   "IE: Interstellar Players 3",
+                   "pg. 20 (date approximate)", date("2950-01-01"), "A")
 
+
+## Aurigan Reach, Part 1 ##
+# So I think I just need to clean out any existing data from HBHA and 
+# then rebuild from scratch later.
+# Before doing anything lets save some information that we will want later
+# what planets were part of AuC in 3025?
+auc_3025 <- sucs_data |>
+  filter(faction == "AuC" & time_point == 3025) |>
+  pull(id_mhq)
+
+# For the period between 2765 and 2864, I can just turn all existing I entries
+# into U entries if they are in a certain area with the exception of Detroit,
+# Herotitus, and Spencer because these are the only cases showing on the map.
+bounding_box <- create_box("Bonavista", "Eliat", "Amnesty", "McEvans' Sacrifice")
+exceptions <- c("Herotitus", "Detroit", "Spencer", "Portland")
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(is_in_box(x, y, bounding_box) & 
+                             faction %in% c("I", "A") & 
+                             !(id_mhq %in% exceptions) & 
+                             time_point %in% time_point_range("2765", "2864"), 
+                           "U", faction))
+# need to deal with a couple of abandoned CC planets that would later be part
+# of AuC: Panzyr, Mechdur, Mangzhangdian in 2830
+sucs_data <- sucs_data |>
+  correct_faction(c("Panzyr", "Mechdur", "Mangzhangdian"), 
+                  time_point_range("2830", "2864"), "A")
+# and Itrom, Tyrlon, and Smithon by 2864
+sucs_data <- sucs_data |>
+  correct_faction(c("Itrom", "Tyrlon", "Smithon"), "2864", "A")
+# Balawat only shows up in HBHA, so remove everything in the range
+sucs_data <- sucs_data |>
+  remove_cases("Balawat", time_point_range("2765", "3025"))
+# For the period between 3025 I think I can use a couple boxes again to
+# turn everything into abandoned unless they are U
+bounding_box <- create_box("Bonavista", "Eliat", "Girondas", "McEvans' Sacrifice")
+exceptions <- c("Herotitus", "Detroit", "Spencer", "Rockwellawan", "Regis Roost",
+                "Addasar")
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(is_in_box(x, y, bounding_box) & 
+                             faction != "U" & 
+                             !(id_mhq %in% exceptions) & 
+                             time_point == "3025", 
+                           "A", faction))
+# this box missed some planets that should be marked as abandoned
+sucs_data <- sucs_data |>
+  correct_faction(c("Enkra", "Umgard", "Bringdam", "Ryans Fate", "Fjaldr",
+                    "Brinton", "Portland", "Weldry", "Ichlangis", "Zangul"), 
+                  "3025", "A")
+# also identify Cassilda as  U
+sucs_data <- sucs_data |>
+  correct_faction("Cassilda", "3025", "U")
+# Coromodir is not a capital
+sucs_data <- sucs_data |> 
+  mutate(capital = if_else(id_mhq == "Coromodir" & time_point == "3025", 
+                           NA, capital))
+
+# we should now have all those planets correct for the original maps before
+# the HBHA
 
 # Add Founding House Maps------------------------------------------------
 
@@ -1256,6 +1314,8 @@ sucs_data <- sucs_data |>
                  "OC", "EF", "GV", "TD")
   )
 
+# TODO: check TC 3040 map and appropriately source if necessary
+
 # Add Era Report 3052 data ----------------------------------------------------
 
 # The first map says 3050, but the wave data indicates that the periphery
@@ -2064,7 +2124,7 @@ jarnfolk <- sucs_data |>
          source_date = date("3066-03-30"))
 sucs_data <- sucs_data |>
   bind_rows(jarnfolk)
-  
+
 
 # The 3095 data is for IE: ISP3 data, ignore everything else
 bounding_box <- create_box("Heidrunn", 
@@ -2083,95 +2143,112 @@ sucs_data <- sucs_data |>
 
 # Handle House Arano data -------------------------------------------------
 
-# TODO: These are still kind of a cluster - waiting to finish the rest before
-# fixing
+# Ok, we took all this out, so we need to rebuild it from scratch
 
-# We do Arano last to fix whatever other messes it might have made.
-# The Arano stuff is quite a mess. I think the best way to handle this 
-# is to identify all the names that are for specifically Arano sourcebook
-# planets that weren't there before and pull them all out of the SUCS as it is,
-# and then create a specific Arano subset of the data from the three maps in
-# the handbook and add it back in.
-
-arano_planets_2765 <- c("Alloway", "Bonavista", "Sacromonte", "Polybius",
-                        "Bellerophon", "Don't (Mantharaka 3022+)", 
-                        "Tiburon (Tiverton 3022+)", 
-                        "Wheeler (Perian 2822+/Mystras 3022+)", 
-                        "Chaadan (Chadan 2864+/Chandan 3022+)",
-                        "Cassilda", "Balawat")
-
-arano_planets_2890 <- c("Amnesty", "Nuncavoy", "Contrilla", "Peratallada",
-                        "Pyrrhus", "Eliat", "Abeline (Taygete 2890+)")
-
-arano_planets_3026 <- c("Highwater", "Tarragona", "Fairuza", "Gaucin", "Ahlat")
-
-all_arano_planets <- c(arano_planets_2765, arano_planets_2890, 
-                       arano_planets_3026)
-
-# pull these entries out into a separate tibble
-arano_data <- sucs_data |>
-  filter(id_mhq %in% all_arano_planets)
-
+## 2765 ##
+# Independents
 sucs_data <- sucs_data |>
-  filter(!(id_mhq %in% all_arano_planets))
-
-# because of the nature of the data, I don't think you can really say when 
-# these planets were undiscovered, except for in earlier periods from the same
-# time. So lets just keep three data points and relabel the time point on 2864
-# to 2890 
-arano_data <- arano_data |>
-  filter(time_point %in% c("2765", "2864", "3025")) |>
-  mutate(time_point = if_else(time_point == "2864", "2890", time_point)) |>
-  mutate(source_title = "Handbook: House Arano",
-         source_loc = case_when(
-           time_point == "2765" ~ "p. 10",
-           time_point == "2890" ~ "p. 12",
-           time_point == "3025" ~ "pp. 14-15"
-         ),
-         source_date = case_when(
-           time_point == "2765" ~ date("2765-01-01"),
-           time_point == "2890" ~ date("2890-07-21"),
-           time_point == "3025" ~ date("3025-01-01")
-         ))
-
-# going by the map in 2890, four planets already belonged to AuC
-auc_2890 <- tibble(id_mhq = c("Coromodir", "Itrom", "Guldra", "Tyrlon")) |>
-  left_join(id_crosswalk) |>
-  left_join(system_coords)
-
-arano_data <- arano_data |>
-  bind_rows(
-    tibble(
-      id_sucs = auc_2890$id_sucs,
-      id_mhq = auc_2890$id_mhq,
-      x = auc_2890$x,
-      y = auc_2890$y,
-      source_type = "map",
-      source_title = "Handbook: House Arano",
-      source_loc = "p. 12",
-      source_date = date("2890-07-21"),
-      faction = "AuC"
-    )
-  )
-
+  make_new_entries(c("Alloway", "Bonavista", "Sacromonte", 
+                     "Polybius (Appian 2822+)",
+                     "Bellerophon", "Don't (Mantharaka 3022+)", 
+                     "Tiburon (Tiverton 3022+)", 
+                     "Wheeler (Perian 2822+/Mystras 3022+)",                         
+                     "Chaadan (Chadan 2864+/Chandan 3022+)"), 
+                   "special", "map", "Handbook: House Arano", "p. 10", 
+                   date("2765-01-01"), "I")
+# MOC
 sucs_data <- sucs_data |>
-  bind_rows(arano_data)
-
-
-# change source for any 3025 AuC entries to Handbook: House Arano
+  make_new_entries(c("Balawat", "Cassilda"), 
+                   "special", "map", "Handbook: House Arano", "p. 10", 
+                   date("2765-01-01"), "MOC")
+# CC: Mandalas
 sucs_data <- sucs_data |>
-  mutate(
-    source_title = if_else(time_point == "3025" & faction == "AuC", 
-                           "Handbook: House Arano", source_title),
-    source_loc = if_else(time_point == "3025" & faction == "AuC", 
-                         "pp. 14-15", source_loc),
-    source_date = if_else(time_point == "3025" & faction == "AuC", 
-                          date("3025-01-01"), source_date),
-  )
+  make_new_entries("Mandalas", 
+                   "special", "map", "Handbook: House Arano", "p. 10", 
+                   date("2765-01-01"), "CC")
 
-# TODO: it seems like most of these planets are reported as abandoned by
-# 3030 - is that canon? from where?
+c("Alloway", "Bonavista", "Sacromonte", 
+  "Polybius (Appian 2822+)",
+  "Bellerophon", "Don't (Mantharaka 3022+)", 
+  "Tiburon (Tiverton 3022+)", 
+  "Wheeler (Perian 2822+/Mystras 3022+)",                         
+  "Chaadan (Chadan 2864+/Chandan 3022+)")
 
+## 2890 ##
+# Independents
+sucs_data <- sucs_data |>
+  make_new_entries(c("Amnesty", "Bonavista", "Alloway", "Detroit", 
+                     "Bellerophon", "Spencer", 
+                     "Chaadan (Chadan 2864+/Chandan 3022+)",
+                     "Abeline (Taygete 2890+)", "Rockwellawan",
+                     "Sacromonte", "Nuncavoy", "Herotitus", "Panzyr",
+                     "Mechdur", "Umgard", "Smithon", "Mangzhangdian",
+                     "Heliat", "Gangtok", "Peratallada", "Argos",
+                     "Wheeler (Perian 2822+/Mystras 3022+)",
+                     "Hellespont", "Pyrrhus", "Eliat",
+                     "Itrom", "Tyrlon", "Coromodir", "Guldra"), 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("2890-07-21"), "I")
+# Duchy of Dont
+sucs_data <- sucs_data |>
+  make_new_entries(c("Don't (Mantharaka 3022+)", "Contrilla"), 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("2890-07-21"), "DD")
+# MOC
+sucs_data <- sucs_data |>
+  make_new_entries(c("Balawat", "Cassilda"), 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("2890-07-21"), "MOC")
+
+## 2910 - text reference for formation of AuC ##
+sucs_data <- sucs_data |>
+  make_new_entries(c("Itrom", "Tyrlon", "Coromodir", "Guldra"), 
+                   "special", "text", "Handbook: House Arano", "p. 11", 
+                   date("2910-01-01"), "AuC")
+sucs_data <- sucs_data |>
+  mutate(capital = if_else(id_mhq == "Coromodir" & year(source_date) == 2910,
+                           "Faction", capital))
+
+## 3025 ##
+# Aurigan Coalition
+sucs_data <- sucs_data |>
+  make_new_entries(c(c("Itrom", "Tyrlon", "Coromodir", "Guldra",
+                       "Gangtok", "Heliat", "Artru", "Katinka", "Qalzi",
+                       "Aea", "Smithon", "Mangzhangdian", "Panzyr", "Mechdur",
+                       "Umgard", "Enkra", "Zangul", "Ichlangis",
+                       "Bringdam", "Ryans Fate", "Fjaldr", "Weldry")), 
+                   "special", "map", "Handbook: House Arano", "p. 14-15", 
+                   date("3025-01-01"), "AuC")
+sucs_data <- sucs_data |>
+  mutate(capital = if_else(id_mhq == "Coromodir" & year(source_date) == 3025 &
+                             time_point == "special",
+                           "Faction", capital))
+
+# Independents
+sucs_data <- sucs_data |>
+  make_new_entries(c("Cassilda", "Zathras/Zatharas", "Hastur", "Bonavista",
+                     "Úr Cruinne", "Cygnus", "Fronc", 
+                     "Chaadan (Chadan 2864+/Chandan 3022+)", "Bellerophon",
+                     "Alloway", "Joppa", "Arn (Jia Tian 3130+)", "Hibuarius", 
+                     "Aquagea", "Viribium", "Salardion", "Antias", "Espia",
+                     "Segerica", "Adrar", "Shaobuon (Liu's Memory 3130+)",
+                     "Zhaomaon (Cluff's Stand 3130+)", "Linhauiguan", 
+                     "Ghorepani", "Payia", "Thamel (Wyeth's Glory 3130+)",
+                     "Untran (Achtur 2822+)", "Huanghuadian (Tincalunas 3130+)", 
+                     "Nuncavoy", "Polybius (Appian 2822+)", 
+                     "Don't (Mantharaka 3022+)", "McEvans' Sacrifice",
+                     "Highwater", "Rockwellawan", "Sacromonte", "Mandalas",
+                     "Lyreton", "Kimi", "Tiburon (Tiverton 3022+)", "Portland",
+                     "Tarragona", "Peratallada", "Fairuza", "Gaucin", "Argos",
+                     "Wheeler (Perian 2822+/Mystras 3022+)", "Ahlat", 
+                     "Hellespont", "Carthage", "Pyrrhus", "Paf", "Spitz"), 
+  "special", "map", "Handbook: House Arano", "p. 12", 
+  date("3025-01-01"), "I")
+# MOC
+sucs_data <- sucs_data |>
+  make_new_entries("Balawat", 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("3025-01-01"), "MOC")
 
 # Handle errata -----------------------------------------------------------
 
