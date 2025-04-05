@@ -279,7 +279,7 @@ server <- function(input, output, session) {
   output$plot <- renderPlotly({ 
     
     map_data |>
-      filter(input$show_unsettled | faction != "U") |>
+      filter(input$show_unsettled | faction != "Unsettled") |>
       filter(input$show_hidden | !hidden) |>
       filter(input$show_isp | !(source_title %in% isp_list)) |>
       filter(input$show_arano | source_title != "Handbook: House Arano") |>
@@ -295,7 +295,7 @@ server <- function(input, output, session) {
     filename = paste0("battletech_map_", input$date, ".csv"),
     content = function(file) {
       sucs_data |>
-        filter(input$show_unsettled | faction != "U") |>
+        filter(input$show_unsettled | faction != "Unsettled") |>
         filter(input$show_hidden | !hidden) |>
         filter(input$show_isp | !(source_title %in% isp_list)) |>
         filter(input$show_arano | source_title != "Handbook: House Arano") |>
