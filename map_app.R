@@ -24,16 +24,13 @@ plot_planets <- function(snapshot_data,
                          xrange = c(-610, 795),
                          yrange = c(-595, 600),
                          choice_color = "faction",
-                         faction_data = sucs_factions) {
+                         palette_color = palettes[["faction"]]) {
   
   # Determine color palette - give a named vector to make sure colors match
   # in subsets
   if(choice_color == "faction") {
-    color_palette <- faction_data |> select(name, color) |> deframe()
     legend_name <- "Faction"
   } else {
-    color_palette <- randomColor(length(unique(snapshot_data$source_title)))
-    names(color_palette) <- unique(snapshot_data$source_title)
     legend_name <- "Source"
   }
   
@@ -58,7 +55,7 @@ plot_planets <- function(snapshot_data,
     geom_point(data = minor_capital_data, size = 3)+
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
     geom_point(size = 2) +
-    scale_color_manual(values = color_palette)+
+    scale_color_manual(values = palette_color)+
     labs(title = title, color = legend_name)+
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
@@ -76,6 +73,7 @@ plot_planets <- function(snapshot_data,
   
   return(map)
 }
+
 
 
 # Preliminary setup --------------------------------------------------------
@@ -171,6 +169,11 @@ map_data <- sucs_data |>
                          source_str, source_date_str)
   )
 
+
+palette_faction <- sucs_factions |> select(name, color) |> deframe()
+palette_source <- randomColor(length(unique(map_data$source_title)))
+names(palette_source) <- unique(map_data$source_title)
+palettes = list(faction = palette_faction, source = palette_source)
 
 
 # Shiny app ---------------------------------------------------------------
@@ -277,7 +280,7 @@ server <- function(input, output, session) {
       filter(input$show_hidden | !hidden) |>
       plot_planets(paste(input$date), 
                    choice_color = input$select_color,
-                   faction_data = sucs_factions,
+                   palette_color = palettes[[input$select_color]],
                    xrange = current_range$xrange,
                    yrange = current_range$yrange)
   }) 
