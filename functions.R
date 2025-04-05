@@ -243,6 +243,9 @@ plot_planets <- function(map_data,
     if (!interactive) {
       map <- map + geom_text_repel(aes(label = id_mhq), color = "grey95", 
                                    size = 3)
+    } else {
+      map <- map + geom_text(aes(label = id_mhq), color = "grey95", 
+                                   size = 2, nudge_y = 1)
     }
   }
   

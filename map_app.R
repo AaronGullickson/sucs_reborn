@@ -129,6 +129,7 @@ server <- function(input, output, session) {
   #bs_themer()
   
   current_range <- reactiveVal(list(x = NULL, y = NULL))
+  show_labels <- reactiveVal(FALSE)
   
   observeEvent(input$year,{
     updateDateInput(session, "date", 
@@ -143,19 +144,18 @@ server <- function(input, output, session) {
   
   # Capture range changes using the relayout event
   observeEvent(event_data("plotly_relayout"), {
-    event <- event_data("plotly_relayout")
     
-    #print(event)
+    event <- event_data("plotly_relayout")
     
     # Update the reactive range value with new ranges
     new_xrange <- c(event$`xaxis.range[0]`, event$`xaxis.range[1]`)
     new_yrange <- c(event$`yaxis.range[0]`, event$`yaxis.range[1]`)
-    
-    #print(new_xrange)
-    #print(new_yrange)
-    
     if (!is.null(new_xrange) && !is.null(new_yrange)) {
       current_range(list(xrange = new_xrange, yrange = new_yrange))
+      
+      # now check zoom level
+      zoom_level = max(abs(range(new_xrange)), abs(range(new_yrange)))
+      show_labels(zoom_level < 200)
     }
   })
   
@@ -171,6 +171,11 @@ server <- function(input, output, session) {
       yrange <- c(-595, 600)
     }
     
+    show_id <- show_labels()
+    if(is.null(show_id)) {
+      show_id <- FALSE
+    }
+    
     sucs_data |>
       filter(input$show_unsettled | faction != "U") |>
       filter(input$show_hidden | !hidden) |>
@@ -179,11 +184,11 @@ server <- function(input, output, session) {
       filter(source_type %in% input$source_types) |>
       plot_planets(input$date, 
                    choice_color = input$select_color,
-                   faction_data = sucs_factions) |> 
+                   faction_data = sucs_factions,
+                   show_id = show_id) |> 
       layout(dragmode = "pan",
              xaxis = list(range = xrange), 
-             yaxis = list(range = yrange)) |> 
-      htmlwidgets::onRender(js_dynamic_labels)
+             yaxis = list(range = yrange))
   }) 
   
   output$download <- downloadHandler(
