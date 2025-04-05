@@ -62,7 +62,8 @@ sucs_data <- sucs_data |>
     # put back in disputed codes
     faction = if_else(faction == "D", 
                       paste0(faction, "(", parenthetical, ")"),
-                      faction))
+                      faction)
+    )
 
 # add in MekHQ ids
 # TODO: we are missing a few new ones
@@ -1412,6 +1413,7 @@ chaos_march <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "FWL", "LA", "FCF", "DC", "CS",
                  "TCC", "SS", "DS", "ST", "SKC")) |>
+  filter(source_date == "3057-12-31") |>
   mutate(time_point = "3057cm")
 
 # now lets switch LA back to FCL and chaos march back to respective factions
@@ -1448,6 +1450,7 @@ sucs_data <- sucs_data |>
   )
 
 # add back in chaos march data
+# TODO: I am adding back in almost the whole thing
 sucs_data <- sucs_data |>
   bind_rows(chaos_march)
 
