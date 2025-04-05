@@ -154,9 +154,8 @@ map_data <- sucs_data |>
                         levels = sucs_factions$id_sucs, 
                         labels = sucs_factions$name)) |>
   # now reshape back wider and concatenate disputed cases
-  pivot_wider(id_cols = c(id_sucs, source_title, source_date), 
-              names_from = name, values_from = value) |>
-  unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE)
+  pivot_wider() |>
+  unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE) |>
   # now organize the rest of the labels
   mutate(
     # first clean the disputed parenthetical away
