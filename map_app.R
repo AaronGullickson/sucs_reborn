@@ -1,13 +1,7 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
 
-# load libraries
+
+# Load libraries ----------------------------------------------------------
+
 library(shiny)
 library(bslib)
 library(googlesheets4)
@@ -16,8 +10,85 @@ library(here)
 library(plotly)
 library(randomcoloR)
 
+# Functions ---------------------------------------------------------------
+
 # load custom functions
 source("functions.R")
+
+# javascript code for dynamic labels
+js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
+
+# the plotting function
+plot_planets <- function(map_data,
+                         date, 
+                         title = NULL, 
+                         xrange = c(-610, 795),
+                         yrange = c(-595, 600),
+                         choice_color = "faction",
+                         faction_data = sucs_factions) {
+  
+  # Take a snapshot
+  map_data <- map_data |>
+    faction_snapshot(date)
+  
+  # Determine color palette - give a named vector to make sure colors match
+  # in subsets
+  if(choice_color == "faction") {
+    map_data$var_color <- map_data$faction
+    color_palette <- faction_data |> select(name, color) |> deframe()
+    legend_name <- "Faction"
+  } else {
+    map_data$var_color <- map_data$source_title
+    color_palette <- randomColor(length(unique(map_data$source_title)))
+    names(color_palette) <- unique(map_data$source_title)
+    legend_name <- "Source"
+  }
+  
+  
+  plot_title <- ifelse(is.null(title), as.character(date), title)
+  
+  faction_capital_data <- map_data |> 
+    filter(capital == "Faction")
+  
+  major_capital_data <- map_data |> 
+    filter(capital == "Major")
+  
+  minor_capital_data <- map_data |> 
+    filter(capital == "Minor")
+  
+  # Base ggplot
+  map <- map_data |>
+    ggplot(aes(x = x, y = y, text = text_plotly, color = var_color,
+               customdata = id_mhq)) +
+    # some fancy stuff here for capital rings
+    geom_point(data = faction_capital_data, size = 4)+
+    geom_point(data = faction_capital_data, color = "grey20", size = 2.5)+
+    geom_point(data = major_capital_data, size = 3.5)+
+    geom_point(data = major_capital_data, color = "grey20", size = 2.5)+
+    geom_point(data = minor_capital_data, size = 3)+
+    geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
+    geom_point(size = 2) +
+    scale_color_manual(values = color_palette)+
+    labs(title = plot_title, color = legend_name)+
+    theme_void() +
+    theme(panel.background = element_rect(fill = "grey20"),
+          panel.grid = element_blank(),
+          # these colors work well with superhero theme - change if it changes
+          plot.background = element_rect(fill = "#3B4D5B"),
+          text = element_text(color = "#EBEBEB"))
+  
+  map <- ggplotly(map, tooltip = "text") |>
+    config(scrollZoom = TRUE)  |> 
+    layout(dragmode = "pan",
+           xaxis = list(range = xrange), 
+           yaxis = list(range = yrange)) |>
+    htmlwidgets::onRender(js_dynamic_labels)
+  
+  return(map)
+}
+
+
+# Preliminary setup --------------------------------------------------------
 
 # load the data - comment out one to read locally or remotely
 #data_address <- here("data", "sucs_data.csv")
@@ -58,8 +129,56 @@ time_periods <- list(
   "Dawn of the IlClan (3152)" = "3152-07-01"
 )
 
-# Define UI for application that draws a histogram
-#ui <- fluidPage(
+# default settings that may get changed and need to be tracked
+# Use the whole Inner Sphere as the default range
+current_range <- list(xrange = c(-610, 795), yrange = c(-595, 600))
+
+# Organize the data for ease of use in the plot - this way this code only
+# has to be run once
+
+map_data <- sucs_data |>
+  # get strings for disputed cases
+  mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
+  separate_wider_delim(disputed, ",", too_few = "align_start", 
+                       names_sep = "") |>
+  # we don't know how many there are so pivot longer to get names
+  pivot_longer(starts_with("disputed")) |>
+  mutate(value = factor(value, 
+                        levels = sucs_factions$id_sucs, 
+                        labels = sucs_factions$name)) |>
+  # now reshape back wider and concatenate disputed cases
+  pivot_wider() |>
+  unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE) |>
+  # now organize the rest of the labels
+  mutate(
+    # first clean the disputed parenthetical away
+    faction = str_remove(faction, "\\s*\\([^\\)]+\\)"),
+    # now turn faction into factor
+    faction = factor(faction, 
+                     levels = sucs_factions$id_sucs, 
+                     labels = sucs_factions$name),
+    # construct strings for the map display
+    faction_str = if_else(disputed == "", 
+                          paste0(faction, "<br>"),
+                          paste0(faction, " (", disputed, ")<br>")),
+    capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
+    region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
+    region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),
+    region3_str = if_else(is.na(region3), "", paste0(region3, "<br>")),
+    source_str = paste0("<i>Source:</i> ", 
+                        paste(source_type, source_title, source_loc, 
+                              sep = ", ")),
+    source_date_str = paste0("<br><i>Source Date:</i> ", source_date),
+    text_plotly = paste0("<b>", id_mhq, "</b><br>",
+                         faction_str,
+                         capital_str, region1_str, region2_str, region3_str,
+                         source_str, source_date_str)
+  )
+
+
+
+# Shiny app ---------------------------------------------------------------
+
 ui <- page_fillable(
   title = "Battletech Universe Faction Map",
   theme = bs_theme(bootswatch = "superhero"),
@@ -122,7 +241,6 @@ ui <- page_fillable(
   )
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output, session) {
 
   # uncomment out to test out bootstrap themes
@@ -139,8 +257,22 @@ server <- function(input, output, session) {
     
   })
   
+  # Capture range changes using the relayout event
+  observeEvent(event_data("plotly_relayout"), {
+    
+    event <- event_data("plotly_relayout")
+    
+    # Update the current_range value with new ranges
+    new_xrange <- c(event$`xaxis.range[0]`, event$`xaxis.range[1]`)
+    new_yrange <- c(event$`yaxis.range[0]`, event$`yaxis.range[1]`)
+    if (!is.null(new_xrange) && !is.null(new_yrange)) {
+      current_range <<- list(xrange = new_xrange, yrange = new_yrange)
+    }
+  })
+  
   output$plot <- renderPlotly({ 
-    sucs_data |>
+    
+    map_data |>
       filter(input$show_unsettled | faction != "U") |>
       filter(input$show_hidden | !hidden) |>
       filter(input$show_isp | !(source_title %in% isp_list)) |>
@@ -148,7 +280,9 @@ server <- function(input, output, session) {
       filter(source_type %in% input$source_types) |>
       plot_planets(input$date, 
                    choice_color = input$select_color,
-                   faction_data = sucs_factions)
+                   faction_data = sucs_factions,
+                   xrange = current_range$xrange,
+                   yrange = current_range$yrange)
   }) 
   
   output$download <- downloadHandler(
