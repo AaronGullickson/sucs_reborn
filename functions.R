@@ -114,6 +114,31 @@ make_new_entry <- function(map_data, id, time, type, title, loc, date, faction,
     )
 }
 
+add_errata <- function(map_data, 
+                       id, type, time_target, 
+                       title, loc, new_faction) {
+  
+  
+  errata_data <- map_data |>
+    # pull the data needing errata from the full data
+    filter(id_mhq %in% id, 
+           source_type == type, 
+           time_point %in% time_target,
+           !is.na(source_date)) |>
+    # now change errata data
+    mutate(time_point = "special",
+           source_type = "errata",
+           source_title = title,
+           source_loc = loc,
+           faction = new_faction)
+  
+  # now bind the errata back to the full data
+  map_data |>
+    bind_rows(errata_data)
+  
+}
+
+
 
 faction_snapshot <- function(base_data, date) {
   # get the date for each planet closest to the date but not over

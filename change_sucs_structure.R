@@ -361,6 +361,13 @@ sucs_data <- sucs_data |>
   make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
                  "p. 80", date("3003-01-01"), "IE")
 
+# we also need to add a text entry about its abandonment during the Amaris
+# Coup in 2769
+sucs_data <- sucs_data |>
+  make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
+                 "p. 80", date("2769-12-31"), "A")
+
+
 ## Sentarus ## 
 # Sentarus is showing as independent long after they drop off maps due to an
 # out of frame issue. According to Sarna "none of the maps from later eras 
@@ -2164,6 +2171,23 @@ sucs_data <- sucs_data |>
 
 # TODO: it seems like most of these planets are reported as abandoned by
 # 3030 - is that canon? from where?
+
+
+# Handle errata -----------------------------------------------------------
+
+# all errata must come at the end to ensure dates are already entered
+# for existing entries
+
+## Skyfog ##
+# ok, now lets add errata for the map that gives control of Skyfog to 
+# SL from 2750 to 2767 and then marks it as abandoned from 2783 to 2864
+sucs_data <- sucs_data |>
+  add_errata("Skyfog", "map", time_point_range("2750", "2767"),
+             "IE: Interstellar Players 3", "p. 80", "SL")
+sucs_data <- sucs_data |>
+  add_errata("Skyfog", "map", time_point_range("2783", "2864"),
+             "IE: Interstellar Players 3", "p. 80", "A")
+
 
 # Create final data --------------------------------------------------------
 
