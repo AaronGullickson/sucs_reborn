@@ -20,7 +20,8 @@ plot_planets <- function(map_data,
                          date, 
                          title = NULL, 
                          show_id = TRUE,
-                         interactive = TRUE,
+                         xrange = c(-610, 795),
+                         yrange = c(-595, 600),
                          choice_color = "faction",
                          faction_data = sucs_factions) {
   
@@ -75,25 +76,21 @@ plot_planets <- function(map_data,
           text = element_text(color = "#EBEBEB"))
   
   # Add ID labels if required
-  if (show_id) {
-    if (!interactive) {
-      map <- map + geom_text_repel(aes(label = id_mhq), color = "grey95", 
-                                   size = 3)
-    } else {
-      map <- map + geom_text(aes(label = id_mhq), color = "grey95", 
-                             size = 2, nudge_y = 1)
-    }
+  if(show_id) {
+    box <- list(x_left = xrange[1], x_right = xrange[2], 
+                y_high = yrange[2], y_low = yrange[1])
+    print(box)
+    label_data <- map_data |> filter(is_in_box(x, y, box))
+    map <- map+
+      geom_text(data = label_data,
+                aes(label = id_mhq), color = "grey95", size = 2, nudge_y = 2)
   }
   
-  if (interactive) {
-    # Convert to plotly
-    map <- ggplotly(map, tooltip = "text") |>
-      config(scrollZoom = TRUE)
-    
-    if(show_id) {
-      #map <- map |> htmlwidgets::onRender(js_dynamic_labels)
-    }
-  }
+  map <- ggplotly(map, tooltip = "text") |>
+    config(scrollZoom = TRUE)  |> 
+    layout(dragmode = "pan",
+           xaxis = list(range = xrange), 
+           yaxis = list(range = yrange))
   
   return(map)
 }
@@ -280,7 +277,7 @@ server <- function(input, output, session) {
       
       # now check zoom level
       zoom_level = max(abs(range(new_xrange)), abs(range(new_yrange)))
-      show_labels(zoom_level < 200)
+      show_labels(zoom_level < 300)
     }
   })
   
@@ -310,10 +307,9 @@ server <- function(input, output, session) {
       plot_planets(input$date, 
                    choice_color = input$select_color,
                    faction_data = sucs_factions,
-                   show_id = show_id) |> 
-      layout(dragmode = "pan",
-             xaxis = list(range = xrange), 
-             yaxis = list(range = yrange))
+                   show_id = show_id,
+                   xrange = xrange,
+                   yrange = yrange)
   }) 
   
   output$download <- downloadHandler(
