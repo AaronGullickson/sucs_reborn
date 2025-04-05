@@ -214,7 +214,7 @@ sucs_data <- sucs_data |>
   correct_faction("Antallos (Port Krin)", c("2750", "2765"), "I")
 
 sucs_data <- sucs_data |>
-  make_new_entry("Antallos (Port Krin)", "special", "text", 
+  make_new_entries("Antallos (Port Krin)", "special", "text", 
                  "Mercenary FM Supplemental 2", "p. 12", date("2674-01-01"),
                  "SL")
 
@@ -246,7 +246,7 @@ sucs_data <- sucs_data |>
   remove_cases("St. Andreas", time_point_range("2783"))
   
 sucs_data <- sucs_data |>
-  make_new_entry("St. Andreas", "special", "text", "IE: Interstellar Players 3",
+  make_new_entries("St. Andreas", "special", "text", "IE: Interstellar Players 3",
                  "pp. 57-61", date("2768-02-01"), "I")
 
 ## Frobisher ##
@@ -259,11 +259,11 @@ sucs_data <- sucs_data |>
   remove_cases("Frobisher", time_point_range("2750"))
   
 sucs_data <- sucs_data |>
-  make_new_entry("Frobisher", "special", "text", "IE: Interstellar Players 3",
+  make_new_entries("Frobisher", "special", "text", "IE: Interstellar Players 3",
                  "p. 81", date("2699-12-31"), "SL")
 
 sucs_data <- sucs_data |>
-  make_new_entry("Frobisher", "special", "text", "IE: Interstellar Players 3",
+  make_new_entries("Frobisher", "special", "text", "IE: Interstellar Players 3",
                  "p. 81", date("2786-12-31"), "I")
 
 ## Andurien Wars ##
@@ -298,7 +298,7 @@ sucs_data <- sucs_data |>
   remove_cases("Kleinwelt", time_point_range("3025"))
 
 sucs_data <- sucs_data |>
-  make_new_entry("Kleinwelt", "special", "text", "IE: Interstellar Players 3", 
+  make_new_entries("Kleinwelt", "special", "text", "IE: Interstellar Players 3", 
                  "p. 82", date("3044-12-31"), "I")
 
 ## Star's End ## 
@@ -358,13 +358,13 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |>
   remove_cases("Skyfog", time_point_range("3025", "3085"))
 sucs_data <- sucs_data |>
-  make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
+  make_new_entries("Skyfog", "special", "text", "IE: Interstellar Players 3", 
                  "p. 80", date("3003-01-01"), "IE")
 
 # we also need to add a text entry about its abandonment during the Amaris
 # Coup in 2769
 sucs_data <- sucs_data |>
-  make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
+  make_new_entries("Skyfog", "special", "text", "IE: Interstellar Players 3", 
                  "p. 80", date("2769-12-31"), "A")
 
 
@@ -431,7 +431,7 @@ sucs_data <- sucs_data |>
 # but lets leave an abandoned code in 2830 so we get abandoned if this source
 # is filtered out.
 sucs_data <- sucs_data |>
-  make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
+  make_new_entries("Tangerz (Mayadi 2822+)", "special", "text", 
                  "IE: Interstellar Players 3",
                  "pg. 20 (date approximate)", date("2830-12-31"), "CS", TRUE)
 # remove the abandoned entry in 2864
@@ -439,7 +439,7 @@ sucs_data <- sucs_data |>
   remove_cases("Tangerz (Mayadi 2822+)", "2864")
 # add an abandoned entry mid 2900s
 sucs_data <- sucs_data |>
-  make_new_entry("Tangerz (Mayadi 2822+)", "special", "text", 
+  make_new_entries("Tangerz (Mayadi 2822+)", "special", "text", 
                  "IE: Interstellar Players 3",
                  "pg. 20 (date approximate)", date("2950-01-01"), "A")
 
@@ -447,6 +447,12 @@ sucs_data <- sucs_data |>
 ## Aurigan Reach, Part 1 ##
 # So I think I just need to clean out any existing data from HBHA and 
 # then rebuild from scratch later.
+# Before doing anything lets save some information that we will want later
+# what planets were part of AuC in 3025?
+auc_3025 <- sucs_data |>
+  filter(faction == "AuC" & time_point == 3025) |>
+  pull(id_mhq)
+
 # For the period between 2765 and 2864, I can just turn all existing I entries
 # into U entries if they are in a certain area with the exception of Detroit,
 # Herotitus, and Spencer because these are the only cases showing on the map.
@@ -492,6 +498,9 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |> 
    mutate(capital = if_else(id_mhq == "Coromodir" & time_point == "3025", 
                             NA, capital))
+
+# we should now have all those planets correct for the original maps before
+# the HBHA
 
 # Add Founding House Maps------------------------------------------------
 
@@ -2133,6 +2142,18 @@ sucs_data <- sucs_data |>
   )
 
 # Handle House Arano data -------------------------------------------------
+
+# Ok, we took all this out, so we need to rebuild it from scratch
+
+## 2765 ##
+# Independents
+independents <- c("Alloway", "Bonavista", "Sacromonte", "Polybius",
+                  "Bellerophon", "Don't (Mantharaka 3022+)", 
+                  "Tiburon (Tiverton 3022+)", 
+                  "Wheeler (Perian 2822+/Mystras 3022+)",                         
+                  "Chaadan (Chadan 2864+/Chandan 3022+)")
+  # MOC: Balawat, Cassilda
+# CC: Mandalas
 
 # TODO: These are still kind of a cluster - waiting to finish the rest before
 # fixing

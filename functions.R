@@ -93,16 +93,22 @@ remove_cases <- function(map_data, id, time_target) {
     filter(!(id_mhq == id & time_point %in% time_target))
 }
 
-make_new_entry <- function(map_data, id, time, type, title, loc, date, faction,
+make_new_entries <- function(map_data, id, time, type, title, loc, date, faction,
                            hidden = FALSE) {
-  case <- map_data |> filter(id_mhq == id)
+  id <- sort(id)
+  case <- map_data |> filter(id_mhq %in% id) |>
+    filter(!duplicated(id_sucs)) |>
+    arrange(id_mhq)
+  id_sucs <- case |> pull(id_sucs)
+  x <- case |> pull(x)
+  y <- case |> pull(y)
   map_data <- map_data |>
     bind_rows(
       tibble(
-        id_sucs = case$id_sucs[1],
+        id_sucs = id_sucs,
         id_mhq = id,
-        x = case$x[1],
-        y = case$y[1],
+        x = x,
+        y = y,
         time_point = time,
         source_type =type,
         source_title = title,
