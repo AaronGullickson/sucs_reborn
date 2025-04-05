@@ -545,7 +545,7 @@ sucs_data <- sucs_data |>
 # Add UHC -----------------------------------------------------------------
 
 # add UHC in properly from the Era Digest: Age of war map
-uhc_worlds <- c("Islamabad", "Songgang", "Gambarare", "As Samik", "Panpour",
+uhc_worlds <- c("Islamabad", "Songgang", "As Samik", "Panpour",
                 "Naka Pabni", "Agliana", "Birmensdorf", "Gambarare", "Kaiyuh",
                 "Niquinohomo", "Ildrong (Sanurcha 2750-)", "Gurrnazovo", 
                 "Neukirchen (Jodipur 3025-)", "June", "Hoonaar", "Vackisujfalu")
