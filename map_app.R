@@ -15,11 +15,13 @@ library(randomcoloR)
 # load custom functions
 source("functions.R")
 
+# javascript code for dynamic labels
+js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
+
 # the plotting function
 plot_planets <- function(map_data,
                          date, 
                          title = NULL, 
-                         show_id = TRUE,
                          xrange = c(-610, 795),
                          yrange = c(-595, 600),
                          choice_color = "faction",
@@ -75,22 +77,12 @@ plot_planets <- function(map_data,
           plot.background = element_rect(fill = "#3B4D5B"),
           text = element_text(color = "#EBEBEB"))
   
-  # Add ID labels if required
-  if(show_id) {
-    box <- list(x_left = xrange[1], x_right = xrange[2], 
-                y_high = yrange[2], y_low = yrange[1])
-    print(box)
-    label_data <- map_data |> filter(is_in_box(x, y, box))
-    map <- map+
-      geom_text(data = label_data,
-                aes(label = id_mhq), color = "grey95", size = 2, nudge_y = 2)
-  }
-  
   map <- ggplotly(map, tooltip = "text") |>
     config(scrollZoom = TRUE)  |> 
     layout(dragmode = "pan",
            xaxis = list(range = xrange), 
-           yaxis = list(range = yrange))
+           yaxis = list(range = yrange)) |>
+    htmlwidgets::onRender(js_dynamic_labels)
   
   return(map)
 }
@@ -270,18 +262,13 @@ server <- function(input, output, session) {
   # Capture range changes using the relayout event
   observeEvent(event_data("plotly_relayout"), {
     
-    print("here")
     event <- event_data("plotly_relayout")
     
-    # Update the reactive range value with new ranges
+    # Update the current_range value with new ranges
     new_xrange <- c(event$`xaxis.range[0]`, event$`xaxis.range[1]`)
     new_yrange <- c(event$`yaxis.range[0]`, event$`yaxis.range[1]`)
     if (!is.null(new_xrange) && !is.null(new_yrange)) {
       current_range <<- list(xrange = new_xrange, yrange = new_yrange)
-      
-      # now check zoom level
-      zoom_level = max(abs(range(new_xrange)), abs(range(new_yrange)))
-      show_labels(zoom_level < 300)
     }
   })
   
@@ -296,7 +283,6 @@ server <- function(input, output, session) {
       plot_planets(input$date, 
                    choice_color = input$select_color,
                    faction_data = sucs_factions,
-                   show_id = FALSE,
                    xrange = current_range$xrange,
                    yrange = current_range$yrange)
   }) 
