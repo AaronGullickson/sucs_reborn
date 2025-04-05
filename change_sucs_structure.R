@@ -469,6 +469,29 @@ sucs_data <- sucs_data |>
 # Balawat only shows up in HBHA, so remove everything
 sucs_data <- sucs_data |>
   filter(id_mhq != "Balawat")
+# For the period between 3025 I think I can use a couple boxes again to
+# turn everything into abandoned unless they are U
+bounding_box <- create_box("Bonavista", "Eliat", "Girondas", "McEvans' Sacrifice")
+exceptions <- c("Herotitus", "Detroit", "Spencer", "Rockwellawan", "Regis Roost",
+                "Addasar")
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(is_in_box(x, y, bounding_box) & 
+                             faction != "U" & 
+                             !(id_mhq %in% exceptions) & 
+                             time_point == "3025", 
+                           "A", faction))
+# this box missed some planets that should be marked as abandoned
+sucs_data <- sucs_data |>
+  correct_faction(c("Enkra", "Umgard", "Bringdam", "Ryans Fate", "Fjaldr",
+                    "Brinton", "Portland", "Weldry", "Ichlangis", "Zangul"), 
+                  "3025", "A")
+# also identify Cassilda as  U
+sucs_data <- sucs_data |>
+  correct_faction("Cassilda", "3025", "U")
+# Coromodir is not a capital
+sucs_data <- sucs_data |> 
+   mutate(capital = if_else(id_mhq == "Coromodir" & time_point == "3025", 
+                            NA, capital))
 
 # Add Founding House Maps------------------------------------------------
 
@@ -1281,6 +1304,8 @@ sucs_data <- sucs_data |>
                  "MOC", "TC", "OA", "CF", "LL" , "IP", "MH",
                  "OC", "EF", "GV", "TD")
   )
+
+# TODO: check TC 3040 map and appropriately source if necessary
 
 # Add Era Report 3052 data ----------------------------------------------------
 
