@@ -2133,7 +2133,9 @@ sucs_data <- sucs_data |>
     source_title = if_else(time_point == "3025" & faction == "AuC", 
                            "Handbook: House Arano", source_title),
     source_loc = if_else(time_point == "3025" & faction == "AuC", 
-                         "pp. 14-15", source_loc)
+                         "pp. 14-15", source_loc),
+    source_date = if_else(time_point == "3025" & faction == "AuC", 
+                          date("3025-01-01"), source_date),
   )
 
 # TODO: it seems like most of these planets are reported as abandoned by
