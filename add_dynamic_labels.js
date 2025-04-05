@@ -32,13 +32,30 @@ function addPlotlyLabels(el, x) {
              // We no longer check visibility here; just add all relevant annotations
              for (var j = 0; j < trace.x.length; j++) {
                if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
+                 
+                 // Constrain label positions to ensure they don't overflow
+                 let labelX = trace.x[j];
+                 let labelY = trace.y[j];
+
+                 // Check if the label is too far to the right, adjust position if necessary
+                 let labelXAnchor = 'left';
+                 if (labelX > xaxisMax - 10) {  // Label too far right
+                   labelXAnchor = 'right';  // Change anchor to the right
+                 }
+
+                 // Check if the label is too far at the bottom, adjust position if necessary
+                 let labelYAnchor = 'bottom';
+                 if (labelY > yaxisMax - 10) {  // Label too far up
+                   labelYAnchor = 'top';  // Change anchor to the top
+                 }
+                 
                  annotations.push({
                    x: trace.x[j],
                    y: trace.y[j],
                    text: trace.customdata[j],  // Using customdata for label text
                    showarrow: false,
-                   xanchor: 'left',
-                   yanchor: 'bottom',
+                   xanchor: labelXAnchor,
+                   yanchor: labelYAnchor,
                    font: { 
                      color: '#f2f2f2',
                      size: 8
