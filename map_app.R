@@ -19,17 +19,12 @@ source("functions.R")
 js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
 
 # the plotting function
-plot_planets <- function(map_data,
-                         date, 
-                         title = NULL, 
+plot_planets <- function(snapshot_data,
+                         title = "Battletech Faction Map", 
                          xrange = c(-610, 795),
                          yrange = c(-595, 600),
                          choice_color = "faction",
                          faction_data = sucs_factions) {
-  
-  # Take a snapshot
-  map_data <- map_data |>
-    faction_snapshot(date)
   
   # Determine color palette - give a named vector to make sure colors match
   # in subsets
@@ -37,24 +32,22 @@ plot_planets <- function(map_data,
     color_palette <- faction_data |> select(name, color) |> deframe()
     legend_name <- "Faction"
   } else {
-    color_palette <- randomColor(length(unique(map_data$source_title)))
-    names(color_palette) <- unique(map_data$source_title)
+    color_palette <- randomColor(length(unique(snapshot_data$source_title)))
+    names(color_palette) <- unique(snapshot_data$source_title)
     legend_name <- "Source"
   }
   
-  plot_title <- ifelse(is.null(title), as.character(date), title)
-  
-  faction_capital_data <- map_data |> 
+  faction_capital_data <- snapshot_data |> 
     filter(capital == "Faction")
   
-  major_capital_data <- map_data |> 
+  major_capital_data <- snapshot_data |> 
     filter(capital == "Major")
   
-  minor_capital_data <- map_data |> 
+  minor_capital_data <- snapshot_data |> 
     filter(capital == "Minor")
   
   # Base ggplot
-  map <- map_data |>
+  map <- snapshot_data |>
     ggplot(aes(x = x, y = y, text = text_plotly, color = !!sym(choice_color),
                customdata = id_mhq)) +
     # some fancy stuff here for capital rings
@@ -66,7 +59,7 @@ plot_planets <- function(map_data,
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
     geom_point(size = 2) +
     scale_color_manual(values = color_palette)+
-    labs(title = plot_title, color = legend_name)+
+    labs(title = title, color = legend_name)+
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank(),
@@ -229,13 +222,13 @@ ui <- page_fillable(
           TRUE
         ),
         input_switch(
-          "show_isp", 
-          "Show Interstellar Players data?", 
+          "use_isp", 
+          "Use Interstellar Players data?", 
           TRUE
         ),
         input_switch(
-          "show_arano", 
-          "Show House Arano data?", 
+          "use_arano", 
+          "Use House Arano data?", 
           TRUE
         )
       ),
@@ -276,12 +269,13 @@ server <- function(input, output, session) {
   output$plot <- renderPlotly({ 
     
     map_data |>
+      filter(input$use_isp | !(source_title %in% isp_list)) |>
+      filter(input$use_arano | source_title != "Handbook: House Arano") |>
+      filter(source_type %in% input$source_types) |>
+      faction_snapshot(input$date) |>
       filter(input$show_unsettled | faction != "Unsettled") |>
       filter(input$show_hidden | !hidden) |>
-      filter(input$show_isp | !(source_title %in% isp_list)) |>
-      filter(input$show_arano | source_title != "Handbook: House Arano") |>
-      filter(source_type %in% input$source_types) |>
-      plot_planets(input$date, 
+      plot_planets(paste(input$date), 
                    choice_color = input$select_color,
                    faction_data = sucs_factions,
                    xrange = current_range$xrange,
@@ -292,12 +286,12 @@ server <- function(input, output, session) {
     filename = paste0("battletech_map_", input$date, ".csv"),
     content = function(file) {
       sucs_data |>
-        filter(input$show_unsettled | faction != "Unsettled") |>
-        filter(input$show_hidden | !hidden) |>
-        filter(input$show_isp | !(source_title %in% isp_list)) |>
-        filter(input$show_arano | source_title != "Handbook: House Arano") |>
+        filter(input$use_isp | !(source_title %in% isp_list)) |>
+        filter(input$use_arano | source_title != "Handbook: House Arano") |>
         filter(source_type %in% input$source_types) |>
         faction_snapshot(input$date) |>
+        filter(input$show_unsettled | faction != "Unsettled") |>
+        filter(input$show_hidden | !hidden) |>
         write_csv(file)
     }
   )
