@@ -2157,7 +2157,6 @@ sucs_data <- sucs_data |>
                    "special", "map", "Handbook: House Arano", "p. 10", 
                    date("2765-01-01"), "I")
 # MOC
-# TODO: Balawat has a different x and y (appears where Cassilda should)
 sucs_data <- sucs_data |>
   make_new_entries(c("Balawat", "Cassilda"), 
                    "special", "map", "Handbook: House Arano", "p. 10", 
@@ -2167,6 +2166,42 @@ sucs_data <- sucs_data |>
   make_new_entries("Mandalas", 
                    "special", "map", "Handbook: House Arano", "p. 10", 
                    date("2765-01-01"), "CC")
+
+c("Alloway", "Bonavista", "Sacromonte", 
+  "Polybius (Appian 2822+)",
+  "Bellerophon", "Don't (Mantharaka 3022+)", 
+  "Tiburon (Tiverton 3022+)", 
+  "Wheeler (Perian 2822+/Mystras 3022+)",                         
+  "Chaadan (Chadan 2864+/Chandan 3022+)")
+
+## 2890 ##
+# Independents
+sucs_data <- sucs_data |>
+  make_new_entries(c("Amnesty", "Bonavista", "Alloway", "Detroit", 
+                     "Bellerophon", "Spencer", 
+                     "Chaadan (Chadan 2864+/Chandan 3022+)",
+                     "Abeline (Taygete 2890+)", "Rockwellawan",
+                     "Sacromonte", "Nuncavoy", "Herotitus", "Panzyr",
+                     "Mechdur", "Umgard", "Smithon", "Mangzhangdian",
+                     "Heliat", "Gangtok", "Peratallada", "Argos",
+                     "Wheeler (Perian 2822+/Mystras 3022+)",
+                     "Hellespont", "Pyrrhus", "Eliat",
+                     "Itrom", "Tyrlon", "Coromodir", "Guldra"), 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("2890-07-21"), "I")
+# Duchy of Dont
+sucs_data <- sucs_data |>
+  make_new_entries(c("Don't (Mantharaka 3022+)", "Contrilla"), 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("2890-07-21"), "DD")
+# MOC
+sucs_data <- sucs_data |>
+  make_new_entries(c("Balawat", "Cassilda"), 
+                   "special", "map", "Handbook: House Arano", "p. 12", 
+                   date("2890-07-21"), "MOC")
+
+## 2910 - text reference for formation of AuC ##
+
 
 # TODO: These are still kind of a cluster - waiting to finish the rest before
 # fixing
