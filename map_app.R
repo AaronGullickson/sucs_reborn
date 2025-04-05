@@ -28,49 +28,6 @@ plot_planets <- function(map_data,
   map_data <- map_data |>
     faction_snapshot(date)
   
-  # get string for disputed cases
-  map_data <- map_data |>
-    mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
-    separate_wider_delim(disputed, ",", too_few = "align_start", 
-                         names_sep = "") |>
-    # we don't know how many there are so pivot longer to get names
-    pivot_longer(starts_with("disputed")) |>
-    mutate(value = factor(value, 
-                          levels = faction_data$id_sucs, 
-                          labels = faction_data$name)) |>
-    # now reshape back wider and concatenate disputed cases
-    pivot_wider() |>
-    unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE)
-  
-  
-  # now organize the rest of the labels
-  map_data <- map_data |>
-    mutate(
-      # first clean the disputed parenthetical away
-      faction = str_remove(faction, "\\s*\\([^\\)]+\\)"),
-      # now turn faction into factor
-      faction = factor(faction, 
-                       levels = faction_data$id_sucs, 
-                       labels = faction_data$name),
-      # construct strings for the map display
-      faction_str = if_else(disputed == "", 
-                            paste0(faction, "<br>"),
-                            paste0(faction, " (", disputed, ")<br>")),
-      capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
-      region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
-      region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),
-      region3_str = if_else(is.na(region3), "", paste0(region3, "<br>")),
-      source_str = paste0("<i>Source:</i> ", 
-                          paste(source_type, source_title, source_loc, 
-                                sep = ", ")),
-      source_date_str = paste0("<br><i>Source Date:</i> ", source_date),
-      text_plotly = paste0("<b>", id_mhq, "</b><br>",
-                           faction_str,
-                           capital_str, region1_str, region2_str, region3_str,
-                           source_str, source_date_str)
-    )
-  
-  
   # Determine color palette - give a named vector to make sure colors match
   # in subsets
   if(choice_color == "faction") {
@@ -182,6 +139,50 @@ time_periods <- list(
   "The Fall of the Republic (3151)" = "3151-01-01",
   "Dawn of the IlClan (3152)" = "3152-07-01"
 )
+
+# Organize the data for ease of use in the plot - this way this code only
+# has to be run once
+
+map_data <- sucs_data |>
+  # get strings for disputed cases
+  mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
+  separate_wider_delim(disputed, ",", too_few = "align_start", 
+                       names_sep = "") |>
+  # we don't know how many there are so pivot longer to get names
+  pivot_longer(starts_with("disputed")) |>
+  mutate(value = factor(value, 
+                        levels = sucs_factions$id_sucs, 
+                        labels = sucs_factions$name)) |>
+  # now reshape back wider and concatenate disputed cases
+  pivot_wider(id_cols = c(id_sucs, source_title, source_date), 
+              names_from = name, values_from = value) |>
+  unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE)
+  # now organize the rest of the labels
+  mutate(
+    # first clean the disputed parenthetical away
+    faction = str_remove(faction, "\\s*\\([^\\)]+\\)"),
+    # now turn faction into factor
+    faction = factor(faction, 
+                     levels = sucs_factions$id_sucs, 
+                     labels = sucs_factions$name),
+    # construct strings for the map display
+    faction_str = if_else(disputed == "", 
+                          paste0(faction, "<br>"),
+                          paste0(faction, " (", disputed, ")<br>")),
+    capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
+    region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
+    region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),
+    region3_str = if_else(is.na(region3), "", paste0(region3, "<br>")),
+    source_str = paste0("<i>Source:</i> ", 
+                        paste(source_type, source_title, source_loc, 
+                              sep = ", ")),
+    source_date_str = paste0("<br><i>Source Date:</i> ", source_date),
+    text_plotly = paste0("<b>", id_mhq, "</b><br>",
+                         faction_str,
+                         capital_str, region1_str, region2_str, region3_str,
+                         source_str, source_date_str)
+  )
+
 
 
 # Shiny app ---------------------------------------------------------------
@@ -301,7 +302,7 @@ server <- function(input, output, session) {
       show_id <- FALSE
     }
     
-    sucs_data |>
+    map_data |>
       filter(input$show_unsettled | faction != "U") |>
       filter(input$show_hidden | !hidden) |>
       filter(input$show_isp | !(source_title %in% isp_list)) |>
