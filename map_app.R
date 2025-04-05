@@ -90,11 +90,17 @@ plot_planets <- function(map_data,
 
 # Preliminary setup --------------------------------------------------------
 
+# unofficial way to determin if local but from Yihui Xie 
+is_local <- Sys.getenv('SHINY_PORT') == ""
+
 # load the data - comment out one to read locally or remotely
-#data_address <- here("data", "sucs_data.csv")
-data_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv"
-#factions_address <- here("data", "sucs_factions.csv")
-factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_factions.csv"
+if(is_local) {
+  data_address <- here("data", "sucs_data.csv")
+  factions_address <- here("data", "sucs_factions.csv")
+} else {
+  data_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv"
+  factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_factions.csv"
+}
 sucs_data <- read_csv(data_address)
 sucs_factions <- read_csv(factions_address)
 
