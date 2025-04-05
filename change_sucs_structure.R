@@ -2201,97 +2201,15 @@ sucs_data <- sucs_data |>
                    date("2890-07-21"), "MOC")
 
 ## 2910 - text reference for formation of AuC ##
+sucs_data <- sucs_data |>
+  make_new_entries(c("Itrom", "Tyrlon", "Coromodir", "Guldra"), 
+                   "special", "text", "Handbook: House Arano", "p. 11", 
+                   date("2910-01-01"), "AuC")
+sucs_data <- sucs_data |>
+  mutate(capital = if_else(id_mhq == "Coromodir" & year(source_date) == 2910,
+                           "Faction", capital))
 
-
-# TODO: These are still kind of a cluster - waiting to finish the rest before
-# fixing
-
-# We do Arano last to fix whatever other messes it might have made.
-# The Arano stuff is quite a mess. I think the best way to handle this 
-# is to identify all the names that are for specifically Arano sourcebook
-# planets that weren't there before and pull them all out of the SUCS as it is,
-# and then create a specific Arano subset of the data from the three maps in
-# the handbook and add it back in.
-
-# arano_planets_2765 <- c("Alloway", "Bonavista", "Sacromonte", "Polybius",
-#                         "Bellerophon", "Don't (Mantharaka 3022+)", 
-#                         "Tiburon (Tiverton 3022+)", 
-#                         "Wheeler (Perian 2822+/Mystras 3022+)", 
-#                         "Chaadan (Chadan 2864+/Chandan 3022+)",
-#                         "Cassilda", "Balawat")
-# 
-# arano_planets_2890 <- c("Amnesty", "Nuncavoy", "Contrilla", "Peratallada",
-#                         "Pyrrhus", "Eliat", "Abeline (Taygete 2890+)")
-# 
 # arano_planets_3026 <- c("Highwater", "Tarragona", "Fairuza", "Gaucin", "Ahlat")
-
-#all_arano_planets <- c(arano_planets_2765, arano_planets_2890, 
-#                       arano_planets_3026)
-
-# pull these entries out into a separate tibble
-# arano_data <- sucs_data |>
-#   filter(id_mhq %in% all_arano_planets)
-# 
-# sucs_data <- sucs_data |>
-#   filter(!(id_mhq %in% all_arano_planets))
-
-# because of the nature of the data, I don't think you can really say when 
-# these planets were undiscovered, except for in earlier periods from the same
-# time. So lets just keep three data points and relabel the time point on 2864
-# to 2890 
-# arano_data <- arano_data |>
-#   filter(time_point %in% c("2765", "2864", "3025")) |>
-#   mutate(time_point = if_else(time_point == "2864", "2890", time_point)) |>
-#   mutate(source_title = "Handbook: House Arano",
-#          source_loc = case_when(
-#            time_point == "2765" ~ "p. 10",
-#            time_point == "2890" ~ "p. 12",
-#            time_point == "3025" ~ "pp. 14-15"
-#          ),
-#          source_date = case_when(
-#            time_point == "2765" ~ date("2765-01-01"),
-#            time_point == "2890" ~ date("2890-07-21"),
-#            time_point == "3025" ~ date("3025-01-01")
-#          ))
-
-# going by the map in 2890, four planets already belonged to AuC
-# auc_2890 <- tibble(id_mhq = c("Coromodir", "Itrom", "Guldra", "Tyrlon")) |>
-#   left_join(id_crosswalk) |>
-#   left_join(system_coords)
-# 
-# arano_data <- arano_data |>
-#   bind_rows(
-#     tibble(
-#       id_sucs = auc_2890$id_sucs,
-#       id_mhq = auc_2890$id_mhq,
-#       x = auc_2890$x,
-#       y = auc_2890$y,
-#       source_type = "map",
-#       source_title = "Handbook: House Arano",
-#       source_loc = "p. 12",
-#       source_date = date("2890-07-21"),
-#       faction = "AuC"
-#     )
-#   )
-# 
-# sucs_data <- sucs_data |>
-#   bind_rows(arano_data)
-# 
-# 
-# # change source for any 3025 AuC entries to Handbook: House Arano
-# sucs_data <- sucs_data |>
-#   mutate(
-#     source_title = if_else(time_point == "3025" & faction == "AuC", 
-#                            "Handbook: House Arano", source_title),
-#     source_loc = if_else(time_point == "3025" & faction == "AuC", 
-#                          "pp. 14-15", source_loc),
-#     source_date = if_else(time_point == "3025" & faction == "AuC", 
-#                           date("3025-01-01"), source_date),
-#   )
-
-# TODO: it seems like most of these planets are reported as abandoned by
-# 3030 - is that canon? from where?
-
 
 # Handle errata -----------------------------------------------------------
 
