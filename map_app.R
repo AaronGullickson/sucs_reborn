@@ -34,16 +34,13 @@ plot_planets <- function(map_data,
   # Determine color palette - give a named vector to make sure colors match
   # in subsets
   if(choice_color == "faction") {
-    map_data$var_color <- map_data$faction
     color_palette <- faction_data |> select(name, color) |> deframe()
     legend_name <- "Faction"
   } else {
-    map_data$var_color <- map_data$source_title
     color_palette <- randomColor(length(unique(map_data$source_title)))
     names(color_palette) <- unique(map_data$source_title)
     legend_name <- "Source"
   }
-  
   
   plot_title <- ifelse(is.null(title), as.character(date), title)
   
@@ -58,7 +55,7 @@ plot_planets <- function(map_data,
   
   # Base ggplot
   map <- map_data |>
-    ggplot(aes(x = x, y = y, text = text_plotly, color = var_color,
+    ggplot(aes(x = x, y = y, text = text_plotly, color = !!sym(choice_color),
                customdata = id_mhq)) +
     # some fancy stuff here for capital rings
     geom_point(data = faction_capital_data, size = 4)+
@@ -211,7 +208,7 @@ ui <- page_fillable(
         selectInput( 
           "select_color", 
           h4("Color by:"), 
-          list("Faction" = "faction", "Source" = "source") 
+          list("Faction" = "faction", "Source" = "source_title") 
         ),
         downloadButton("download", "Download CSV file"),
         h4("Further Map Controls"),
