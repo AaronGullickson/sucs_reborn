@@ -249,14 +249,10 @@ plot_planets <- function(map_data,
   if (interactive) {
     # Convert to plotly
     map <- ggplotly(map, tooltip = "text") |>
-      config(scrollZoom = TRUE) |>
-      layout(dragmode = "pan",
-             # set the default zoom to cover the IS and Periphery
-             xaxis = list(range = list(-610, 795)), 
-             yaxis = list(range = list(-595, 600)))
+      config(scrollZoom = TRUE)
     
     if(show_id) {
-      map <- map |> htmlwidgets::onRender(js_dynamic_labels)
+      #map <- map |> htmlwidgets::onRender(js_dynamic_labels)
     }
   }
   
