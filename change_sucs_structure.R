@@ -331,11 +331,35 @@ sucs_data <- sucs_data |>
 sucs_data <- sucs_data |>
   remove_cases("Wynn's Roost", time_point_range("3025"))
 
-# TODO: Skyfog is showing as part of MOC long after it is abandoned
-# because of an out of frame issue. It is also coded in the SUCK data as 
-# IE which I think is a little weird. Its area does seem to come back into frame
-# in the Field Report: Periphery map for the MOC and its not there, so maybe
-# it should be listed as abandoned?
+## Skyfog ##
+#So this is listed as an MOC holding on the maps dating from peak star league 
+# (2750) through the second succession war and then disappears in the 3025 maps.
+# However, IE: ISP3 describes Skyfog as a star league scientific outpost that 
+# was abandoned in 2769 during the Amaris Coup, never part of the MOC, and then
+# rediscovered by IE in 3003. The current SUCK sort of splits the difference 
+# here. Its listed as SL for 2750, 2765, and 2767. Then its listed as MOC from 
+# 2783 to 2864 and then as IE for the remainder of the time. I think if the idea
+# was to prefer IE: ISP3, then it should be listed as A not MOC. But in general,
+# this seems to be a case where IE: ISP3 and the maps are clearly in conflict.
+# There is an additional problem that skyfog is out of frame after 2864, so 
+# it shows up as MOC into later periods. I think we could sort of cheat this
+# by the fact that the MOC's borders don't include, but that doesn't tell us 
+# whether it was abandoned or just independent, technically. Another option
+# would be to put in the text reference in 3003 for IE and then it gets picked
+# up again in 3095 as part of the IE: ISP3 map. 
+
+# As a start for dealing with this one, lets fix the maps. We know that the 
+# maps say it is an MOC holding from 2750 to 2864 so do that.
+sucs_data <- sucs_data |>
+  correct_faction("Skyfog", time_point_range("2750", "2864"), "MOC")
+
+# now lets remove all references from 3025 on except for 3095 and then add
+# a 3003 text entry that gives control to IE
+sucs_data <- sucs_data |>
+  remove_cases("Skyfog", time_point_range("3025", "3085"))
+sucs_data <- sucs_data |>
+  make_new_entry("Skyfog", "special", "text", "IE: Interstellar Players 3", 
+                 "p. 80", date("3003-01-01"), "IE")
 
 ## Sentarus ## 
 # Sentarus is showing as independent long after they drop off maps due to an
