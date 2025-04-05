@@ -137,6 +137,10 @@ time_periods <- list(
   "Dawn of the IlClan (3152)" = "3152-07-01"
 )
 
+# default settings that may get changed and need to be tracked
+# Use the whole Inner Sphere as the default range
+current_range <- list(xrange = c(-610, 795), yrange = c(-595, 600))
+
 # Organize the data for ease of use in the plot - this way this code only
 # has to be run once
 
@@ -250,7 +254,6 @@ server <- function(input, output, session) {
   # uncomment out to test out bootstrap themes
   #bs_themer()
   
-  current_range <- reactiveVal(list(x = NULL, y = NULL))
   show_labels <- reactiveVal(FALSE)
   
   observeEvent(input$year,{
@@ -267,13 +270,14 @@ server <- function(input, output, session) {
   # Capture range changes using the relayout event
   observeEvent(event_data("plotly_relayout"), {
     
+    print("here")
     event <- event_data("plotly_relayout")
     
     # Update the reactive range value with new ranges
     new_xrange <- c(event$`xaxis.range[0]`, event$`xaxis.range[1]`)
     new_yrange <- c(event$`yaxis.range[0]`, event$`yaxis.range[1]`)
     if (!is.null(new_xrange) && !is.null(new_yrange)) {
-      current_range(list(xrange = new_xrange, yrange = new_yrange))
+      current_range <<- list(xrange = new_xrange, yrange = new_yrange)
       
       # now check zoom level
       zoom_level = max(abs(range(new_xrange)), abs(range(new_yrange)))
@@ -282,21 +286,6 @@ server <- function(input, output, session) {
   })
   
   output$plot <- renderPlotly({ 
-    
-    # set the default zoom to cover the IS and Periphery
-    xrange <- current_range()$xrange
-    if(is.null(current_range()$xrange)) {
-      xrange <- c(-610, 795)
-    }
-    yrange <- current_range()$yrange
-    if(is.null(current_range()$xrange)) {
-      yrange <- c(-595, 600)
-    }
-    
-    show_id <- show_labels()
-    if(is.null(show_id)) {
-      show_id <- FALSE
-    }
     
     map_data |>
       filter(input$show_unsettled | faction != "U") |>
@@ -307,9 +296,9 @@ server <- function(input, output, session) {
       plot_planets(input$date, 
                    choice_color = input$select_color,
                    faction_data = sucs_factions,
-                   show_id = show_id,
-                   xrange = xrange,
-                   yrange = yrange)
+                   show_id = FALSE,
+                   xrange = current_range$xrange,
+                   yrange = current_range$yrange)
   }) 
   
   output$download <- downloadHandler(
