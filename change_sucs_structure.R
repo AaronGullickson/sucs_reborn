@@ -444,6 +444,32 @@ sucs_data <- sucs_data |>
                  "pg. 20 (date approximate)", date("2950-01-01"), "A")
 
 
+## Aurigan Reach, Part 1 ##
+# So I think I just need to clean out any existing data from HBHA and 
+# then rebuild from scratch later.
+# For the period between 2765 and 2864, I can just turn all existing I entries
+# into U entries if they are in a certain area with the exception of Detroit,
+# Herotitus, and Spencer because these are the only cases showing on the map.
+bounding_box <- create_box("Bonavista", "Eliat", "Amnesty", "McEvans' Sacrifice")
+exceptions <- c("Herotitus", "Detroit", "Spencer", "Portland")
+sucs_data <- sucs_data |>
+  mutate(faction = if_else(is_in_box(x, y, bounding_box) & 
+                             faction %in% c("I", "A") & 
+                             !(id_mhq %in% exceptions) & 
+                             time_point %in% time_point_range("2765", "2864"), 
+                           "U", faction))
+# need to deal with a couple of abandoned CC planets that would later be part
+# of AuC: Panzyr, Mechdur, Mangzhangdian in 2830
+sucs_data <- sucs_data |>
+  correct_faction(c("Panzyr", "Mechdur", "Mangzhangdian"), 
+                  time_point_range("2830", "2864"), "A")
+# and Itrom, Tyrlon, and Smithon by 2864
+sucs_data <- sucs_data |>
+  correct_faction(c("Itrom", "Tyrlon", "Smithon"), "2864", "A")
+# Balawat only shows up in HBHA, so remove everything
+sucs_data <- sucs_data |>
+  filter(id_mhq != "Balawat")
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
