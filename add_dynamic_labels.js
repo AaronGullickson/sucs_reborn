@@ -1,6 +1,3 @@
-// This function will add dynamic labels to the plotly plot that only
-// appear at certain zoom levels
-
 function addPlotlyLabels(el, x) {
    console.log('Binding plotly_relayout and plotly_restyle events...');
    var plot = document.getElementById(el.id);
@@ -25,29 +22,28 @@ function addPlotlyLabels(el, x) {
          var zoomThreshold = 300;
          var annotations = [];
 
+         // Only add annotations if zoom level is below threshold
          if (zoomLevel < zoomThreshold) {
            console.log('Zoomed in: Showing labels');
 
            for (var i = 0; i < x.data.length; i++) {
              var trace = x.data[i];
 
-             // Check if the trace is visible (trace.visible is 'legendonly' when hidden)
-             if (trace.visible === true || trace.visible === undefined) {
-               for (var j = 0; j < trace.x.length; j++) {
-                 if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
-                   annotations.push({
-                     x: trace.x[j],
-                     y: trace.y[j],
-                     text: trace.customdata[j],
-                     showarrow: false,
-                     xanchor: 'left',
-                     yanchor: 'bottom',
-                     font: { 
-                       color: '#f2f2f2',
-                       size: 8
-                     }
-                   });
-                 }
+             // We no longer check visibility here; just add all relevant annotations
+             for (var j = 0; j < trace.x.length; j++) {
+               if (trace.x[j] >= xaxisMin && trace.x[j] <= xaxisMax && trace.y[j] >= yaxisMin && trace.y[j] <= yaxisMax) {
+                 annotations.push({
+                   x: trace.x[j],
+                   y: trace.y[j],
+                   text: trace.customdata[j],  // Using customdata for label text
+                   showarrow: false,
+                   xanchor: 'left',
+                   yanchor: 'bottom',
+                   font: { 
+                     color: '#f2f2f2',
+                     size: 8
+                   }
+                 });
                }
              }
            }
@@ -55,18 +51,28 @@ function addPlotlyLabels(el, x) {
            console.log('Zoomed out: Hiding labels');
          }
 
+         // After zoom/pan adjustments, update annotations
          Plotly.relayout(el, { annotations: annotations });
        }
        throttleTimeout = null;
      });
    }
 
-   // Listen for zoom/pan events
+   // Listen for zoom/pan events and update annotations
    el.on('plotly_relayout', updateAnnotations);
 
-   // Listen for legend clicks (trace visibility changes)
-   el.on('plotly_restyle', function() {
-     console.log('Legend clicked: Updating labels');
-     Plotly.relayout(el, { annotations: [] }); // Clear annotations
+   // This ensures the labels persist even after plot updates (like legend visibility change)
+   el.on('plotly_restyle', function(eventData) {
+     console.log('Plotly restyle event triggered: Updating labels');
+     // Force reapplication of annotations after restyle
+     updateAnnotations(eventData);
+   });
+
+   // Initial annotations setup
+   updateAnnotations({
+     'xaxis.range[0]': plot.layout.xaxis.range[0],
+     'xaxis.range[1]': plot.layout.xaxis.range[1],
+     'yaxis.range[0]': plot.layout.yaxis.range[0],
+     'yaxis.range[1]': plot.layout.yaxis.range[1]
    });
 }

@@ -246,8 +246,6 @@ server <- function(input, output, session) {
   # uncomment out to test out bootstrap themes
   #bs_themer()
   
-  show_labels <- reactiveVal(FALSE)
-  
   observeEvent(input$year,{
     updateDateInput(session, "date", 
                     value = date(paste(input$year, "01", "01", sep = "-")))
