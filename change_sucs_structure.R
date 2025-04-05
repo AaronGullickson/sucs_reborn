@@ -472,9 +472,9 @@ sucs_data <- sucs_data |>
 # and Itrom, Tyrlon, and Smithon by 2864
 sucs_data <- sucs_data |>
   correct_faction(c("Itrom", "Tyrlon", "Smithon"), "2864", "A")
-# Balawat only shows up in HBHA, so remove everything
+# Balawat only shows up in HBHA, so remove everything in the range
 sucs_data <- sucs_data |>
-  filter(id_mhq != "Balawat")
+  remove_cases("Balawat", time_point_range("2765", "3025"))
 # For the period between 3025 I think I can use a couple boxes again to
 # turn everything into abandoned unless they are U
 bounding_box <- create_box("Bonavista", "Eliat", "Girondas", "McEvans' Sacrifice")
@@ -2147,13 +2147,26 @@ sucs_data <- sucs_data |>
 
 ## 2765 ##
 # Independents
-independents <- c("Alloway", "Bonavista", "Sacromonte", "Polybius",
-                  "Bellerophon", "Don't (Mantharaka 3022+)", 
-                  "Tiburon (Tiverton 3022+)", 
-                  "Wheeler (Perian 2822+/Mystras 3022+)",                         
-                  "Chaadan (Chadan 2864+/Chandan 3022+)")
-  # MOC: Balawat, Cassilda
+sucs_data <- sucs_data |>
+  make_new_entries(c("Alloway", "Bonavista", "Sacromonte", 
+                     "Polybius (Appian 2822+)",
+                     "Bellerophon", "Don't (Mantharaka 3022+)", 
+                     "Tiburon (Tiverton 3022+)", 
+                     "Wheeler (Perian 2822+/Mystras 3022+)",                         
+                     "Chaadan (Chadan 2864+/Chandan 3022+)"), 
+                   "special", "map", "Handbook: House Arano", "p. 10", 
+                   date("2765-01-01"), "I")
+# MOC
+# TODO: Balawat has a different x and y (appears where Cassilda should)
+sucs_data <- sucs_data |>
+  make_new_entries(c("Balawat", "Cassilda"), 
+                   "special", "map", "Handbook: House Arano", "p. 10", 
+                   date("2765-01-01"), "MOC")
 # CC: Mandalas
+sucs_data <- sucs_data |>
+  make_new_entries("Mandalas", 
+                   "special", "map", "Handbook: House Arano", "p. 10", 
+                   date("2765-01-01"), "CC")
 
 # TODO: These are still kind of a cluster - waiting to finish the rest before
 # fixing

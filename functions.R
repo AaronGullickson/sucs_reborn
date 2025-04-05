@@ -99,6 +99,9 @@ make_new_entries <- function(map_data, id, time, type, title, loc, date, faction
   case <- map_data |> filter(id_mhq %in% id) |>
     filter(!duplicated(id_sucs)) |>
     arrange(id_mhq)
+  if(nrow(case) != length(id)) {
+    stop("Length of ids and cases found do not match in make_new_entries")
+  }
   id_sucs <- case |> pull(id_sucs)
   x <- case |> pull(x)
   y <- case |> pull(y)
@@ -150,12 +153,19 @@ faction_snapshot <- function(base_data, date) {
   # get the date for each planet closest to the date but not over
   base_data |>
     filter(source_date <= date) |>
-    # create a type priority
-    mutate(source_type = factor(source_type, 
-                                levels = c("errata", "text", "map"))) |>
+    
+    mutate(
+      # create a type priority
+      source_type = factor(source_type, levels = c("errata", "text", "map")),
+      # create a faction type for priority
+      faction_priority = case_when(
+        faction == "Abandoned" | faction == "Unsettled" ~ 1,
+        TRUE ~ 2
+      )) |>
     # arrange with most recent date at the top, and then break date
     # ties by source_type
-    arrange(id_sucs, desc(source_date), source_type) |>
+    arrange(id_sucs, desc(source_date), source_type, desc(faction_priority)) |>
     # remove duplicate planet entries
-    filter(!duplicated(id_sucs))
+    filter(!duplicated(id_sucs)) |>
+    select(-faction_priority)
 }
