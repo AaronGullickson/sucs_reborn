@@ -126,7 +126,5 @@ faction_snapshot <- function(base_data, date) {
     # ties by source_type
     arrange(id_sucs, desc(source_date), source_type) |>
     # remove duplicate planet entries
-    filter(!duplicated(id_sucs)) |>
-    select(starts_with("id_"), x, y, faction, starts_with("region"), capital,
-           source_type, source_title, source_loc, source_date)
+    filter(!duplicated(id_sucs))
 }
