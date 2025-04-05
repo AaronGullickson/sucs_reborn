@@ -69,8 +69,7 @@ plot_planets <- function(snapshot_data,
 }
 
 
-
-# Preliminary setup --------------------------------------------------------
+# Load and organize data --------------------------------------------------
 
 # unofficial way to determin if local but from Yihui Xie 
 is_local <- Sys.getenv('SHINY_PORT') == ""
@@ -86,44 +85,7 @@ if(is_local) {
 sucs_data <- read_csv(data_address)
 sucs_factions <- read_csv(factions_address)
 
-# get required lists and vectors
-source_types <- unique(sucs_data$source_type)
-names(source_types) <- str_to_title(source_types)
-isp_list <- c("Interstellar Players", "IE: Interstellar Players 3")
-time_periods <- list(
-  "Major Houses Founded (2366)" = "2366-12-31",
-  "Founding of the Star League (2571)" = "2571-12-31",
-  "End of Reunification War (2596)" = "2596-12-31",
-  "Height of the Star League (2750)" = "2750-12-31",
-  "Start of First Succession War (2786)" = "2786-01-01",
-  "End of First Succession War (2822)" = "2822-12-31",
-  "Start of Second Succession War (2830)" = "2830-01-01",
-  "End of Second Succession War (2864)" = "2864-12-31",
-  "End of Third Succession War (3025)" = "3025-12-31",
-  "End of Fourth Succession War (3030)" = "3030-01-31",
-  "End of War of 3039 (3040)" = "3040-01-31",
-  "Start of Clan Invasion (3049)" = "3049-06-01",
-  "End of Clan Invasion (3052)" = "3052-10-31",
-  "Start of FedCom Civil War (3063)" = "3063-12-31",
-  "End of FedCom Civil War (3067)" = "3067-10-31",
-  "Mid Jihad (3075)" = "3075-12-31",
-  "Late Jihad (3079)" = "3079-12-31",
-  "End of the Jihad (3081)" = "3081-12-31",
-  "Early Republic of the Sphere (3085)" = "3085-12-31",
-  "Late Republic of the Sphere (3130)" = "3130-01-01",
-  "Early Dark Age (3135)" = "3135-01-01",
-  "Late Dark Age (3145)" = "3145-01-01",
-  "The Fall of the Republic (3151)" = "3151-01-01",
-  "Dawn of the IlClan (3152)" = "3152-07-01"
-)
-
-# default settings that may get changed and need to be tracked
-# Use the whole Inner Sphere as the default range
-current_range <- list(xrange = c(-610, 795), yrange = c(-595, 600))
-
-# Organize the data for ease of use in the plot - this way this code only
-# has to be run once
-
+# Organize the data for ease of use in the plot
 map_data <- sucs_data |>
   # get strings for disputed cases
   mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
@@ -163,12 +125,54 @@ map_data <- sucs_data |>
                          source_str, source_date_str)
   )
 
+# Define globals --------------------------------------------------------
 
+# what source types do we have?
+source_types <- unique(map_data$source_type)
+names(source_types) <- str_to_title(source_types)
+
+# list of ISP sources to potentially exclude
+isp_list <- c("Interstellar Players", "IE: Interstellar Players 3")
+
+# list of eras
+eras <- list(
+  "Major Houses Founded (2366)" = "2366-12-31",
+  "Founding of the Star League (2571)" = "2571-12-31",
+  "End of Reunification War (2596)" = "2596-12-31",
+  "Height of the Star League (2750)" = "2750-12-31",
+  "Start of First Succession War (2786)" = "2786-01-01",
+  "End of First Succession War (2822)" = "2822-12-31",
+  "Start of Second Succession War (2830)" = "2830-01-01",
+  "End of Second Succession War (2864)" = "2864-12-31",
+  "End of Third Succession War (3025)" = "3025-12-31",
+  "End of Fourth Succession War (3030)" = "3030-01-31",
+  "End of War of 3039 (3040)" = "3040-01-31",
+  "Start of Clan Invasion (3049)" = "3049-06-01",
+  "End of Clan Invasion (3052)" = "3052-10-31",
+  "Start of FedCom Civil War (3063)" = "3063-12-31",
+  "End of FedCom Civil War (3067)" = "3067-10-31",
+  "Mid Jihad (3075)" = "3075-12-31",
+  "Late Jihad (3079)" = "3079-12-31",
+  "End of the Jihad (3081)" = "3081-12-31",
+  "Early Republic of the Sphere (3085)" = "3085-12-31",
+  "Late Republic of the Sphere (3130)" = "3130-01-01",
+  "Early Dark Age (3135)" = "3135-01-01",
+  "Late Dark Age (3145)" = "3145-01-01",
+  "The Fall of the Republic (3151)" = "3151-01-01",
+  "Dawn of the IlClan (3152)" = "3152-07-01"
+)
+
+# define color palettes. The palettes object should be a named list 
+# with the names corresponding to the the different color_choice options.
+# Each palette should be a named vector with names corresponding to all
+# possible options for a given color_choice
 palette_faction <- sucs_factions |> select(name, color) |> deframe()
 palette_source <- randomColor(length(unique(map_data$source_title)))
 names(palette_source) <- unique(map_data$source_title)
 palettes = list(faction = palette_faction, source_title = palette_source)
 
+# Set the initial zoom level/layout - use whole Inner Sphere as default
+current_range <- list(xrange = c(-610, 795), yrange = c(-595, 600))
 
 # Shiny app ---------------------------------------------------------------
 
@@ -179,55 +183,60 @@ ui <- page_fillable(
     card_header("Battletech Universe Faction Map"),
     layout_sidebar(
       sidebar = sidebar(
-        width = 350,
-        selectizeInput( 
-          inputId = "era",
-          label = h4("Pick an era..."), 
-          choices = time_periods,
-          selected = "3152-07-01"
+        width = 375,
+        card(
+          card_header("Choose time period"), 
+          selectizeInput( 
+            inputId = "era",
+            label = "Pick an era...", 
+            choices = eras,
+            selected = "3152-07-01"
+          ),
+          sliderInput(
+            inputId = "year", 
+            label = "Or select a year...", 
+            min = 2271, max = 3152, value = 3152, sep = ""), 
+          dateInput(
+            inputId = "date",
+            label = "Or choose a specific date...",
+            value = date("3152-07-01"),
+          )
         ),
-        sliderInput(
-          inputId = "year", 
-          label = h4("Or select a year..."), 
-          min = 2271, max = 3152, value = 3152, sep = ""), 
-        dateInput(
-          inputId = "date",
-          label = h4("Or choose a specific date..."),
-          value = date("3152-07-01"),
-        ),
-        selectInput( 
-          "select_color", 
-          h4("Color by:"), 
-          list("Faction" = "faction", "Source" = "source_title") 
+        card(
+          card_header("Map controls"),
+          selectInput( 
+            "select_color", 
+            "Color by:", 
+            list("Faction" = "faction", "Source" = "source_title") 
+          ),
+          checkboxGroupInput( 
+            "source_types", 
+            "Source Types:", 
+            source_types,
+            selected = source_types
+          ),
+          input_switch(
+            "show_unsettled", 
+            "Show unsettled planets?", 
+            FALSE
+          ), 
+          input_switch(
+            "show_hidden", 
+            "Show hidden/secret planets?", 
+            TRUE
+          ),
+          input_switch(
+            "use_isp", 
+            "Use Interstellar Players data?", 
+            TRUE
+          ),
+          input_switch(
+            "use_arano", 
+            "Use House Arano data?", 
+            TRUE
+          )
         ),
         downloadButton("download", "Download CSV file"),
-        h4("Further Map Controls"),
-        checkboxGroupInput( 
-          "source_types", 
-          h5("Source Types:"), 
-          source_types,
-          selected = source_types
-        ),
-        input_switch(
-          "show_unsettled", 
-          "Show unsettled planets?", 
-          FALSE
-        ), 
-        input_switch(
-          "show_hidden", 
-          "Show hidden/secret planets?", 
-          TRUE
-        ),
-        input_switch(
-          "use_isp", 
-          "Use Interstellar Players data?", 
-          TRUE
-        ),
-        input_switch(
-          "use_arano", 
-          "Use House Arano data?", 
-          TRUE
-        )
       ),
       plotlyOutput(outputId = "plot")
     )
