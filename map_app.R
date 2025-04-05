@@ -26,13 +26,7 @@ plot_planets <- function(snapshot_data,
                          choice_color = "faction",
                          palette_color = palettes[["faction"]]) {
   
-  # Determine color palette - give a named vector to make sure colors match
-  # in subsets
-  if(choice_color == "faction") {
-    legend_name <- "Faction"
-  } else {
-    legend_name <- "Source"
-  }
+  legend_name <- choice_color |> str_replace_all("_", " ") |> str_to_title()
   
   faction_capital_data <- snapshot_data |> 
     filter(capital == "Faction")
@@ -173,7 +167,7 @@ map_data <- sucs_data |>
 palette_faction <- sucs_factions |> select(name, color) |> deframe()
 palette_source <- randomColor(length(unique(map_data$source_title)))
 names(palette_source) <- unique(map_data$source_title)
-palettes = list(faction = palette_faction, source = palette_source)
+palettes = list(faction = palette_faction, source_title = palette_source)
 
 
 # Shiny app ---------------------------------------------------------------
