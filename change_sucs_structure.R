@@ -522,14 +522,22 @@ sucs_data <- sucs_data |>
 # PR formed the FWL on 2271-06-02. So add that data
 fwl_founders <- sucs_data |>
   filter(time_point == "2271" & faction %in% c("FO", "MCM", "PR", "SC")) |>
-  mutate(source_date = date("2271-06-02"),
-         region1 = case_when(
-           faction == "MCM" ~ "Marik Commonwealth",
-           faction == "PR" ~ "Prinicipality of Regulus",
-           faction == "SC" ~ "Steward Confederation",
-           faction == "FO" ~ "Federation of Oriente"
-         ),
-         faction = "FWL")
+  mutate(
+    source_title = "Handbook: House Marik",
+    source_loc = "p. 16",
+    source_date = date("2271-06-02"),
+    region1 = case_when(
+      faction == "MCM" ~ "Marik Commonwealth",
+      faction == "PR" ~ "Prinicipality of Regulus",
+      faction == "SC" ~ "Steward Confederation",
+      faction == "FO" ~ "Federation of Oriente"
+    ),
+    capital = case_when(
+      id_mhq %in% c("Regulus", "Stewart", "Oriente", "Marik") ~ "Major",
+      id_mhq == "Atreus (FWL)" ~ "Faction",
+      TRUE ~ NA
+    ),
+    faction = "FWL")
 
 sucs_data <- sucs_data |>
   bind_rows(fwl_founders)
