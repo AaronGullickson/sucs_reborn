@@ -240,6 +240,11 @@ ui <- page_fillable(
             FALSE
           ), 
           input_switch(
+            "show_abandoned", 
+            "Show abandoned planets?", 
+            TRUE
+          ), 
+          input_switch(
             "show_hidden", 
             "Show hidden/secret planets?", 
             TRUE
@@ -325,6 +330,7 @@ server <- function(input, output, session) {
       filter(source_type %in% input$source_types) |>
       faction_snapshot(input$date) |>
       filter(input$show_unsettled | faction != "Unsettled") |>
+      filter(input$show_abandoned | faction != "Abandoned") |>
       filter(input$show_hidden | !hidden) |>
       plot_planets(paste(input$date), 
                    choice_color = input$select_color,
@@ -342,6 +348,7 @@ server <- function(input, output, session) {
         filter(source_type %in% input$source_types) |>
         faction_snapshot(input$date) |>
         filter(input$show_unsettled | faction != "Unsettled") |>
+        filter(input$show_abandoned | faction != "Abandoned") |>
         filter(input$show_hidden | !hidden) |>
         write_csv(file)
     }
