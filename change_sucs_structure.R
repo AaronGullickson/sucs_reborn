@@ -733,18 +733,6 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", "TH", "DC", "CC", "OA", "LC", "FWL", "RW")
   )
 
-# Handbook: House Steiner
-bounding_box <- create_box("Slewis", "Achernar", "Crellacor", "Gei-Fu")
-sucs_data <- sucs_data |>
-  update_sources(
-    target = "2571", 
-    title = "Handbook: House Steiner", 
-    loc = "p. 25",
-    date = date("2571-07-09"), 
-    box = bounding_box, 
-    factions = c("I", "U", "A", "TH", "DC", "CC", "OA", "LC", "FWL", "RW")
-  )
-
 # Handbook: House Liao
 bounding_box <- create_box("Sheridan (FWL)", "Ridgebrook", "Caph", "Harminous")
 sucs_data <- sucs_data |>

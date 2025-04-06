@@ -45,28 +45,22 @@ time_point_range <- function(start,
 
 update_sources <- function(map_data, target, title, loc, date, 
                            box = NULL, factions = NULL) {
-  map_data |> 
-    # First, drop any values from sucs_data from the target_time 
-    mutate(
-      # only change values that are from the target time and in
-      # the bounding box and come from acceptable factions
-      change_source = (time_point == target) & is_in_box(x, y, box) & 
-        (is.null(faction) | 
-           faction %in% factions | 
-           # always accept disputed codes
-           str_detect(faction, "^D\\(")),
-      # add source information
-      source_title = case_when(
-        !change_source ~ source_title,
-        time_point == target ~ title),
-      source_loc = case_when(
-        !change_source ~ source_loc,
-        time_point == target ~ loc),
-      source_date = case_when(
-        !change_source ~ source_date,
-        time_point == target ~ date)
-    )
+  updated_entries <- map_data |> 
+    # get target cases
+    filter((time_point == target) & is_in_box(x, y, box) & 
+             (is.null(faction) | 
+                faction %in% factions | 
+                # always accept disputed codes
+                str_detect(faction, "^D\\("))) |>
+    mutate(time_point = "updated",
+           # add source information
+           source_title =  title,
+           source_loc = loc,
+           source_date =  date)
   
+  # bind this new data back into map data
+  map_data |> 
+    bind_rows(updated_entries)
 }
 
 correct_faction <- function(map_data, id, time_target, new_faction) {
@@ -105,7 +99,7 @@ make_new_entries <- function(map_data, id, time, type, title, loc, date, faction
   id_sucs <- case |> pull(id_sucs)
   x <- case |> pull(x)
   y <- case |> pull(y)
-  map_data <- map_data |>
+  map_data |>
     bind_rows(
       tibble(
         id_sucs = id_sucs,
@@ -144,7 +138,6 @@ add_errata <- function(map_data,
   # now bind the errata back to the full data
   map_data |>
     bind_rows(errata_data)
-  
 }
 
 
@@ -153,7 +146,6 @@ faction_snapshot <- function(base_data, date) {
   # get the date for each planet closest to the date but not over
   base_data |>
     filter(source_date <= date) |>
-    
     mutate(
       # create a type priority
       source_type = factor(source_type, levels = c("errata", "text", "map")),
@@ -164,7 +156,13 @@ faction_snapshot <- function(base_data, date) {
       )) |>
     # arrange with most recent date at the top, and then break date
     # ties by source_type
-    arrange(id_sucs, desc(source_date), source_type, desc(faction_priority)) |>
+    arrange(
+      id_sucs,                    # sort first by id, duh
+      desc(source_date),          # sort to get closest date at the top
+      source_type,                # sort by type priority
+      desc(faction_priority),     # sort by faction priority
+      source_title                # sort by source preference (must be defined in input)
+    ) |>
     # remove duplicate planet entries
     filter(!duplicated(id_sucs)) |>
     select(-faction_priority)

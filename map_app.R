@@ -78,15 +78,20 @@ is_local <- Sys.getenv('SHINY_PORT') == ""
 if(is_local) {
   data_address <- here("data", "sucs_data.csv")
   factions_address <- here("data", "sucs_factions.csv")
+  sources_address <- here("data", "sucs_sources.csv")
 } else {
   data_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv"
   factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_factions.csv"
+  sources_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_sources.csv"
 }
 sucs_data <- read_csv(data_address)
 sucs_factions <- read_csv(factions_address)
+sucs_sources <- read_csv(sources_address)
 
 # Organize the data for ease of use in the plot
 map_data <- sucs_data |>
+  # remove any duplicates (shouldn't be, but good to check)
+  distinct() |>
   # get strings for disputed cases
   mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
   separate_wider_delim(disputed, ",", too_few = "align_start", 
@@ -107,6 +112,9 @@ map_data <- sucs_data |>
     faction = factor(faction, 
                      levels = sucs_factions$id_sucs, 
                      labels = sucs_factions$name),
+    # now turn source_title into a factor
+    source_title = factor(source_title,
+                           levels = sucs_sources$source),
     # construct strings for the map display
     faction_str = if_else(disputed == "", 
                           paste0(faction, "<br>"),
