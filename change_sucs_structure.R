@@ -831,7 +831,7 @@ bounding_box <- create_box("Hunter's Paradise", "Pilon", "Syrstart", "Helvetica"
 sucs_data <- sucs_data |>  
   update_sources(
     target = "2765", 
-    title = "Liberation of Terra, Vol. I", 
+    title = "Liberation of Terra, Vol. 1", 
     loc = "pp. 10-11",
     date = date("2765-01-01"), 
     box = bounding_box, 
