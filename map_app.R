@@ -131,6 +131,12 @@ map_data <- sucs_data |>
 source_types <- unique(map_data$source_type)
 names(source_types) <- str_to_title(source_types)
 
+# what planets do we have
+planet_ids <- sort(unique(map_data$id_mhq))
+system_coords <- map_data |>
+  select(id_mhq, x, y) |>
+  distinct()
+
 # list of ISP sources to potentially exclude
 isp_list <- c("Interstellar Players", "IE: Interstellar Players 3")
 
@@ -204,6 +210,11 @@ ui <- page_fillable(
         ),
         card(
           card_header("Map controls"),
+          selectizeInput( 
+            "select_planet", 
+            "Center on:", 
+            choices = NULL
+          ),
           selectInput( 
             "select_color", 
             "Color by:", 
@@ -248,6 +259,13 @@ server <- function(input, output, session) {
   # uncomment out to test out bootstrap themes
   #bs_themer()
   
+  trigger_recenter <- reactiveVal(0)
+  
+  # use server side selectize for speed
+  updateSelectizeInput(session, 'select_planet', 
+                       choices = c("Choose planet...", planet_ids),
+                       server = TRUE)
+  
   observeEvent(input$year,{
     updateDateInput(session, "date", 
                     value = date(paste(input$year, "01", "01", sep = "-")))
@@ -257,6 +275,22 @@ server <- function(input, output, session) {
   observeEvent(input$era,{
     updateDateInput(session, "date", value = date(input$era))
     
+  })
+  
+  observeEvent(input$select_planet, {
+    # check for recentering
+    if(input$select_planet != "" & input$select_planet != "Choose planet...") {
+      coords <- system_coords |> filter(id_mhq == input$select_planet)
+      if(nrow(coords) == 1) {
+        new_xrange <- c(coords$x - diff(current_range$xrange)/2,
+                        coords$x + diff(current_range$xrange)/2)
+        new_yrange <- c(coords$y - diff(current_range$yrange)/2,
+                        coords$y + diff(current_range$yrange)/2)
+        current_range <<- list(xrange = new_xrange, yrange = new_yrange)
+        # trigger a redraw with a recentering
+        trigger_recenter(trigger_recenter() + 1)
+      }
+    }
   })
   
   # Capture range changes using the relayout event
@@ -273,6 +307,9 @@ server <- function(input, output, session) {
   })
   
   output$plot <- renderPlotly({ 
+    
+    # check for recenter
+    trigger_recenter()
     
     map_data |>
       filter(input$use_isp | !(source_title %in% isp_list)) |>
