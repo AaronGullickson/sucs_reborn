@@ -23,6 +23,7 @@ js_dynamic_labels <- paste(readLines("add_dynamic_labels.js"), collapse = "\n")
 # the plotting function
 plot_planets <- function(snapshot_data,
                          title = "Battletech Faction Map", 
+                         use_polygons = FALSE,
                          xrange = c(-610, 795),
                          yrange = c(-595, 600),
                          choice_color = "faction",
@@ -44,7 +45,7 @@ plot_planets <- function(snapshot_data,
     ggplot(aes(x = x, y = y, text = text_plotly, color = !!sym(choice_color),
                customdata = id_mhq))
   
-  if(choice_color == "faction") {
+  if(use_polygons & choice_color == "faction") {
     # add hulls
     hull_data <- snapshot_data |>
       group_by(faction) |>
@@ -79,20 +80,6 @@ plot_planets <- function(snapshot_data,
           plot.background = element_rect(fill = "#3B4D5B"),
           text = element_text(color = "#EBEBEB"))
   
-  if(choice_color == "faction") {
-    # add hulls
-    hull_data <- snapshot_data |>
-      filter(!(faction %in% c("Abandoned", "Unsettled", "Independent",
-                              "Disputed", "Interstellar Expeditions",
-                              "Clan Sea Fox", "ComStar"))) |>
-               generate_hull()
-    map <- map +
-      geom_polygon(data = hull_data, 
-                   aes(x = X, y = Y, fill = faction, group = faction), 
-                   alpha = 0.2,
-                   inherit.aes = FALSE)
-  }
-  
   map <- ggplotly(map, tooltip = "text") |>
     config(scrollZoom = TRUE)  |> 
     layout(dragmode = "pan",
@@ -110,25 +97,27 @@ generate_hull <- function(map_data) {
     # Convert to sf POINT, CRS is NA for cartesian plot
     st_as_sf(coords = c("x", "y"), crs = NA) |>
     group_by(faction) |>
+    # need more than 3 planets to do it
     filter(n() > 3) |>
     group_split() |>
     map(function(group_data) {
-      # remove outliers
+      # remove outliers that are more than 500 LY from centroid
       group_data <- remove_outliers(group_data, 500)
       if(nrow(group_data) == 0) {
         return(NULL)
       }
-      # Concave hull
-      hull <- concaveman(group_data)
-      # Buffer
-      hull_buff <- st_buffer(hull, dist = 30)  # 5km outward buffer
-      # Smooth the polygon
-      hull_smooth <- smooth(hull_buff, method = "ksmooth", smoothness = 5)
-      # get coordinates for plotting
-      hull_df <- as.data.frame(st_coordinates(hull_smooth))
-      # Add group column to hull for coloring
-      hull_df$faction <- group_data$faction[1]  # Use the group's identifier
-      return(hull_df)
+      
+      # concaveman will find a concave hull
+      hull <- concaveman(group_data) |>
+        # buffer out to 30 LY
+        st_buffer(dist = 30) |>
+        # Smooth the edges
+        smooth(method = "ksmooth", smoothness = 5) |>
+        # convert to coordinates for plotting
+        st_coordinates() |>
+        as_tibble() |>
+        # add faction back in
+        mutate(faction = group_data$faction[1])
     }) |>
     bind_rows()
 }
@@ -137,13 +126,10 @@ generate_hull <- function(map_data) {
 remove_outliers <- function(group_data, max_distance) {
   # Calculate the centroid (center of mass) for the group
   centroid <- st_centroid(st_union(group_data))
-  
   # Calculate the distance of each point from the centroid
   distances <- st_distance(group_data, centroid)
-  
   # Keep only the points within the maximum distance threshold
   filtered_points <- group_data[distances <= max_distance, ]
-  
   return(filtered_points)
 }
 
@@ -315,6 +301,11 @@ ui <- page_fillable(
             selected = source_types
           ),
           input_switch(
+            "show_boundaries", 
+            "Show boundaries (slower)?", 
+            TRUE
+          ), 
+          input_switch(
             "show_unsettled", 
             "Show unsettled planets?", 
             FALSE
@@ -322,7 +313,7 @@ ui <- page_fillable(
           input_switch(
             "show_abandoned", 
             "Show abandoned planets?", 
-            TRUE
+            FALSE
           ), 
           input_switch(
             "show_hidden", 
@@ -413,6 +404,7 @@ server <- function(input, output, session) {
       filter(input$show_abandoned | faction != "Abandoned") |>
       filter(input$show_hidden | !hidden) |>
       plot_planets(paste(input$date), 
+                   use_polygons = input$show_boundaries,
                    choice_color = input$select_color,
                    palette_color = palettes[[input$select_color]],
                    xrange = current_range$xrange,
