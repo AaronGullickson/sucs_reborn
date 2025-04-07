@@ -59,8 +59,7 @@ plot_planets <- function(snapshot_data,
                        text = faction), 
                    alpha = 0.2,
                    inherit.aes = FALSE,
-                   show.legend = FALSE,
-                   name = NULL)
+                   show.legend = FALSE)
   }
   
   map <- map + 
