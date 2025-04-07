@@ -574,6 +574,8 @@ sucs_data <- sucs_data |>
 dc_founders <- sucs_data |>
   filter(time_point == "2319" & faction == "AG") |>
   mutate(source_date = date("2319-09-30"),
+         source_title = "Handbook: House Kurita",
+         source_loc = "p. 18",
          faction = "DC")
 
 sucs_data <- sucs_data |>
@@ -597,13 +599,15 @@ sucs_data <- sucs_data |>
 lc_founders <- sucs_data |>
   filter(time_point == "2341" & faction %in% c("TamP", "FoS", "PD")) |>
   mutate(source_date = date("2341-01-01"),
+         source_title = "Handbook: House Steiner",
+         source_loc = "p. 13",
          faction = "LC")
 
 sucs_data <- sucs_data |>
   bind_rows(lc_founders)
 
 # Handbook: House Liao
-bounding_box <- create_box("Gannett", "Ridgebrook", "Ronel", "Ghorepani")
+bounding_box <- create_box("Helm", "Ridgebrook", "Ronel", "Ghorepani")
 sucs_data <- sucs_data |>
   update_sources(
     target = "2366", 
@@ -624,16 +628,20 @@ sucs_data <- sucs_data |>
 # CC at this time according to map, so add them manually here
 independent_cc <- sucs_data |> 
   # most of the independents on this map should be CC
-  filter(time_point == "2366" & faction == "I") |>
+  filter(time_point == "2366" & 
+           faction == "I" & 
+           is_in_box(x, y, bounding_box)) |>
   # remove the few cases that are not
   filter((!id_mhq %in% c("Aspropirgos", "Gouderak", "Calseraigne", "Ghorepani",
-                         "Sunnywood", "Scheuerheck")))
+                         "Sunnywood", "Scheuerheck", "Eleusis")))
 
 cc_founders <- sucs_data |>
   filter(time_point == "2366" & 
            faction %in% c( "DL", "SS", "SIML", "CCom", "SiS", "TGU")) |>
   bind_rows(independent_cc) |>
   mutate(source_date = date("2366-07-15"),
+         source_title = "Handbook: House Liao",
+         source_loc = "p. 17",
          faction = "CC")
 
 sucs_data <- sucs_data |>
