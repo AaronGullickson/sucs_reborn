@@ -1694,7 +1694,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "FWL", "LA", "DC", 
                  "CS", "FR", "WB",
-                 "CWF", "CJF", "GBD", "CNC",
+                 "CWF", "CJF", "GBD", "CNC", "CDS",
                  "TCC", "SS", "DS", "ST", "SKC",
                  "MOC", "TC", "CDP", "OA", "CF", "MH",
                  "TD", "RC", "FrR")
@@ -1717,7 +1717,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "LA", "DC", "RS",
                  "CS", "WB",
-                 "CWF", "CJF", "GBD", "CNC", "CHH",
+                 "CWF", "CJF", "GBD", "CNC", "CHH", "CDS",
                  "MCM", "PR", "DO", "DA", "DGM", "MSC", "TP", "DoO", "RFS", "PG", 
                  "MA", "DTA", "OZP", "SHC", 
                  "RCM", "FvC",
@@ -1748,7 +1748,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "LA", "DC", "FWL", "CoF",
                  "CS", "WB",
-                 "CWF", "CJF", "GBD", "CNC", "CHH",
+                 "CWF", "CJF", "GBD", "CNC", "CHH", "CDS",
                  "AB", "RCM", "FvC", "MC", "KP",
                  "MOC", "TC", "CDP", "OA", "MH", "CF",
                  "TD", "RC", "FrR")
@@ -1771,7 +1771,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "FS", "LA", "DC", "RS", "CoF",
                  "CS", "WB",
-                 "CWF", "CJF", "GBD", "CNC", "CHH",
+                 "CWF", "CJF", "GBD", "CNC", "CHH", "CDS",
                  "AB", "OA")
   )
 
@@ -1828,7 +1828,7 @@ sucs_data <- sucs_data |>
     date = date("3079-08-01"), 
     box = bounding_box, 
     factions = c("I", "U", "A", 
-                 "LA", "FWL", "CC", "DC", "RS", "CoF",
+                 "LA", "FWL", "CC", "DC", "RS", "CoF", "CDS",
                  "CJF", "CWF", "CHH", "GBD",
                  "CS", "WB",
                  "CF", "MH", "AB")
@@ -1939,7 +1939,7 @@ sucs_data <- sucs_data |>
     box = bounding_box, 
     factions = c("I", "U", "A", 
                  "DC", "LA",
-                 "GBD", "CHH", "CWF", "CJF")
+                 "GBD", "CHH", "CWF", "CJF", "CDS")
   )
 
 # Field Reports: Clan, Jade Falcon map
@@ -1954,7 +1954,7 @@ sucs_data <- sucs_data |>
     box = bounding_box, 
     factions = c("I", "U", "A", 
                  "LA",
-                 "GBD", "CHH", "CWF", "CJF")
+                 "GBD", "CHH", "CWF", "CJF", "CDS")
   )
 
 # Field Reports: Clan, Wolf, Hell's Horses map
@@ -1969,7 +1969,7 @@ sucs_data <- sucs_data |>
     box = bounding_box, 
     factions = c("I", "U", "A", 
                  "LA", "DC",
-                 "GBD", "CHH", "CWF", "CJF")
+                 "GBD", "CHH", "CWF", "CJF", "CDS")
   )
 
 # Field Reports: Clan, Snow Ravens and OA
@@ -2016,7 +2016,7 @@ sucs_data <- sucs_data |>
     factions = c("I", "U", "A", 
                  "CC", "FS", "LC", "DC", "RS",
                  "CS", "WB",
-                 "CWF", "CJF", "GBD", "CNC", "CHH", "RA",
+                 "CWF", "CJF", "GBD", "CNC", "CHH", "RA", "CDS",
                  "MSC", "PR", "DO", "DA", "DGM", "TP", "RFS", "MA", "DTA", 
                  "RCM", "SHC",  
                  "MOC", "TC", "CDP", "OA", "MH",
