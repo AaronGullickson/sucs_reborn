@@ -9,6 +9,8 @@ library(tidyverse)
 library(here)
 library(plotly)
 library(randomcoloR)
+library(sf)
+library(smoothr)
 
 # Functions ---------------------------------------------------------------
 
@@ -40,7 +42,24 @@ plot_planets <- function(snapshot_data,
   # Base ggplot
   map <- snapshot_data |>
     ggplot(aes(x = x, y = y, text = text_plotly, color = !!sym(choice_color),
-               customdata = id_mhq)) +
+               customdata = id_mhq))
+  
+  if(choice_color == "faction") {
+    # add hulls
+    hull_data <- snapshot_data |>
+      group_by(faction) |>
+      filter(!(faction %in% c("Abandoned", "Unsettled", "Independent",
+                              "Interstellar Expeditions", "Disputed",
+                              "Clan Sea Fox", "ComStar"))) |>
+      generate_hull()
+    map <- map +
+      geom_polygon(data = hull_data, 
+                   aes(x = X, y = Y, fill = faction, group = faction), 
+                   alpha = 0.2,
+                   inherit.aes = FALSE)
+  }
+  
+  map <- map + 
     # some fancy stuff here for capital rings
     geom_point(data = faction_capital_data, size = 4)+
     geom_point(data = faction_capital_data, color = "grey20", size = 2.5)+
@@ -50,13 +69,29 @@ plot_planets <- function(snapshot_data,
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
     geom_point(size = 2) +
     scale_color_manual(values = palette_color)+
+    scale_fill_manual(values = palette_color)+
     labs(title = title, color = legend_name)+
+    guides(fill = "none")+
     theme_void() +
     theme(panel.background = element_rect(fill = "grey20"),
           panel.grid = element_blank(),
           # these colors work well with superhero theme - change if it changes
           plot.background = element_rect(fill = "#3B4D5B"),
           text = element_text(color = "#EBEBEB"))
+  
+  if(choice_color == "faction") {
+    # add hulls
+    hull_data <- snapshot_data |>
+      filter(!(faction %in% c("Abandoned", "Unsettled", "Independent",
+                              "Disputed", "Interstellar Expeditions",
+                              "Clan Sea Fox", "ComStar"))) |>
+               generate_hull()
+    map <- map +
+      geom_polygon(data = hull_data, 
+                   aes(x = X, y = Y, fill = faction, group = faction), 
+                   alpha = 0.2,
+                   inherit.aes = FALSE)
+  }
   
   map <- ggplotly(map, tooltip = "text") |>
     config(scrollZoom = TRUE)  |> 
@@ -67,6 +102,51 @@ plot_planets <- function(snapshot_data,
   
   return(map)
 }
+
+# generate hulls
+generate_hull <- function(map_data) {
+  map_data |>
+    select(x, y, faction) |>
+    # Convert to sf POINT, CRS is NA for cartesian plot
+    st_as_sf(coords = c("x", "y"), crs = NA) |>
+    group_by(faction) |>
+    filter(n() > 3) |>
+    group_split() |>
+    map(function(group_data) {
+      # remove outliers
+      group_data <- remove_outliers(group_data, 500)
+      if(nrow(group_data) == 0) {
+        return(NULL)
+      }
+      # Concave hull
+      hull <- concaveman(group_data)
+      # Buffer
+      hull_buff <- st_buffer(hull, dist = 30)  # 5km outward buffer
+      # Smooth the polygon
+      hull_smooth <- smooth(hull_buff, method = "ksmooth", smoothness = 5)
+      # get coordinates for plotting
+      hull_df <- as.data.frame(st_coordinates(hull_smooth))
+      # Add group column to hull for coloring
+      hull_df$faction <- group_data$faction[1]  # Use the group's identifier
+      return(hull_df)
+    }) |>
+    bind_rows()
+}
+
+# remove observations that are a long way from the centroid
+remove_outliers <- function(group_data, max_distance) {
+  # Calculate the centroid (center of mass) for the group
+  centroid <- st_centroid(st_union(group_data))
+  
+  # Calculate the distance of each point from the centroid
+  distances <- st_distance(group_data, centroid)
+  
+  # Keep only the points within the maximum distance threshold
+  filtered_points <- group_data[distances <= max_distance, ]
+  
+  return(filtered_points)
+}
+
 
 
 # Load and organize data --------------------------------------------------
