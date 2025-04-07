@@ -2167,9 +2167,21 @@ sucs_data <- sucs_data |>
 
 
 # The 3095 data is for IE: ISP3 data, ignore everything else
-# TODO: there is a bunch of stuff here that is misidentified as independent 
-# or IE that should not even be habitable systems. 
-# starting a list, but probably needs to be added to and checked
+# There is a bunch of stuff here that is misidentified as independent 
+# or IE that should not even be habitable systems. Making all clusters U as 
+# well as a few others taht are clearly U
+sucs_data <- sucs_data |>
+  correct_faction(c("Star Cluster P24", "Star Cluster P12", "Star Cluster A51",
+                    "Theta Carinae Cluster", "Jordian Cluster", 
+                    "Malador Cluster", "Star Cluster 814", "The Eyes in the Dark",
+                    "The Swan's Eye", "T Cephei (The Devil's Eye)", 
+                    "Monument to Man", "Mauna Loa", "Star Cluster Briceno 1",
+                    "Star Cluster 643", "Star Cluster 1108 (RW)", "Rover", 
+                    "California Nebula", "Star Cluster 752", "Star Cluster 889",
+                    "Death's Gaze Cluster", "Star Cluster 1108 (SW)",
+                    "Nebula D77", "Beehive Cluster", "Star Cluster 65"),
+                  "3095",
+                  "U")
 
 # Coreward - this misses Star Cluster A51 and Theta Carinae Cluster
 bounding_box <- create_box("Waystation 531", 
