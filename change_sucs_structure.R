@@ -2169,7 +2169,7 @@ sucs_data <- sucs_data |>
 # The 3095 data is for IE: ISP3 data, ignore everything else
 # There is a bunch of stuff here that is misidentified as independent 
 # or IE that should not even be habitable systems. Making all clusters U as 
-# well as a few others taht are clearly U
+# well as a few others that are clearly U
 sucs_data <- sucs_data |>
   correct_faction(c("Star Cluster P24", "Star Cluster P12", "Star Cluster A51",
                     "Theta Carinae Cluster", "Jordian Cluster", 
