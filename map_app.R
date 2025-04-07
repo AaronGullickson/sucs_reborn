@@ -277,15 +277,22 @@ ui <- page_fillable(
             choices = eras,
             selected = "3152-07-01"
           ),
-          sliderInput(
-            inputId = "year", 
-            label = "Or select a year...", 
-            min = 2271, max = 3152, value = 3152, sep = ""
-          ), 
           dateInput(
             inputId = "date",
             label = "Or choose a specific date...",
             value = date("3152-07-01"),
+          ),
+          p("Advance date by a ..."),
+          fluidRow(
+            actionButton("increment_year", "year", style = 'display: inline-block; margin-left: 15px;', width = 100), 
+            actionButton("increment_month", "month", style = 'display: inline-block;', width = 100), 
+            actionButton("increment_day", "day", style = 'display: inline-block;', width = 100)
+          ),
+          p("Reverse date by a ..."),
+          fluidRow(
+            actionButton("decrement_year", "year", style = 'display: inline-block; margin-left: 15px;', width = 100), 
+            actionButton("decrement_month", "month", style = 'display: inline-block;', width = 100), 
+            actionButton("decrement_day", "day", style = 'display: inline-block;', width = 100)
           )
         ),
         card(
@@ -367,6 +374,36 @@ server <- function(input, output, session) {
   
   observeEvent(input$era,{
     updateDateInput(session, "date", value = date(input$era))
+    
+  })
+  
+  observeEvent(input$increment_year,{
+    updateDateInput(session, "date", value = (input$date %m+% years(1)))
+    
+  })
+  
+  observeEvent(input$increment_month,{
+    updateDateInput(session, "date", value = (input$date %m+% months(1)))
+    
+  })
+  
+  observeEvent(input$increment_day,{
+    updateDateInput(session, "date", value = (input$date %m+% days(1)))
+    
+  })
+  
+  observeEvent(input$decrement_year,{
+    updateDateInput(session, "date", value = (input$date %m-% years(1)))
+    
+  })
+  
+  observeEvent(input$decrement_month,{
+    updateDateInput(session, "date", value = (input$date %m-% months(1)))
+    
+  })
+  
+  observeEvent(input$decrement_day,{
+    updateDateInput(session, "date", value = (input$date %m-% days(1)))
     
   })
   
