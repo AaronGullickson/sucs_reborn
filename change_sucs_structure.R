@@ -217,6 +217,12 @@ sucs_data <- sucs_data |>
   make_new_entries("Antallos (Port Krin)", "special", "text", 
                    "Mercenary FM Supplemental 2", "p. 12", date("2674-01-01"),
                    "SL")
+# Antallos is also listed as belonging to the Snow Ravens in 3067, but I see
+# no evidence of that on the map in 3067 and I don't think they were in the IS
+# until much later in the Jihad
+sucs_data <- sucs_data |>
+  correct_faction("Antallos (Port Krin)", "3067", "I")
+
 
 ## Oberon Confederation ##
 # Sigurd, Oberon VI, and Crellacor are showing up as OC from 2783. The OG 
