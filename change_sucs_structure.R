@@ -241,9 +241,10 @@ sucs_data <- sucs_data |>
 # The St. Andreas entry is from Interstellar Expeditions: Interstellar Players 3
 # and provides an exact date of settlement of 1st of February 2768. It doesn't 
 # change after that, so we should remove all entries from 2786 forward and 
-# replace with a text entry
+# replace with a text entry (except for the map of 3095)
 sucs_data <- sucs_data |>
-  remove_cases("St. Andreas", time_point_range("2783"))
+  remove_cases("St. Andreas", c(time_point_range("2783", "3085"),
+                                time_point_range("3130")))
 
 sucs_data <- sucs_data |>
   make_new_entries("St. Andreas", "special", "text", "IE: Interstellar Players 3",
@@ -253,11 +254,12 @@ sucs_data <- sucs_data |>
 # This is an IE: ISP3 entry and it says the colony of ... fish people ...
 # was founded in the "late 2690s". It is still existing today, although in a 
 # somewhat ... unusual state. So, like St. Andreas above, we should wipe out
-# all the map references and make a two entries - one for an SL faction and 
-# then a fall of the SL date to I.
+# all the map references and make a two entries (except 3095) - one for an SL 
+# faction and then a fall of the SL date to I.
 sucs_data <- sucs_data |>
-  remove_cases("Frobisher", time_point_range("2750"))
-
+  remove_cases("Frobisher", c(time_point_range("2750", "3085"),
+                              time_point_range("3130"))
+)
 sucs_data <- sucs_data |>
   make_new_entries("Frobisher", "special", "text", "IE: Interstellar Players 3",
                    "p. 81", date("2699-12-31"), "SL")
@@ -293,9 +295,11 @@ sucs_data <- sucs_data |>
 # This was originally part of MOC but was abandoned by 2864 map. The 
 # SUCK has it as independent from 3040 map onward, but it is only from IE:ISP3
 # entry regarding Marian Hegemony slaves refounding a colony there in 3044.
-# So remove all entries after 2864 and then add a text entry in 3044.
+# So remove all entries after 2864 (except 3095) and then add a text entry in 
+# 3044.
 sucs_data <- sucs_data |>
-  remove_cases("Kleinwelt", time_point_range("3025"))
+  remove_cases("Kleinwelt", c(time_point_range("3025", "3085"),
+                              time_point_range("3130")))
 
 sucs_data <- sucs_data |>
   make_new_entries("Kleinwelt", "special", "text", "IE: Interstellar Players 3", 
@@ -2163,18 +2167,135 @@ sucs_data <- sucs_data |>
 
 
 # The 3095 data is for IE: ISP3 data, ignore everything else
-#TODO: this treats all I, U, and A as in IE: ISP3 but clearly that should
-# not be the case for stuff in the main IS, so I think we need to break this
-# into four maps for each cardinal direction
-bounding_box <- create_box("Heidrunn", 
-                           "Star Cluster 643", 
+# TODO: there is a bunch of stuff here that is misidentified as independent 
+# or IE that should not even be habitable systems. 
+# starting a list, but probably needs to be added to and checked
+
+# Coreward - this misses Star Cluster A51 and Theta Carinae Cluster
+bounding_box <- create_box("Waystation 531", 
+                           "Salonika", 
                            "Star Cluster P24", 
+                           "Columbus (Epsilon Pegasus)")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 30",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE")
+  )
+# add Star Cluster A51 and Theta Carinae Cluster
+bounding_box <- create_box("Star Cluster A51", 
+                           "Star Cluster A51", 
+                           "Star Cluster A51", 
+                           "Star Cluster A51")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 30",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE")
+  )
+bounding_box <- create_box("Theta Carinae Cluster", 
+                           "Theta Carinae Cluster", 
+                           "Theta Carinae Cluster", 
+                           "Theta Carinae Cluster")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 30",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE")
+  )
+
+# Anti-Spinward
+bounding_box <- create_box("Heidrunn", 
+                           "St. Andreas", 
+                           "Kazlam", 
+                           "Fröislandis")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 48",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE", "AP", "NDC")
+  )
+
+# Spinward - missing The Devil's Eye and The Swan's Eye
+bounding_box <- create_box("Rest Stop",
+                           "Star Cluster 643", 
+                           "Monument to Man", 
+                           "Star Cluster 1108 (SW)")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 61",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE", "AP", "NDC")
+  )
+
+# get Devil's Eye and Swan's eye
+bounding_box <- create_box("T Cephei (The Devil's Eye)",
+                           "T Cephei (The Devil's Eye)", 
+                           "T Cephei (The Devil's Eye)", 
+                           "T Cephei (The Devil's Eye)")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 61",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE", "AP", "NDC")
+  )
+bounding_box <- create_box("The Swan's Eye",
+                           "The Swan's Eye", 
+                           "The Swan's Eye", 
+                           "The Swan's Eye")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 61",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE", "AP", "NDC")
+  )
+
+# Rimward - missing Kleinwelt, Frobisher
+bounding_box <- create_box("Interstellar Expeditions Base #22",
+                           "Aurigae", 
+                           "Skyfog", 
                            "Leviathans Rest")
 sucs_data <- sucs_data |>
   update_sources(
     target = "3095", 
     title = "IE: Interstellar Players 3", 
-    loc = "pp. 30, 48, 61, 75",
+    loc = "p. 75",
+    date = date("3095-01-01"), 
+    box = bounding_box, 
+    factions = c("I", "U", "A", "IE", "AP", "NDC")
+  )
+
+# get Frobisher and Kleinwelt
+bounding_box <- create_box("Frobisher",
+                           "Kleinwelt", 
+                           "Kleinwelt", 
+                           "Frobisher")
+sucs_data <- sucs_data |>
+  update_sources(
+    target = "3095", 
+    title = "IE: Interstellar Players 3", 
+    loc = "p. 75",
     date = date("3095-01-01"), 
     box = bounding_box, 
     factions = c("I", "U", "A", "IE", "AP", "NDC")
