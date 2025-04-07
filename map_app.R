@@ -42,7 +42,7 @@ plot_planets <- function(snapshot_data,
   
   # Base ggplot
   map <- snapshot_data |>
-    ggplot(aes(x = x, y = y, text = text_plotly, color = !!sym(choice_color),
+    ggplot(aes(x = x, y = y, color = !!sym(choice_color),
                customdata = id_mhq))
   
   if(use_polygons & choice_color == "faction") {
@@ -55,9 +55,12 @@ plot_planets <- function(snapshot_data,
       generate_hull()
     map <- map +
       geom_polygon(data = hull_data, 
-                   aes(x = X, y = Y, fill = faction, group = faction), 
+                   aes(x = X, y = Y, fill = faction, group = faction,
+                       text = faction), 
                    alpha = 0.2,
-                   inherit.aes = FALSE)
+                   inherit.aes = FALSE,
+                   show.legend = FALSE,
+                   name = NULL)
   }
   
   map <- map + 
@@ -68,7 +71,7 @@ plot_planets <- function(snapshot_data,
     geom_point(data = major_capital_data, color = "grey20", size = 2.5)+
     geom_point(data = minor_capital_data, size = 3)+
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
-    geom_point(size = 2) +
+    geom_point(size = 2, aes(text = text_plotly)) +
     scale_color_manual(values = palette_color)+
     scale_fill_manual(values = palette_color)+
     labs(title = title, color = legend_name)+
