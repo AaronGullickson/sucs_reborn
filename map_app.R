@@ -54,12 +54,14 @@ plot_planets <- function(snapshot_data,
                               "Clan Sea Fox", "ComStar"))) |>
       generate_hull()
     map <- map +
-      geom_polygon(data = hull_data, 
-                   aes(x = X, y = Y, fill = faction, group = faction,
-                       text = faction), 
-                   alpha = 0.2,
-                   inherit.aes = FALSE,
-                   show.legend = FALSE)
+      suppressWarnings(
+        geom_polygon(data = hull_data, 
+                     aes(x = X, y = Y, fill = faction, group = faction,
+                         text = faction), 
+                     alpha = 0.2,
+                     inherit.aes = FALSE,
+                     show.legend = FALSE)
+        )
   }
   
   map <- map + 
@@ -70,7 +72,7 @@ plot_planets <- function(snapshot_data,
     geom_point(data = major_capital_data, color = "grey20", size = 2.5)+
     geom_point(data = minor_capital_data, size = 3)+
     geom_point(data = minor_capital_data, color = "grey20", size = 2.5)+
-    geom_point(size = 2, aes(text = text_plotly)) +
+    suppressWarnings(geom_point(size = 2, aes(text = text_plotly))) +
     scale_color_manual(values = palette_color)+
     scale_fill_manual(values = palette_color)+
     labs(title = title, color = legend_name)+
@@ -397,8 +399,7 @@ server <- function(input, output, session) {
   })
   
   output$plot <- renderPlotly({ 
-    print("rendering")
-    
+
     # check for recenter
     trigger_recenter()
     
