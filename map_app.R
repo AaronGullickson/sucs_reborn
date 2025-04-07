@@ -277,7 +277,8 @@ ui <- page_fillable(
           sliderInput(
             inputId = "year", 
             label = "Or select a year...", 
-            min = 2271, max = 3152, value = 3152, sep = ""), 
+            min = 2271, max = 3152, value = 3152, sep = ""
+          ), 
           dateInput(
             inputId = "date",
             label = "Or choose a specific date...",
@@ -353,8 +354,11 @@ server <- function(input, output, session) {
                        server = TRUE)
   
   observeEvent(input$year,{
+    req(input$date)
     updateDateInput(session, "date", 
-                    value = date(paste(input$year, "01", "01", sep = "-")))
+                    value = date(paste(input$year, 
+                                       month(input$date), 
+                                       day(input$date), sep = "-")))
     
   })
   
@@ -393,6 +397,7 @@ server <- function(input, output, session) {
   })
   
   output$plot <- renderPlotly({ 
+    print("rendering")
     
     # check for recenter
     trigger_recenter()
