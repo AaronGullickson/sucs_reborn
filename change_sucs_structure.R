@@ -502,6 +502,38 @@ sucs_data <- sucs_data |>
 # we should now have all those planets correct for the original maps before
 # the HBHA
 
+## Tyrfing ##
+# It gets entered as IE in 3095 because of an "anthropological listening post" 
+# described in ToS: Tyrfing. This is being mislabeled as a IE:ISP3 source. 
+# Additionally we don't know the time period for this. It says "to this day"
+# and the planet information caption gives population in 3150 not 3095 but
+# the voice is that of Betram Habeas who is Jihad era. However, does a 
+# listening post qualify as settlement? Its a good question about all of 
+# these IE entries which I think are a little weird. For now, I think it 
+# should be identified as abandoned from 3095 on. The 3130 to 3152 entries
+# have been removed because they were blank so put them back in to get
+# processed later
+sucs_data <- sucs_data |>
+  correct_faction("Tyrfing", "3095", "A")
+sucs_data <- sucs_data |>
+  make_new_entries("Tyrfing", time_point_range("3130", "3152"), "map", 
+                   NA, NA, NA, "A")
+
+# we also know that the planet dropped off of maps between 1SW (2822) and 
+# 2SW (2830), but ToS gives us a "quarantine" date of 2824. So lets add that.
+sucs_data <- sucs_data |>
+  make_new_entries("Tyrfing", "special", "text", "Touring the Stars: Tyrfing", 
+                   "p. 7 (month/day approx.)", date("2824-01-01"), "A")
+
+# we also know the planet was colonized by the TH in the "2350s". So lets give 
+# it a data of 2355 and describe it as a approximate.
+sucs_data <- sucs_data |>
+  make_new_entries("Tyrfing", "special", "text", "Touring the Stars: Tyrfing", 
+                   "p. 5 (date approx.)", date("2355-01-01"), "TH")
+
+
+
+
 # Add Founding House Maps------------------------------------------------
 
 # Lets start with the founding cases. 
@@ -2131,6 +2163,9 @@ sucs_data <- sucs_data |>
 
 
 # The 3095 data is for IE: ISP3 data, ignore everything else
+#TODO: this treats all I, U, and A as in IE: ISP3 but clearly that should
+# not be the case for stuff in the main IS, so I think we need to break this
+# into four maps for each cardinal direction
 bounding_box <- create_box("Heidrunn", 
                            "Star Cluster 643", 
                            "Star Cluster P24", 
@@ -2269,7 +2304,6 @@ sucs_data <- sucs_data |>
   add_errata("Skyfog", "map", 
              date(c("2786-12-31", "2821-09-24", "2830-01-01", "2864-01-01")),
              "IE: Interstellar Players 3", "p. 80", "A")
-
 
 # Create final data --------------------------------------------------------
 
