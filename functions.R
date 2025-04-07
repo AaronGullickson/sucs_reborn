@@ -118,7 +118,7 @@ make_new_entries <- function(map_data, id, time, type, title, loc, date, faction
 }
 
 add_errata <- function(map_data, 
-                       id, type, time_target, 
+                       id, type, dates, 
                        title, loc, new_faction) {
   
   
@@ -126,8 +126,8 @@ add_errata <- function(map_data,
     # pull the data needing errata from the full data
     filter(id_mhq %in% id, 
            source_type == type, 
-           time_point %in% time_target,
-           !is.na(source_date)) |>
+           !is.na(source_date),
+           source_date %in% dates) |>
     # now change errata data
     mutate(time_point = "special",
            source_type = "errata",

@@ -2263,10 +2263,11 @@ sucs_data <- sucs_data |>
 # ok, now lets add errata for the map that gives control of Skyfog to 
 # SL from 2750 to 2767 and then marks it as abandoned from 2783 to 2864
 sucs_data <- sucs_data |>
-  add_errata("Skyfog", "map", time_point_range("2750", "2767"),
+  add_errata("Skyfog", "map", date(c("2750-01-01", "2765-01-01")),
              "IE: Interstellar Players 3", "p. 80", "SL")
 sucs_data <- sucs_data |>
-  add_errata("Skyfog", "map", time_point_range("2783", "2864"),
+  add_errata("Skyfog", "map", 
+             date(c("2786-12-31", "2821-09-24", "2830-01-01", "2864-01-01")),
              "IE: Interstellar Players 3", "p. 80", "A")
 
 
