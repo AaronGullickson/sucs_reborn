@@ -11,6 +11,7 @@ library(plotly)
 library(randomcoloR)
 library(sf)
 library(smoothr)
+library(concaveman)
 
 # Functions ---------------------------------------------------------------
 
