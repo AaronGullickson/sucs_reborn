@@ -1,0 +1,146 @@
+---
+title: "MHQ/SUCS Faction Correspondence"
+format: 
+   html:
+     code-fold: true
+execute:
+  echo: false
+---
+
+
+```{r}
+#| label: libraries
+#| include: false
+
+library(googlesheets4)
+library(xml2)
+library(tidyverse)
+library(gt)
+library(ggvenn)
+```
+
+```{r}
+#| label: load-mhq-factions
+#| include: false
+
+mhq_factions <- read_xml("https://raw.githubusercontent.com/MegaMek/mekhq/refs/heads/master/MekHQ/data/universe/factions.xml") |>
+  xml_children()
+
+mhq_factions <- mhq_factions |> map(function(node) {
+  
+  # convert rbg to hex
+  rgb <- xml_text(xml_find_first(node, "colorRGB"))
+  if(is.na(rgb)) {
+    color <- NA
+  } else {
+    rgb <- str_split_1(rgb, ",")
+    color <- rgb(rgb[1], rgb[2], rgb[3], maxColorValue=255)
+  }
+  
+  tibble(
+    id_mhq = xml_text(xml_find_first(node, "shortname")),
+    name_mhq = xml_text(xml_find_first(node, "fullname")),
+    color_mhq = color
+    #start = xml_text(xml_find_first(node, "start")),
+    #end = xml_text(xml_find_first(node, "end")),
+    #successor = xml_text(xml_find_first(node, "successor")),
+    #tags = xml_text(xml_find_first(node, "tags"))
+  )
+}) |>
+  bind_rows()
+```
+
+
+```{r}
+#| label: load-sucs-factions
+#| include: false
+
+gs4_deauth()
+sucs_factions <- read_sheet("1uO6aZ20rfEcAZJ-nDRhCnaNUiCPemuoOOd67Zqi1MVM", 
+                            sheet = "Factions") |>
+  select(id_sucs = factionId, name_sucs = factionName, color_sucs = color) |>
+  filter(!is.na(id_sucs))
+```
+
+```{r}
+#| label: fig-overlap-id
+#| fig-cap: Venn diagram showing overlap in MHQ and SUCS faction ids
+list(MHQ = unique(mhq_factions$id_mhq),
+     SUCS = unique(sucs_factions$id_sucs)) |>
+  ggvenn(auto_scale = TRUE, fill_color = c("navy","seagreen"))
+```
+
+```{r}
+#| label: match-id
+
+combined <- full_join(mhq_factions, sucs_factions, 
+                      by = join_by(id_mhq == id_sucs), keep = TRUE) |>
+  select(starts_with("id_"), starts_with("name_"), starts_with("color_")) |>
+  mutate(matched = (id_mhq == id_sucs),
+         matched = if_else(is.na(matched), FALSE, matched)) |>
+  arrange(desc(matched), id_mhq, id_sucs)
+
+# Ok, now lets separate them out by those that matched and those that
+# are unique to each source
+matched <- combined |> 
+  filter(matched) |>
+  mutate(match = "matched by id") |>
+  select(-matched)
+mhq_solo <- combined |> 
+  filter(is.na(id_sucs)) |>
+  select(ends_with("_mhq"))
+sucs_solo <- combined |> 
+  filter(is.na(id_mhq)) |>
+  select(ends_with("_sucs"))
+```
+
+```{r}
+#| label: fig-overlap-names
+#| fig-cap: Venn diagram showing overlap in MHQ and SUCS faction names amongst cases taht did not match on id.
+list(MHQ = unique(mhq_solo$name_mhq),
+     SUCS = unique(sucs_solo$name_sucs)) |>
+  ggvenn(auto_scale = TRUE, fill_color = c("navy","seagreen"))
+```
+
+```{r}
+#| label: match-name
+
+# now try to match by name
+combined_names <- full_join(mhq_solo, sucs_solo, 
+                            by = join_by(name_mhq == name_sucs), keep = TRUE) |>
+  mutate(matched = (name_mhq == name_sucs),
+         matched = if_else(is.na(matched), FALSE, matched)) |>
+  arrange(desc(matched), name_mhq, name_sucs) |>
+  mutate(match = case_when(
+    matched ~ "matched by name",
+    is.na(id_sucs) ~ "mhq only",
+    is.na(id_mhq) ~ "sucs only",
+  )) |>
+  select(-matched)
+
+# put them all together
+full_comparison <- matched |> 
+  bind_rows(combined_names)
+```
+
+```{r}
+#| label: tbl-full-join
+#| fig-cap: Table of all factions in both sources after attempting to match by id and name
+
+full_comparison |> 
+  mutate(color_mhq = if_else(is.na(color_mhq), "grey", color_mhq),
+         color_sucs = if_else(is.na(color_sucs), "grey", color_sucs)) |>
+  gt() |> 
+  tab_style(
+    style = list(
+      cell_fill(color = from_column(column = "color_mhq"))
+    ),
+    locations = cells_body(columns = color_mhq)
+  ) |>
+  tab_style(
+    style = list(
+      cell_fill(color = from_column(column = "color_sucs"))
+    ),
+    locations = cells_body(columns = color_sucs)
+  )
+```
