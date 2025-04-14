@@ -1,0 +1,4 @@
+- source: faction_correspondence.qmd
+  netlify:
+    - id: 38520bd8-28a9-4fbf-955f-b3479ee91f96
+      url: https://frolicking-kulfi-84439a.netlify.app
