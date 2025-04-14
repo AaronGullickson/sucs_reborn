@@ -3,6 +3,7 @@ title: "MHQ/SUCS Faction Correspondence"
 format: 
    html:
      code-fold: true
+     embed-resources: true
 execute:
   echo: false
 ---
@@ -17,6 +18,7 @@ library(xml2)
 library(tidyverse)
 library(gt)
 library(ggvenn)
+library(here)
 ```
 
 ```{r}
@@ -142,5 +144,32 @@ full_comparison |>
       cell_fill(color = from_column(column = "color_sucs"))
     ),
     locations = cells_body(columns = color_sucs)
+  )
+```
+
+```{r}
+#| label: tbl-unused-mhq-factions
+#| tbl-cap: These factions are declared in MHQ but are not in current use.
+
+# check the frequency of codes in use in MHQ
+load(here("data", "mhq_faction_events.RData"))
+factions_used <- faction_events |> 
+  pull(faction) |>
+  unique() |>
+  paste(collapse = ", ") |>
+  str_split_1(pattern = ",") |>
+  str_trim() |>
+  unique() |>
+  sort()
+
+mhq_factions[!(mhq_factions$id_mhq %in% factions_used), ] |> 
+  mutate(color_mhq = if_else(is.na(color_mhq), "grey", color_mhq)) |>
+  arrange(id_mhq) |>
+  gt()  |> 
+  tab_style(
+    style = list(
+      cell_fill(color = from_column(column = "color_mhq"))
+    ),
+    locations = cells_body(columns = color_mhq)
   )
 ```
