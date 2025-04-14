@@ -463,7 +463,7 @@ server <- function(input, output, session) {
   output$download <- downloadHandler(
     filename = paste0("battletech_map_", input$date, ".csv"),
     content = function(file) {
-      sucs_data |>
+      map_data |>
         filter(input$use_isp | !(source_title %in% isp_list)) |>
         filter(input$use_arano | source_title != "Handbook: House Arano") |>
         filter(source_type %in% input$source_types) |>
@@ -471,7 +471,7 @@ server <- function(input, output, session) {
         filter(input$show_unsettled | faction_id != "UND") |>
         filter(input$show_abandoned | faction_id != "ABN") |>
         filter(input$show_hidden | !hidden) |>
-        select(-starts_with("str_")) |>
+        select(-starts_with("str_"), -faction, -text_plotly) |>
         write_csv(file)
     }
   )
