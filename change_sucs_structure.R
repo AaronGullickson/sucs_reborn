@@ -20,6 +20,9 @@ sucs_factions <- read_sheet("1uO6aZ20rfEcAZJ-nDRhCnaNUiCPemuoOOd67Zqi1MVM",
   rename(id_sucs = factionId, name = factionName) |>
   filter(!is.na(id_sucs))
 
+smucs_factions <- read_sheet("1zvbcOmFd2iHgLEJA5WQWFDVSfuaCSJne3XtIYfOQxYk",
+                             sheet = "possible fix")
+
 id_crosswalk <- read_sheet("17GFFFp1sGvSYcs8DBryleQGvqgppX8EZ8MuF6Oq3or8")
 
 
@@ -542,7 +545,18 @@ sucs_data <- sucs_data |>
                    "p. 5 (date approx.)", date("2355-01-01"), "TH")
 
 
-
+## Join Clan Worlds ##
+# Some worlds in the clan occupation zone were jointly held but are currently
+# being just shown as C for "Clans" - we can do better
+# Avon - Held by Smoke Jags and Nova Cats for 3052 to 3059b
+sucs_data <- sucs_data |>
+  correct_faction("Avon", time_point_range("3052", "3059b"), "D(CSJ,CNC)")
+# Caripare - Held by Smoke Jags and Nova Cats for 3052 to 3059b
+sucs_data <- sucs_data |>
+  correct_faction("Caripare", time_point_range("3052", "3059a"), "D(CSJ,CNC)")
+# Orkney - jointly held by Steel Vipers and Jade Falcons, just in 3052
+sucs_data <- sucs_data |>
+  correct_faction("Orkney (LC)", "3052", "D(CJF,CSV)")
 
 # Add Founding House Maps------------------------------------------------
 
@@ -2444,31 +2458,47 @@ sucs_data <- sucs_data |>
              date(c("2786-12-31", "2821-09-24", "2830-01-01", "2864-01-01")),
              "IE: Interstellar Players 3", "p. 80", "A")
 
+
+
 # Create final data --------------------------------------------------------
 
+# remove all cases without a source
 sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
   select(id_sucs, id_mhq, x, y, starts_with("source_"), 
          faction, starts_with("region"), capital, hidden) |>
   arrange(id_sucs, source_date)
 
-# change some colors for better comparison
-sucs_factions <- sucs_factions |>
-  mutate(
-    color = if_else(id_sucs == "UHC", "#90EE90", color),
-    color = if_else(id_sucs == "U", "#7f7f7f", color),
-    color = if_else(id_sucs == "CSJ", "#2f4f4f", color),
-    color = if_else(id_sucs == "FCL" | id_sucs == "FCF", "#ffcf40", color),
-    color = if_else(id_sucs == "SS", "#CEFF00", color),
-    color = if_else(id_sucs == "D", "#E40078", color),
-    color = if_else(id_sucs == "CS", "#FFFAFA", color),
-    color = if_else(id_sucs == "DD", "#422649", color),
-    color = if_else(id_sucs == "WE", "#AC5A30", color),
-    name = if_else(id_sucs == "I", "Independent", name),
-    name = if_else(id_sucs == "U", "Unsettled", name)
-  )
+# Change faction codes - to this we will need to deal with the disputed cases
+# which will mean reshaping faction codes into a long format for easy handling
+# and then back to a wider format.
+sucs_data <- sucs_data |>
+  # get strings for disputed cases
+  mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
+  # separate disputed cases out into variables
+  separate_wider_delim(disputed, ",", too_few = "align_start", 
+                       names_sep = "") |>
+  # pivot longer to get individual faction codes
+  pivot_longer(c(faction, starts_with("disputed"))) |>
+  # missing values here are cases without disputes (most of them)
+  filter(!is.na(value)) |>
+  # now merge with new faction codes
+  left_join(smucs_factions, by = join_by(value == faction_sucs)) |>
+  # we need to deal with the FCL/FCF case
+  mutate(faction_id = if_else(value %in% c("FCF", "FCL"), "FC", faction_id)) |>
+  # remove excess variables and replace value with faction_id
+  select(-mekhq_rename, -faction_name, -faction_color, -value) |>
+  rename(value = faction_id) |>
+  # now we can pivot back wider
+  pivot_wider() |>
+  # combine the disputed codes into comma separated list
+  unite("disputed", starts_with("disputed"), sep = ",", na.rm = TRUE) |>
+  # if disputed is not empty replace faction with it
+  mutate(faction = if_else(disputed != "", disputed, faction)) |>
+  select(starts_with("id_"), x, y, starts_with("source_"), 
+         faction, starts_with("region"), capital, hidden)
+
 write_csv(sucs_data, file = here("data", "sucs_data.csv"))
-write_csv(sucs_factions, file = here("data", "sucs_factions.csv"))
-#save(sucs_data, sucs_factions, file = "sucs_data.RData")
+write_csv(smucs_factions, file = here("data", "smucs_factions.csv"))
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)

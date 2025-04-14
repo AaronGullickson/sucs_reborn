@@ -151,7 +151,7 @@ faction_snapshot <- function(base_data, date) {
       source_type = factor(source_type, levels = c("errata", "text", "map")),
       # create a faction type for priority
       faction_priority = case_when(
-        faction == "Abandoned" | faction == "Unsettled" ~ 1,
+        faction_id == "ABN" | faction_id == "U" ~ 1,
         TRUE ~ 2
       )) |>
     # arrange with most recent date at the top, and then break date

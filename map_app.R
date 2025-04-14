@@ -49,10 +49,8 @@ plot_planets <- function(snapshot_data,
   if(use_polygons & choice_color == "faction") {
     # add hulls
     hull_data <- snapshot_data |>
-      group_by(faction) |>
-      filter(!(faction %in% c("Abandoned", "Unsettled", "Independent",
-                              "Interstellar Expeditions", "Disputed",
-                              "Clan Sea Fox", "ComStar"))) |>
+      filter(!(faction_id %in% c("ABN", "UND", "IND", "IE", "DIS", 
+                                 "CSF", "CDS", "CS"))) |>
       generate_hull()
     map <- map +
       suppressWarnings(
@@ -148,11 +146,11 @@ is_local <- Sys.getenv('SHINY_PORT') == ""
 # load the data - comment out one to read locally or remotely
 if(is_local) {
   data_address <- here("data", "sucs_data.csv")
-  factions_address <- here("data", "sucs_factions.csv")
+  factions_address <- here("data", "smucs_factions.csv")
   sources_address <- here("data", "sucs_sources.csv")
 } else {
   data_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv"
-  factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_factions.csv"
+  factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/smucs_factions.csv"
   sources_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_sources.csv"
 }
 sucs_data <- read_csv(data_address)
@@ -163,46 +161,49 @@ sucs_sources <- read_csv(sources_address)
 map_data <- sucs_data |>
   # remove any duplicates (shouldn't be, but good to check)
   distinct() |>
-  # get strings for disputed cases
-  mutate(disputed = str_extract(faction, "(?<=\\()[^()]+(?=\\))")) |>
-  separate_wider_delim(disputed, ",", too_few = "align_start", 
+  # for multiple factions, lets expand to separate variable
+  separate_wider_delim(faction, ",", too_few = "align_start", 
                        names_sep = "") |>
-  # we don't know how many there are so pivot longer to get names
-  pivot_longer(starts_with("disputed")) |>
-  mutate(value = factor(value, 
-                        levels = sucs_factions$id_sucs, 
-                        labels = sucs_factions$name)) |>
+  pivot_longer(starts_with("faction"), values_to = "faction_id") |>
+  filter(!is.na(faction_id)) |>
+  left_join(sucs_factions) |>
+  select(-mekhq_rename, -faction_color, -faction_sucs) |>
   # now reshape back wider and concatenate disputed cases
-  pivot_wider() |>
-  unite("disputed", starts_with("disputed"), sep = "/", na.rm = TRUE) |>
+  pivot_wider(values_from = c("faction_id", "faction_name")) |>
+  unite("faction_id", starts_with("faction_id"), sep = ",", na.rm = TRUE) |>
+  unite("faction_name", starts_with("faction_name"), sep = "/", na.rm = TRUE) |>
   # now organize the rest of the labels
   mutate(
-    # first clean the disputed parenthetical away
-    faction = str_remove(faction, "\\s*\\([^\\)]+\\)"),
-    # now turn faction into factor
-    faction = factor(faction, 
-                     levels = sucs_factions$id_sucs, 
-                     labels = sucs_factions$name),
+    # if the faction variable has multiple entries recode it to DIS
+    faction_id = if_else(str_detect(faction_id, ","), "DIS", faction_id),
+    # create a separate faction variable that is factored up and 
+    # can be used to plot by color on the map directly
+    faction = factor(faction_id, 
+                     levels = sucs_factions$faction_id, 
+                     labels = sucs_factions$faction_name),
     # now turn source_title into a factor
     source_title = factor(source_title,
                            levels = sucs_sources$source),
     # construct strings for the map display
-    faction_str = if_else(disputed == "", 
-                          paste0(faction, "<br>"),
-                          paste0(faction, " (", disputed, ")<br>")),
-    capital_str = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
-    region1_str = if_else(is.na(region1), "", paste0(region1, "<br>")),
-    region2_str = if_else(is.na(region2), "", paste0(region2, "<br>")),
-    region3_str = if_else(is.na(region3), "", paste0(region3, "<br>")),
-    source_str = paste0("<i>Source:</i> ", 
+    str_faction = if_else(faction_id != "DIS", 
+                          paste0(faction_name, "<br>"),
+                          paste0("Disputed (", faction_name, ")<br>")),
+    str_capital = if_else(is.na(capital), "", paste0(capital, " Capital<br>")),
+    str_region1 = if_else(is.na(region1), "", paste0(region1, "<br>")),
+    str_region2 = if_else(is.na(region2), "", paste0(region2, "<br>")),
+    str_region3 = if_else(is.na(region3), "", paste0(region3, "<br>")),
+    str_source = paste0("<i>Source:</i> ", 
                         paste(source_type, source_title, source_loc, 
                               sep = ", ")),
-    source_date_str = paste0("<br><i>Source Date:</i> ", source_date),
+    str_source_date = paste0("<br><i>Source Date:</i> ", source_date),
     text_plotly = paste0("<b>", id_mhq, "</b><br>",
-                         faction_str,
-                         capital_str, region1_str, region2_str, region3_str,
-                         source_str, source_date_str)
-  )
+                         str_faction,
+                         str_capital, str_region1, str_region2, str_region3,
+                         str_source, str_source_date)
+  ) |>
+  select(starts_with("id_"), x, y, starts_with("source_"), 
+         starts_with("faction"), starts_with("region"), capital, hidden, 
+         starts_with("str_"), text_plotly)
 
 # Define globals --------------------------------------------------------
 
@@ -251,7 +252,9 @@ eras <- list(
 # with the names corresponding to the the different color_choice options.
 # Each palette should be a named vector with names corresponding to all
 # possible options for a given color_choice
-palette_faction <- sucs_factions |> select(name, color) |> deframe()
+palette_faction <- sucs_factions |> 
+  select(faction_name, faction_color) |> 
+  deframe()
 palette_source <- randomColor(length(unique(map_data$source_title)))
 names(palette_source) <- unique(map_data$source_title)
 palettes = list(faction = palette_faction, source_title = palette_source)
@@ -446,8 +449,8 @@ server <- function(input, output, session) {
       filter(input$use_arano | source_title != "Handbook: House Arano") |>
       filter(source_type %in% input$source_types) |>
       faction_snapshot(input$date) |>
-      filter(input$show_unsettled | faction != "Unsettled") |>
-      filter(input$show_abandoned | faction != "Abandoned") |>
+      filter(input$show_unsettled | faction_id != "UND") |>
+      filter(input$show_abandoned | faction_id != "ABN") |>
       filter(input$show_hidden | !hidden) |>
       plot_planets(paste(input$date), 
                    use_polygons = input$show_boundaries,
@@ -465,9 +468,10 @@ server <- function(input, output, session) {
         filter(input$use_arano | source_title != "Handbook: House Arano") |>
         filter(source_type %in% input$source_types) |>
         faction_snapshot(input$date) |>
-        filter(input$show_unsettled | faction != "Unsettled") |>
-        filter(input$show_abandoned | faction != "Abandoned") |>
+        filter(input$show_unsettled | faction_id != "UND") |>
+        filter(input$show_abandoned | faction_id != "ABN") |>
         filter(input$show_hidden | !hidden) |>
+        select(-starts_with("str_")) |>
         write_csv(file)
     }
   )
