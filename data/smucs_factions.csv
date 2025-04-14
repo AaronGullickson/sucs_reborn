@@ -1,0 +1,163 @@
+faction_id,faction_sucs,mekhq_rename,faction_name,faction_color
+AB,AB,NA,Azami Brotherhood,#c76555
+AC,AC,NA,Azami Caliphate,#c76555
+AE,AE,NA,Amaris Empire,#5d8593
+AG,AG,NA,Alliance of Galedon,#ec2027
+AML,AML,NA,Alyina Mercantile League,#00b38c
+CBS,CBS,NA,Clan Blood Spirit,#b05739
+CC,CC,NA,Capellan Confederation,#1d8542
+CCC,CCC,NA,Clan Cloud Cobra,#4d7e77
+CCom,CCom,NA,Capellan Commonality,#1d8542
+CDP,CDP,NA,Calderon Protectorate,#ac7355
+CDS,CDS,NA,Clan Diamond Shark,#8690a3
+CFM,CFM,NA,Clan Fire Mandrill,#663d37
+CGB,CGB,NA,Clan Ghost Bear,#bae6fb
+CGS,CGS,NA,Clan Goliath Scorpion,#816a0e
+CH,CH,NA,Capellan Hegemony,#1d8542
+CHH,CHH,NA,Clan Hell's Horses,#faa61b
+CI,CI,NA,Chainelane Isles,#949D93
+CIH,CIH,NA,Clan Ice Hellion,#A8C1B3
+CJF,CJF,NA,Clan Jade Falcon,#ABD375
+CNC,CNC,NA,Clan Nova Cat,#381715
+CS,CS,NA,ComStar,#F3F3F3
+CSA,CSA,NA,Clan Star Adder,#32382F
+CSJ,CSJ,NA,Clan Smoke Jaguar,#2F2E30
+CSL,CSL,NA,Clan Stone Lion,#F2A810
+CSR,CSR,NA,Clan Snow Raven,#009690
+CSV,CSV,NA,Clan Steel Viper,#A3D451
+DA,DA,NA,Duchy of Andurien,#617274
+DC,DC,NA,Draconis Combine,#EC2027
+DGM,DGM,NA,Duchy of Graham-Marik,#9E3C93
+DO,DO,NA,Duchy of Oriente,#A55EA6
+DS,DS,NA,Duchy of Small,#6B8E23
+DT,DT,NA,Duchy of Tamarind,#9E3C93
+DTA,DTA,NA,Duchy of Tamarind-Abbey,#9E3C93
+DoO,DoO,NA,Duchy of Orloff,#A24D9D
+EF,EF,NA,Elysian Fields,#85526A
+FCo,FCo,NA,Ferris Collective,#BFAB78
+FFR,FFR,NA,Finmark Free Republic,#5D8593
+FR,FrR,NA,Fronc Reaches,#7A6D5E
+FS,FS,NA,Federated Suns,#FED600
+FWL,FWL,NA,Free Worlds League,#A55EA6
+FoS,FoS,NA,Federation of Skye,#5BAAA2
+GL,GL,NA,Galatean League,#5BAAA2
+GV,GV,NA,Greater Valkyrate,#c27ba0
+HL,HL,NA,Hanseatic League,#db7093
+IE,IE,NA,Interstellar Expeditions,#c1b69e
+IP,IP,NA,Illyrian Palatinate,#D27553
+IoS,IoS,NA,Isle of Skye,#5BAAA2
+JF,JF,NA,JàrnFòlk,#864C9E
+KP,KP,NA,Kittery Prefecture,#DF7E27
+LC,LC,LA,Lyran Commonwealth,#1861a3
+LL,LL,NA,Lothian League,#f68c1f
+LR,LR,NA,Liao Republic,#009C55
+MA,MA,NA,Mosiro Archipelago,#A55EA6
+MC,MC,NA,Malagrotta Cooperative,#DB8913
+MCM,MCM,NA,Marik Commonwealth,#A55EA6
+MH,MH,NA,Marian Hegemony,#F68C48
+MOC,MOC,NA,Magistracy of Canopus,#3D9D96
+MSC,MSC,NA,Marik-Stewart Commonwealth,#A55EA6
+MV,MV,NA,Morgraine's Valkyrate,#c27ba0
+NC,NC,NA,Nueva Castile,#60A158
+NCR,NCR,NA,New Colony Region,#7A6D5E
+NDC,NDC,NA,New Delphi Compact,#7F978B
+NOC,NOC,NA,New Oberon Confederation,#FFE599
+OA,OA,NA,Outworlds Alliance,#DCBF97
+OC,OC,NA,Oberon Confederation,#FFE599
+OMA,OMA,NA,Ozawa Mercantile Association,#EC2027
+OP,OP,NA,Oriente Protectorate,#A55EA6
+OZP,OZP,NA,Ohrenson-Zion Province,#A55EA6
+PD,PD,NA,Protectorate of Donegal,#0070C0
+PG,PG,NA,Principality of Gibson,#A55EA6
+PR,PR,NA,Principality of Regulus,#9E3C93
+PoR,PoR,NA,Principality of Rasalhague,#4E7AAC
+RA,RA,NA,Raven Alliance,#009690
+RCM,RCM,NA,Rim Commonality,#CE7577
+RD,RD,NA,Rasalhague Dominion,#BAE6FB
+RF,RF,NA,Regulan Fiefs,#9E3C93
+RFS,RFS,NA,Regulan Free States,#A55EA6
+RT,RT,NA,Rim Territories,#3B739B
+RU,RU,NA,Ragnarök Union,#D3BD48
+SA,SA,NA,Senate Alliance,#C1B69E
+SC,SC,NA,Stewart Commonality,#9E3C93
+SHC,SHC,NA,Silver Hawks Coalition,#9E3C93
+SIC,SIC,NA,St. Ives Compact,#8EAE21
+SKC,SKC,NA,Styk Commonality,#008B8B
+SL,SL,NA,Star League,#8E926F
+SLIE,SLIE,NA,Star League-in-Exile,#8E926F
+ST,ST,NA,Saiph Triumvirate,#808000
+TA,TA,NA,Terran Alliance,#E17F27
+TC,TC,NA,Taurian Concordat,#B73C26
+TCC,TCC,NA,Terracap Confederation,#E9967A
+TD,TD,NA,Tortuga Dominions,#D5A52B
+TFR,TFR,NA,Tikonov Free Republic,#02A64F
+TGU,TGU,NA,Tikonov Grand Union,#02A64F
+TH,TH,NA,Terran Hegemony,#E17F27
+THW,THW,NA,Taurian Homeworlds,#B73C26
+THa,THa,NA,The Havens,#93ADAC
+TP,TP,NA,The Protectorate,#9E3C93
+TamP,TamP,NA,Tamar Pact,#CC1637
+TiC,TiC,NA,Timbuktu Collective,#5D8593
+UHC,UHC,NA,United Hindu Collective,#FED600
+ABN,A,NA,Abandoned,#202020
+ARL,ALC,NA,Arc-Royal Liberty Coalition,#78B7E3
+ARC,AuC,NA,Aurigan Coalition,#DB472D
+ARD,AuD,NA,Aurigan Directorate,#308040
+AXP,AP,NA,Axumite Providence,#877776
+CIR,CF,NA,Circinus Federation,#5F60A5
+CB,CBR,NA,Clan Burrock,#714834
+CCO,CCY,NA,Clan Coyote,#583822
+CMG,CMN,NA,Clan Mongoose,#CFBCD1
+CWI,CWM,NA,Clan Widowmaker,#7A6A34
+CW,CWF,NA,Clan Wolf,#D9743D
+CWIE,CWX,NA,Clan Wolf-in-Exile,#d9743d
+CWOV,CWV,NA,Clan Wolverine,#7B6248
+DIS,D,NA,Disputed/Joint,#e40078
+DoL,DL,NA,Duchy of Liao,#009C55
+CEI,EI,NA,Escorpión Imperio,#816A0E
+FoO,FO,NA,Federation of Oriente,#A24D9D
+FVC,FvC,NA,Filtvelt Coalition,#D0C042
+MalC,MaC,NA,Malthus Confederation,#88A49B
+Mara,MarA,NA,Marlette Association,#FED600
+ME,MuC,NA,Muskegon Coalition,#FED600
+TB,RB,NA,Republic of the Barrens,#D3AF55
+ROS,RS,NA,Republic of the Sphere,#DF7E27
+RIM,RC,NA,Rim Collection,#5D8593
+RWR,RW,NA,Rim Worlds Republic,#5D8593
+SSUP,SS,NA,Sarna Supremacy,#0B984D
+SIS,SiS,NA,Sian Supremacy,#02A64F
+UND,U,NA,Unsettled,#EFEFEF
+VSM,VM,NA,Vesper Marches,#8681BC
+CWE,WE,NA,Wolf Empire,#D9743D
+WOB,WB,NA,Word of Blake,#808080
+CLAN,C,NA,Clans,#8E926F
+RR,TR,NA,Republic Remnant,#F0BF93
+SIMA,SIML,NA,St. Ives Mercantile League,#8EAE21
+Stone,CoF,NA,Coalition Forces,#dF7e27
+IND,I,NA,Inhabited,#FFFFFF
+FRR,FR,NA,Free Rasalhague Republic,#4e7aaC
+FC,NA,NA,Federated Commonwealth,#ffcf40
+CSF,CSF,CDS,Clan Sea Fox,#8690a3
+GBD,GBD,CGB,Ghost Bear Dominion,#bae6fb
+SE,SE,CEI,Scorpion Empire,#816a0e
+LA,LA,NA,Lyrance Alliance,#1861a3
+DD,DD,NA,Duchy of Don't,#422649
+SH,SH,NA,Sirian Holds,#3c0008
+IC,IC,NA,Ingersoll Concordium,#0b984d
+CRep,NA,NA,Capellan Republic,#02a64f
+CTL,NA,NA,Chesterton Trade League,#b88616
+ChP,NA,NA,Chisholm Protectorate,#e06820
+MRep,NA,NA,Marik Republic,#8FBEC0
+TU,NA,NA,Tikonov Union,#ffa07a
+AA,NA,NA,Augustine Alliance,#FF6699
+BC,NA,NA,Buena Collective,#0082ba
+CvW,NA,NA,Covenant Worlds,#663333
+PC,NA,NA,Protectorate Coalition,#336666
+ShA,NA,NA,Shiloh Alliance,#611a5c
+TTU,NA,NA,Tall Trees Union,#993333
+SOC,NA,NA,The Society,#9370db
+UC,NA,NA,Umayyad Caliphate,#00ff00
+MiC,NA,NA,Milton Combine,#ff0033
+SCon,NA,NA,Stewart Commonality,#4c0099
+CCon,NA,NA,Coreward Confederacy,#ff0000
+KE,NA,NA,Khwarazm Empire,#505050
