@@ -95,6 +95,18 @@ disputed |> pull(faction) |> unique() |> sort()
 
 table(disputed$faction, disputed$time_point)
 
+## Start of Jihad ##
+# The 3067 data lists Luthien and New Avalon as disputed with WoB but the 
+# map is from October 3067 so it should not be
+sucs_data <- sucs_data |>
+  correct_faction("Luthien", "3067", "DC")
+sucs_data <- sucs_data |>
+  correct_faction("New Avalon", "3067", "FS")
+
+## Chaine Cluster 7 ##
+# this is also listed as disputed between Chainelaine Isles and Diamond Sharks
+# but is off map frame - data comes from IE:ISP3 apparently. It will get ignored
+# anyway
 
 ## Malagrotta Cooperative ##
 # The three planets of the Malagrotta Cooperative are listed as D(MC,FS) in
