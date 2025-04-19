@@ -140,34 +140,40 @@ remove_outliers <- function(group_data, max_distance) {
 
 # Load and organize data --------------------------------------------------
 
-# unofficial way to determin if local but from Yihui Xie 
+gs4_deauth()
+sheet_id <- "1HD2tfdbiPbkzzmegUwLsudRt0TxYHdLkZfm-kZQaYy4"
+
+# unofficial way to determine if local but from Yihui Xie 
 is_local <- Sys.getenv('SHINY_PORT') == ""
 
-# load the data - comment out one to read locally or remotely
 if(is_local) {
-  data_address <- here("data", "sucs_data.csv")
-  factions_address <- here("data", "smucs_factions.csv")
-  sources_address <- here("data", "sucs_sources.csv")
+  sucs_data <- read_csv(here("data", "sucs_data.csv"))
+  sucs_base_planet <- read_csv(here("data", "sucs_base_planet.csv"))
+  sucs_factions <- read_csv(here("data", "sucs_factions.csv"))
+  sucs_sources <- read_csv(here("data", "sucs_sources.csv"))
 } else {
-  data_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv"
-  factions_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/smucs_factions.csv"
-  sources_address <- "https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_sources.csv"
+  # I want to read from the google sheet but its seems to die on shinyapps.io
+  # maybe too big for the current plan?
+  #sucs_data <- read_sheet(sheet_id, sheet = "faction data")
+  sucs_data <- read_csv("https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv")
+  sucs_base_planet <- read_sheet(sheet_id, sheet = "base planet data")
+  sucs_factions <- read_sheet(sheet_id, sheet = "faction codes")
+  sucs_sources <- read_sheet(sheet_id, sheet = "sources")
 }
-sucs_data <- read_csv(data_address)
-sucs_factions <- read_csv(factions_address)
-sucs_sources <- read_csv(sources_address)
 
 # Organize the data for ease of use in the plot
 map_data <- sucs_data |>
   # remove any duplicates (shouldn't be, but good to check)
   distinct() |>
+  # merge in x and y values
+  left_join(sucs_base_planet) |>
   # for multiple factions, lets expand to separate variable
   separate_wider_delim(faction, ",", too_few = "align_start", 
                        names_sep = "") |>
   pivot_longer(starts_with("faction"), values_to = "faction_id") |>
   filter(!is.na(faction_id)) |>
   left_join(sucs_factions) |>
-  select(-mekhq_rename, -faction_color, -faction_sucs) |>
+  select(-mekhq_rename, -faction_color) |>
   # now reshape back wider and concatenate disputed cases
   pivot_wider(values_from = c("faction_id", "faction_name")) |>
   unite("faction_id", starts_with("faction_id"), sep = ",", na.rm = TRUE) |>

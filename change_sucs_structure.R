@@ -88,6 +88,13 @@ sucs_data <- sucs_data |>
          faction, starts_with("region"), capital, hidden)
 
 
+# Save base system data ---------------------------------------------------
+
+sucs_data |>
+  select(id_sucs, id_mhq, x, y) |>
+  distinct() |>
+  write_csv(file = here("data", "sucs_base_planet.csv"))
+
 # Address disputed faction codes ------------------------------------------
 
 disputed <- sucs_data |> filter(str_detect(faction, "^D\\("))
@@ -2506,7 +2513,7 @@ sucs_data <- sucs_data |>
 # remove all cases without a source
 sucs_data <- sucs_data |>
   filter(!is.na(source_title)) |>
-  select(id_sucs, id_mhq, x, y, starts_with("source_"), 
+  select(id_sucs, id_mhq, starts_with("source_"), 
          faction, starts_with("region"), capital, hidden) |>
   arrange(id_sucs, source_date)
 
@@ -2536,10 +2543,10 @@ sucs_data <- sucs_data |>
   unite("disputed", starts_with("disputed"), sep = ",", na.rm = TRUE) |>
   # if disputed is not empty replace faction with it
   mutate(faction = if_else(disputed != "", disputed, faction)) |>
-  select(starts_with("id_"), x, y, starts_with("source_"), 
+  select(starts_with("id_"), starts_with("source_"), 
          faction, starts_with("region"), capital, hidden)
 
 write_csv(sucs_data, file = here("data", "sucs_data.csv"))
-write_csv(smucs_factions, file = here("data", "smucs_factions.csv"))
+#write_csv(smucs_factions, file = here("data", "smucs_factions.csv"))
 #gs4_auth()
 #gs4_create("SUCS reborn", sheets = sucs_data)
