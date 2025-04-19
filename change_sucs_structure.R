@@ -112,6 +112,30 @@ sucs_data <- sucs_data |>
 # The three planets of the Malagrotta Cooperative are listed as D(MC,FS) in
 # 3079. The AFFS and Periphery maps from Field Reports show them as FS, but 
 # the AFFS map marks them off as "disputed."
+# Malagrotta is also listed as disputed in 2571. The map does show the border
+# as crossing over it and Sarna says that Malagrotta governance was split
+# by FS and TC before reunification war, so I think this is correct
+
+## Denebola ##
+# This is listed as disputed between FWL and LC in 3025, but its a little 
+# confusing. Both House Marik and House Kurita maps show it as unambigiously
+# on the LC side of the border. The House Steiner book has it slightly touching
+# the border but mostly on LC side and House Liao book has it exactly on the
+# border. Sarna has no record of it being disputed in 3025. I think its
+# best to separate this one out by the maps to be fully consistent. So, lets
+# set it as LC and then change it for the House Liao map specificallly
+sucs_data <- sucs_data |>
+  correct_faction("Denebola", "3025", "LC")
+
+## Warren ##
+# I see no evidence that this was disputed in the 3075 map
+sucs_data <- sucs_data |>
+  correct_faction("Warren", "3075", "FS")
+
+
+# Great X should have "LA" not "LC" for 3075
+sucs_data <- sucs_data |>
+  correct_faction("Great X", "3075", "D(LA,CJF)")
 
 # Fix some cases ----------------------------------------------------------
 
@@ -1183,7 +1207,12 @@ sucs_data <- sucs_data |>
                  "MOC", "TFR", "CF", "LL", "IP", "MH")
   )
 
+
 # Handbook: House Liao
+# we can first "correct" Denebola now
+sucs_data <- sucs_data |>
+  correct_faction("Denebola", "3025", "D(LC,FWL)")
+
 bounding_box <- create_box("McAffe", "New Avalon", "Clovis", "Rockwellawan")
 sucs_data <- sucs_data |>
   update_sources(
