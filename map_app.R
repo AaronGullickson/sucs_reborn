@@ -140,7 +140,13 @@ remove_outliers <- function(group_data, max_distance) {
 
 # Load and organize data --------------------------------------------------
 
-gs4_deauth()
+options(
+  # whenever there is one account token found, use the cached token
+  gargle_oauth_email = TRUE,
+  # specify auth tokens should be stored in a hidden directory ".secrets"
+  gargle_oauth_cache = ".secrets"
+)
+
 sheet_id <- "1HD2tfdbiPbkzzmegUwLsudRt0TxYHdLkZfm-kZQaYy4"
 
 # unofficial way to determine if local but from Yihui Xie 
@@ -155,7 +161,8 @@ if(is_local) {
   # I want to read from the google sheet but its seems to die on shinyapps.io
   # maybe too big for the current plan?
   #sucs_data <- read_sheet(sheet_id, sheet = "faction data")
-  sucs_data <- read_csv("https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv")
+  #sucs_data <- read_csv("https://raw.githubusercontent.com/AaronGullickson/sucs_reborn/refs/heads/master/data/sucs_data.csv")
+  sucs_data <- read_sheet(sheet_id, sheet = "faction data")
   sucs_base_planet <- read_sheet(sheet_id, sheet = "base planet data")
   sucs_factions <- read_sheet(sheet_id, sheet = "faction codes")
   sucs_sources <- read_sheet(sheet_id, sheet = "sources")
